@@ -116,6 +116,28 @@ export function useOnboarding() {
     setErrors({})
 
     try {
+      let avatarUrl: string | null = null
+
+      // Upload avatar if one is selected
+      if (avatarFile) {
+        const formData = new FormData()
+        formData.append('file', avatarFile)
+        formData.append('type', 'avatar')
+        formData.append('userId', userId)
+
+        const uploadResponse = await fetch(`/api/${tenantSlug}/upload`, {
+          method: 'POST',
+          body: formData,
+        })
+
+        if (uploadResponse.ok) {
+          const uploadData = await uploadResponse.json()
+          avatarUrl = uploadData.url
+        } else {
+          console.error('Avatar upload failed, continuing without avatar')
+        }
+      }
+
       const response = await fetch(`/api/${tenantSlug}/onboarding/personal`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -125,7 +147,7 @@ export function useOnboarding() {
           lastName,
           preferredName: preferredName || null,
           phone: phone || null,
-          // Avatar would be handled separately with FormData for file upload
+          avatar: avatarUrl,
         }),
       })
 
@@ -144,7 +166,7 @@ export function useOnboarding() {
     } finally {
       setIsSubmitting(false)
     }
-  }, [tenantSlug, userId, firstName, lastName, preferredName, phone])
+  }, [tenantSlug, userId, firstName, lastName, preferredName, phone, avatarFile])
 
   const saveAddress = useCallback(async (): Promise<boolean> => {
     if (!userId) {

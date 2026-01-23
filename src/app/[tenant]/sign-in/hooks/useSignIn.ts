@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import type { TenantInfo } from '../../layout'
 
 export type SignInStep = 'email' | 'password'
@@ -20,12 +20,17 @@ export interface UseSignInReturn {
   // Step navigation
   step: SignInStep
   handleBack: () => void
+  handleBackToFindDomain: () => void
 
   // Form state
   email: string
   password: string
   handleEmailChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   handlePasswordChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+
+  // Password visibility
+  showPassword: boolean
+  setShowPassword: React.Dispatch<React.SetStateAction<boolean>>
 
   // Submission state
   isCheckingEmail: boolean
@@ -49,6 +54,7 @@ export interface UseSignInReturn {
 
 export function useSignIn(): UseSignInReturn {
   const params = useParams<{ tenant: string }>()
+  const router = useRouter()
   const tenantSlug = params.tenant
 
   // ============================================
@@ -64,6 +70,9 @@ export function useSignIn(): UseSignInReturn {
   // Form data
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+
+  // Password visibility
+  const [showPassword, setShowPassword] = useState(false)
 
   // Loading states
   const [isCheckingEmail, setIsCheckingEmail] = useState(false)
@@ -130,9 +139,14 @@ export function useSignIn(): UseSignInReturn {
   const handleBack = useCallback(() => {
     setStep('email')
     setPassword('')
+    setShowPassword(false)
     setError(null)
     setUserInfo(null)
   }, [])
+
+  const handleBackToFindDomain = useCallback(() => {
+    router.push('/find-domain')
+  }, [router])
 
   const handleEmailSubmit = useCallback(async (e?: React.FormEvent | React.MouseEvent) => {
     e?.preventDefault()
@@ -227,12 +241,17 @@ export function useSignIn(): UseSignInReturn {
     // Step navigation
     step,
     handleBack,
+    handleBackToFindDomain,
 
     // Form state
     email,
     password,
     handleEmailChange,
     handlePasswordChange,
+
+    // Password visibility
+    showPassword,
+    setShowPassword,
 
     // Submission state
     isCheckingEmail,

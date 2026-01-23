@@ -6,6 +6,8 @@
     cursor: pointer
 
     .avatarImage:hover
+      border-color: var(--neo-accent)
+
       .overlay
         opacity: 1
 
@@ -63,9 +65,6 @@
   transition: all var(--transition-fast)
   box-shadow: var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
   position: relative
-
-  &:hover
-    border-color: var(--neo-accent)
 
 .overlay
   position: absolute
