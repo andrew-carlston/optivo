@@ -1,0 +1,195 @@
+// ===================
+// Page Layout
+// ===================
+.page
+  min-height: 100vh
+  display: flex
+  flex-direction: column
+  background-color: var(--neo-background)
+  position: relative
+
+// ===================
+// Theme Switcher
+// ===================
+.themeSwitcherWrapper
+  position: fixed
+  top: var(--spacing-4)
+  right: var(--spacing-4)
+  z-index: 1000
+
+// ===================
+// Hero Section
+// ===================
+.hero
+  display: flex
+  align-items: center
+  justify-content: center
+  min-height: 80vh
+  padding: var(--spacing-8) var(--spacing-4)
+  text-align: center
+
+  @media (min-width: 768px)
+    padding: var(--spacing-12) var(--spacing-8)
+
+.heroContent
+  max-width: 800px
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: var(--spacing-6)
+
+.heroTitle
+  font-size: var(--font-size-3xl)
+  font-weight: 700
+  color: var(--neo-text-primary)
+  max-width: 600px
+  line-height: 1.2
+
+  @media (max-width: 768px)
+    font-size: var(--font-size-2xl)
+
+.heroSubtitle
+  font-size: var(--font-size-lg)
+  color: var(--neo-text-secondary)
+  max-width: 500px
+  line-height: 1.6
+
+.heroCtas
+  display: flex
+  gap: var(--spacing-4)
+  margin-top: var(--spacing-4)
+  flex-wrap: wrap
+  justify-content: center
+
+// ===================
+// Features Section
+// ===================
+.features
+  padding: var(--spacing-12) var(--spacing-4)
+  display: flex
+  flex-direction: column
+  align-items: center
+
+  @media (min-width: 768px)
+    padding: var(--spacing-12) var(--spacing-8)
+
+.sectionTitle
+  font-size: var(--font-size-2xl)
+  font-weight: 600
+  color: var(--neo-text-primary)
+  text-align: center
+  margin-bottom: var(--spacing-10)
+
+.featuresGrid
+  display: grid
+  grid-template-columns: 1fr
+  gap: var(--spacing-6)
+  max-width: 1200px
+  width: 100%
+
+  @media (min-width: 640px)
+    grid-template-columns: repeat(2, 1fr)
+
+  @media (min-width: 1024px)
+    grid-template-columns: repeat(4, 1fr)
+
+.featureTitle
+  font-size: var(--font-size-lg)
+  font-weight: 600
+  color: var(--neo-text-primary)
+  margin-bottom: var(--spacing-3)
+
+.featureDescription
+  font-size: var(--font-size-base)
+  color: var(--neo-text-secondary)
+  line-height: 1.6
+
+// ===================
+// Signup Section
+// ===================
+.signup
+  display: flex
+  align-items: center
+  justify-content: center
+  padding: var(--spacing-12) var(--spacing-4)
+
+  @media (min-width: 768px)
+    padding: var(--spacing-12) var(--spacing-8)
+
+.signupCard
+  max-width: 480px
+  width: 100%
+  text-align: center
+
+.signupDescription
+  font-size: var(--font-size-base)
+  color: var(--neo-text-secondary)
+  margin-bottom: var(--spacing-6)
+
+.signupForm
+  text-align: left
+
+.successMessage
+  padding: var(--spacing-6)
+  border-radius: var(--radius-md)
+  background-color: var(--neo-background)
+  box-shadow: var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+  text-align: center
+
+  p
+    color: var(--neo-success)
+    font-weight: 500
+
+// ===================
+// Footer
+// ===================
+.footer
+  margin-top: auto
+  padding: var(--spacing-10) var(--spacing-4)
+  border-top: 1px solid var(--neo-border)
+
+.footerContent
+  max-width: 1200px
+  margin: 0 auto
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: var(--spacing-6)
+  text-align: center
+
+  @media (min-width: 768px)
+    flex-direction: row
+    justify-content: space-between
+    text-align: left
+
+.footerBrand
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-1)
+
+.footerLogo
+  font-size: var(--font-size-xl)
+  font-weight: 700
+  color: var(--neo-text-primary)
+
+.footerTagline
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+
+.footerLinks
+  display: flex
+  gap: var(--spacing-6)
+  flex-wrap: wrap
+  justify-content: center
+
+  a
+    color: var(--neo-text-secondary)
+    font-size: var(--font-size-sm)
+    transition: color var(--transition-normal)
+
+    &:hover
+      color: var(--neo-accent)
+
+.copyright
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)

@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Core system table for tenant management
+/// Note: User credentials are stored in each tenant's core_directory table
+model Tenant {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  email       String   @unique  // Contact email for the tenant organization
+  logo        String?  // Company logo URL
+  subtext     String?  // Company subtext/tagline
+  industry    String?  // Company industry (technology, healthcare, finance, etc.)
+  // Company address
+  address     String?  // Street address
+  city        String?
+  state       String?
+  zip         String?
+  country     String?
+  // Database connection info - for future Neon branching support
+  dbType      String   @default("schema") // "schema" | "neon_branch"
+  dbSchema    String?  // PostgreSQL schema name (for schema-based isolation)
+  dbBranchId  String?  // Neon branch ID (for Neon branching)
+  dbUrl       String?  // Full connection URL (for Neon branching)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  billing     TenantBilling?
+
+  @@map("core_tenant")
+}
+
+/// Billing information for tenants
+model TenantBilling {
+  id              String   @id @default(cuid())
+  tenantId        String   @unique
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  plan            String   @default("free") // free, pro, enterprise
+  hipaaCompliance Boolean  @default(false)
+  // Billing address (if different from company)
+  address         String?
+  city            String?
+  state           String?
+  zip             String?
+  country         String?
+  // Payment info (for future Stripe integration)
+  stripeCustomerId    String?
+  stripeSubscriptionId String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("core_tenant_billing")
+}

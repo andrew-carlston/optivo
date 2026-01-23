@@ -1,0 +1,462 @@
+.page
+  min-height: 100vh
+  background: var(--neo-background)
+  color: var(--neo-text-primary)
+
+.themeSwitcherWrapper
+  position: fixed
+  top: var(--spacing-4)
+  right: var(--spacing-4)
+  z-index: 100
+
+.register
+  display: flex
+  align-items: center
+  justify-content: center
+  min-height: 100vh
+  padding: var(--spacing-6)
+
+  @media (max-width: 640px)
+    padding: var(--spacing-3)
+
+.registerCard
+  max-width: 640px
+  width: 100%
+  margin: 0 auto
+
+.registerTitle
+  font-size: var(--font-size-3xl)
+  font-weight: 700
+  margin-bottom: var(--spacing-2)
+  color: var(--neo-text-primary)
+  text-align: center
+
+  @media (max-width: 640px)
+    font-size: var(--font-size-xl)
+    margin-bottom: var(--spacing-1)
+
+  .accent
+    color: var(--neo-accent)
+
+.registerSubtitle
+  font-size: var(--font-size-base)
+  color: var(--neo-text-secondary)
+  margin-bottom: var(--spacing-8)
+  text-align: center
+
+  @media (max-width: 640px)
+    font-size: var(--font-size-sm)
+    margin-bottom: var(--spacing-3)
+
+// Step Indicator
+.stepIndicator
+  display: flex
+  justify-content: center
+  align-items: flex-start
+  gap: 0
+  margin-top: var(--spacing-4)
+
+  @media (max-width: 640px)
+    margin-top: var(--spacing-2)
+
+.stepWrapper
+  display: flex
+  flex-direction: column
+  align-items: center
+  position: relative
+  flex: 1
+  max-width: 120px
+
+  @media (max-width: 640px)
+    max-width: 80px
+
+.step
+  width: 40px
+  height: 40px
+  border-radius: 50%
+  display: flex
+  align-items: center
+  justify-content: center
+  font-weight: 600
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+  background: var(--neo-background)
+  border: 2px solid var(--neo-border)
+  transition: all var(--transition-normal)
+  position: relative
+  z-index: 2
+
+  @media (max-width: 640px)
+    width: 32px
+    height: 32px
+    font-size: var(--font-size-xs)
+
+  &.active
+    background: var(--neo-accent)
+    color: white
+    border-color: var(--neo-accent)
+
+  &.completed
+    background: var(--neo-success)
+    color: white
+    border-color: var(--neo-success)
+
+.stepLabel
+  margin-top: var(--spacing-2)
+  font-size: var(--font-size-xs)
+  color: var(--neo-text-secondary)
+  font-weight: 500
+  text-align: center
+
+  @media (max-width: 640px)
+    display: none
+
+  &.active
+    color: var(--neo-accent)
+    font-weight: 600
+
+  &.completed
+    color: var(--neo-success)
+
+.stepLine
+  position: absolute
+  top: 20px
+  left: calc(50% + 24px)
+  width: calc(100% - 48px)
+  height: 2px
+  background: var(--neo-border)
+  z-index: 1
+
+  @media (max-width: 640px)
+    top: 16px
+    left: calc(50% + 20px)
+    width: calc(100% - 40px)
+
+  &.completed
+    background: var(--neo-success)
+
+.stepTitle
+  font-size: var(--font-size-xl)
+  font-weight: 600
+  color: var(--neo-text-primary)
+  margin-bottom: var(--spacing-4)
+  text-align: center
+
+.formGroup
+  margin-bottom: var(--spacing-3)
+
+.label
+  display: block
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  color: var(--neo-text-primary)
+  margin-bottom: var(--spacing-2)
+
+// Company Header (Logo + Name/Tagline)
+.companyHeader
+  display: flex
+  align-items: flex-start
+  gap: var(--spacing-4)
+  margin-bottom: var(--spacing-3)
+
+  @media (max-width: 480px)
+    flex-direction: column
+    align-items: center
+
+.companyLogo
+  margin-top: var(--spacing-6)
+
+.companyDetails
+  flex: 1
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-2)
+
+// Slug under company name
+.slugUnderName
+  display: flex
+  align-items: center
+  gap: var(--spacing-2)
+  margin-top: var(--spacing-1)
+
+.slugValue
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  color: var(--neo-accent)
+
+.slugInput
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  color: var(--neo-accent)
+  background: var(--neo-background)
+  border: 1px solid var(--neo-border)
+  border-radius: var(--radius-sm)
+  padding: var(--spacing-1) var(--spacing-2)
+  outline: none
+  transition: all var(--transition-fast)
+  width: auto
+  min-width: 150px
+
+  &:focus
+    border-color: var(--neo-accent)
+
+  &.slugAvailable
+    border-color: var(--neo-success)
+
+  &.slugUnavailable
+    border-color: var(--neo-error)
+
+.slugStatus
+  font-size: var(--font-size-xs)
+  font-weight: 500
+  white-space: nowrap
+
+.editButton
+  background: none
+  border: none
+  cursor: pointer
+  color: var(--neo-text-secondary)
+  padding: var(--spacing-1)
+  display: flex
+  align-items: center
+  justify-content: center
+  border-radius: var(--radius-sm)
+  transition: all var(--transition-fast)
+
+  &:hover
+    color: var(--neo-accent)
+
+.slugError
+  margin-top: var(--spacing-1)
+  font-size: var(--font-size-xs)
+  color: var(--neo-error)
+
+// Two Column Row
+.twoColumn
+  display: grid
+  grid-template-columns: 1fr 1fr
+  gap: var(--spacing-2)
+
+  @media (max-width: 480px)
+    grid-template-columns: 1fr
+
+// Plan Cards
+.planCards
+  display: grid
+  grid-template-columns: repeat(3, minmax(0, 1fr))
+  gap: var(--spacing-3)
+  width: 100%
+
+  @media (max-width: 640px)
+    grid-template-columns: 1fr
+
+.planCard
+  display: flex
+  flex-direction: column
+  padding: var(--spacing-3)
+  background: var(--neo-background)
+  border: 2px solid var(--neo-border)
+  border-radius: var(--radius-md)
+  cursor: pointer
+  transition: all var(--transition-fast)
+  box-shadow: inset var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), inset calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+  height: 240px
+  overflow: hidden
+
+  &:hover
+    border-color: var(--neo-accent)
+
+  &.selected
+    border-color: var(--neo-accent)
+    background: var(--neo-surface-secondary)
+    box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+.planName
+  font-size: var(--font-size-lg)
+  font-weight: 600
+  color: var(--neo-text-primary)
+  margin: 0 0 var(--spacing-1) 0
+  text-align: center
+
+.planPrice
+  font-size: var(--font-size-2xl)
+  font-weight: 700
+  color: var(--neo-accent)
+  text-align: center
+  white-space: nowrap
+
+  small
+    font-size: var(--font-size-sm)
+    font-weight: 400
+    color: var(--neo-text-secondary)
+
+.planSubprice
+  font-size: var(--font-size-xs)
+  font-weight: 600
+  color: var(--neo-accent)
+  height: 18px
+  text-align: center
+  margin-bottom: var(--spacing-3)
+
+.planFeatures
+  list-style: none
+  padding: 0
+  margin: 0
+  margin-top: auto
+  flex: 1
+  display: flex
+  flex-direction: column
+  justify-content: flex-end
+
+  li
+    font-size: var(--font-size-xs)
+    color: var(--neo-text-secondary)
+    padding: 2px 0
+    display: flex
+    align-items: center
+    gap: var(--spacing-1)
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis
+
+    &::before
+      content: '✓'
+      color: var(--neo-success)
+      font-weight: bold
+      flex-shrink: 0
+
+// Checkbox Label
+.checkboxLabel
+  display: flex
+  align-items: center
+  gap: var(--spacing-2)
+  cursor: pointer
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-primary)
+
+  input[type="checkbox"]
+    accent-color: var(--neo-accent)
+    width: 16px
+    height: 16px
+
+// Toggle Row
+.toggleRow
+  display: flex
+  align-items: center
+  justify-content: space-between
+  gap: var(--spacing-4)
+
+.toggleInfo
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-1)
+
+.toggleLabel
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  color: var(--neo-text-primary)
+
+.togglePrice
+  font-size: var(--font-size-xs)
+  color: var(--neo-accent)
+  font-weight: 600
+
+// HIPAA Note
+.hipaaNote
+  margin-top: var(--spacing-2)
+  padding: var(--spacing-3)
+  background: var(--neo-surface-secondary)
+  border-radius: var(--radius-sm)
+  font-size: var(--font-size-xs)
+  color: var(--neo-text-secondary)
+  line-height: 1.5
+
+// Password Toggle
+.inputWithToggle
+  display: flex
+  align-items: flex-end
+  gap: var(--spacing-2)
+
+  > div
+    flex: 1
+
+.toggleButton
+  background: var(--neo-surface-secondary)
+  border: 1px solid var(--neo-border)
+  border-radius: var(--radius-md)
+  cursor: pointer
+  color: var(--neo-text-secondary)
+  height: 42px
+  width: 42px
+  display: flex
+  align-items: center
+  justify-content: center
+  transition: all var(--transition-fast)
+  flex-shrink: 0
+
+  &:hover
+    background: var(--neo-accent)
+    color: white
+    border-color: var(--neo-accent)
+
+// Review Section
+.review
+  background: var(--neo-surface-secondary)
+  border-radius: var(--radius-md)
+  border: 1px solid var(--neo-border)
+  overflow: hidden
+
+.reviewSection
+  padding: var(--spacing-4) var(--spacing-5)
+
+  &:not(:last-child)
+    border-bottom: 1px solid var(--neo-border)
+
+  h3
+    font-size: var(--font-size-sm)
+    font-weight: 600
+    color: var(--neo-text-secondary)
+    text-transform: uppercase
+    letter-spacing: 0.05em
+    margin-bottom: var(--spacing-3)
+
+.reviewGrid
+  display: grid
+  gap: var(--spacing-3)
+
+.reviewItem
+  display: flex
+  justify-content: space-between
+  align-items: center
+  gap: var(--spacing-4)
+
+.reviewLabel
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+
+.reviewValue
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  color: var(--neo-text-primary)
+  text-align: right
+
+// Messages
+.successMessage
+  margin-top: var(--spacing-6)
+  padding: var(--spacing-4)
+  background: var(--neo-success)
+  color: white
+  border-radius: var(--radius-md)
+  text-align: center
+  font-weight: 500
+
+.errorMessage
+  margin-top: var(--spacing-6)
+  padding: var(--spacing-4)
+  background: var(--neo-error)
+  color: white
+  border-radius: var(--radius-md)
+  text-align: center
+  font-weight: 500

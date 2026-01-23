@@ -1,0 +1,223 @@
+// Reusable SASS Mixins for Neomorphic Design System
+// Note: Uses CSS custom properties for theme support
+
+// ===================
+// Design Token Defaults (for use in mixins)
+// ===================
+$neo-distance-sm: 3px
+$neo-distance-md: 6px
+$neo-distance-lg: 10px
+
+$neo-blur-sm: 6px
+$neo-blur-md: 12px
+$neo-blur-lg: 20px
+
+$transition-fast: 150ms ease
+$transition-normal: 250ms ease
+$transition-slow: 350ms ease
+
+// Spacing scale
+$spacing-unit: 4px
+$spacing-1: $spacing-unit
+$spacing-2: $spacing-unit * 2
+$spacing-3: $spacing-unit * 3
+$spacing-4: $spacing-unit * 4
+$spacing-5: $spacing-unit * 5
+$spacing-6: $spacing-unit * 6
+$spacing-8: $spacing-unit * 8
+$spacing-10: $spacing-unit * 10
+$spacing-12: $spacing-unit * 12
+$spacing-16: $spacing-unit * 16
+$spacing-20: $spacing-unit * 20
+$spacing-24: $spacing-unit * 24
+
+// Border radius
+$radius-sm: 8px
+$radius-md: 12px
+$radius-lg: 16px
+$radius-xl: 24px
+$radius-2xl: 32px
+$radius-full: 9999px
+
+// Font families
+$font-family-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif
+$font-family-mono: var(--font-geist-mono), 'SF Mono', Monaco, 'Courier New', monospace
+
+// Typography
+$font-size-xs: 0.75rem
+$font-size-sm: 0.875rem
+$font-size-base: 1rem
+$font-size-lg: 1.125rem
+$font-size-xl: 1.25rem
+$font-size-2xl: 1.5rem
+$font-size-3xl: 1.875rem
+$font-size-4xl: 2.25rem
+$font-size-5xl: 3rem
+$font-size-6xl: 3.75rem
+
+$font-weight-normal: 400
+$font-weight-medium: 500
+$font-weight-semibold: 600
+$font-weight-bold: 700
+
+$line-height-tight: 1.25
+$line-height-normal: 1.5
+$line-height-relaxed: 1.75
+
+// Breakpoints
+$breakpoint-sm: 640px
+$breakpoint-md: 768px
+$breakpoint-lg: 1024px
+$breakpoint-xl: 1280px
+$breakpoint-2xl: 1536px
+
+// ===================
+// Neomorphic Shadow Mixins
+// ===================
+
+// Elevated appearance (default button state, cards)
+=neo-elevated($distance: $neo-distance-md, $blur: $neo-blur-md)
+  box-shadow: $distance $distance $blur var(--neo-shadow-dark), (-$distance) (-$distance) $blur var(--neo-shadow-light)
+
+// Inset appearance (pressed buttons, inputs)
+=neo-inset($distance: $neo-distance-md, $blur: $neo-blur-md)
+  box-shadow: inset $distance $distance $blur var(--neo-shadow-dark), inset (-$distance) (-$distance) $blur var(--neo-shadow-light)
+
+// Flat appearance (ghost variant base)
+=neo-flat
+  box-shadow: none
+
+// Subtle elevated (smaller shadows)
+=neo-elevated-sm
+  +neo-elevated($neo-distance-sm, $neo-blur-sm)
+
+// Deep elevated (larger shadows)
+=neo-elevated-lg
+  +neo-elevated($neo-distance-lg, $neo-blur-lg)
+
+// Subtle inset
+=neo-inset-sm
+  +neo-inset($neo-distance-sm, $neo-blur-sm)
+
+// Deep inset
+=neo-inset-lg
+  +neo-inset($neo-distance-lg, $neo-blur-lg)
+
+// ===================
+// Responsive Breakpoint Mixins
+// ===================
+
+=media-sm
+  @media (min-width: $breakpoint-sm)
+    @content
+
+=media-md
+  @media (min-width: $breakpoint-md)
+    @content
+
+=media-lg
+  @media (min-width: $breakpoint-lg)
+    @content
+
+=media-xl
+  @media (min-width: $breakpoint-xl)
+    @content
+
+=media-2xl
+  @media (min-width: $breakpoint-2xl)
+    @content
+
+// Max-width breakpoints (mobile-first fallbacks)
+=media-max-sm
+  @media (max-width: #{$breakpoint-sm - 1px})
+    @content
+
+=media-max-md
+  @media (max-width: #{$breakpoint-md - 1px})
+    @content
+
+=media-max-lg
+  @media (max-width: #{$breakpoint-lg - 1px})
+    @content
+
+// ===================
+// Theme-Aware Helpers
+// ===================
+
+// Background that follows theme
+=neo-background
+  background-color: var(--neo-background)
+
+// Text color that follows theme
+=neo-text-primary
+  color: var(--neo-text-primary)
+
+=neo-text-secondary
+  color: var(--neo-text-secondary)
+
+// ===================
+// Interactive States
+// ===================
+
+// Focus ring for accessibility
+=focus-ring
+  outline: none
+  box-shadow: 0 0 0 3px var(--neo-accent), inset $neo-distance-sm $neo-distance-sm $neo-blur-sm var(--neo-shadow-dark), inset (-$neo-distance-sm) (-$neo-distance-sm) $neo-blur-sm var(--neo-shadow-light)
+
+// Transition for neomorphic elements
+=neo-transition
+  transition: box-shadow $transition-normal, transform $transition-normal, background-color $transition-normal
+
+// ===================
+// Layout Helpers
+// ===================
+
+=flex-center
+  display: flex
+  align-items: center
+  justify-content: center
+
+=flex-column
+  display: flex
+  flex-direction: column
+
+=flex-between
+  display: flex
+  align-items: center
+  justify-content: space-between
+
+// ===================
+// Typography Helpers
+// ===================
+
+=heading-1
+  font-size: $font-size-5xl
+  font-weight: $font-weight-bold
+  line-height: $line-height-tight
+  letter-spacing: -0.02em
+
+=heading-2
+  font-size: $font-size-4xl
+  font-weight: $font-weight-semibold
+  line-height: $line-height-tight
+  letter-spacing: -0.01em
+
+=heading-3
+  font-size: $font-size-3xl
+  font-weight: $font-weight-semibold
+  line-height: $line-height-tight
+
+=heading-4
+  font-size: $font-size-2xl
+  font-weight: $font-weight-medium
+  line-height: $line-height-normal
+
+=body-text
+  font-size: $font-size-base
+  font-weight: $font-weight-normal
+  line-height: $line-height-relaxed
+
+=body-text-lg
+  font-size: $font-size-lg
+  font-weight: $font-weight-normal
+  line-height: $line-height-relaxed

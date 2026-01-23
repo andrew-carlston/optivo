@@ -1,0 +1,209 @@
+// ============================================
+// Animations
+// ============================================
+
+@keyframes fadeIn
+  from
+    opacity: 0
+    transform: translateY(-8px)
+  to
+    opacity: 1
+    transform: translateY(0)
+
+@keyframes slideOut
+  from
+    opacity: 1
+    transform: translateX(0)
+  to
+    opacity: 0
+    transform: translateX(-20px)
+
+@keyframes slideIn
+  from
+    opacity: 0
+    transform: translateX(20px)
+  to
+    opacity: 1
+    transform: translateX(0)
+
+// ============================================
+// Page Layout
+// ============================================
+
+.page
+  min-height: 100vh
+  background: var(--neo-background)
+  color: var(--neo-text-primary)
+
+.themeSwitcherWrapper
+  position: fixed
+  top: var(--spacing-4)
+  right: var(--spacing-4)
+  z-index: 100
+
+.signIn
+  display: flex
+  align-items: center
+  justify-content: center
+  min-height: 100vh
+  padding: var(--spacing-6)
+
+  @media (max-width: 640px)
+    padding: var(--spacing-3)
+
+// ============================================
+// Card Container
+// ============================================
+
+.signInCard
+  max-width: 420px
+  width: 100%
+  margin: 0 auto
+
+// ============================================
+// Header Section
+// ============================================
+
+.header
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: var(--spacing-3)
+  text-align: center
+
+.avatarWrapper
+  animation: fadeIn 0.3s ease-out
+
+.companyName
+  font-size: var(--font-size-2xl)
+  font-weight: 700
+  margin: 0
+  color: var(--neo-text-primary)
+
+  @media (max-width: 640px)
+    font-size: var(--font-size-xl)
+
+.tagline
+  font-size: var(--font-size-base)
+  color: var(--neo-text-secondary)
+  margin: 0
+
+  @media (max-width: 640px)
+    font-size: var(--font-size-sm)
+
+// ============================================
+// Form Content
+// ============================================
+
+.formContent
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-4)
+  position: relative
+  min-height: 120px
+
+// Step containers
+.stepContainer
+  animation: fadeIn 0.3s ease-out
+
+.stepContainerExiting
+  animation: slideOut 0.2s ease-in forwards
+
+.stepContainerEntering
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-4)
+  animation: slideIn 0.3s ease-out
+
+// ============================================
+// User Info Display (shown in password step)
+// ============================================
+
+.userInfoDisplay
+  display: flex
+  align-items: center
+  gap: var(--spacing-3)
+  padding: var(--spacing-3)
+  background: var(--neo-surface-secondary)
+  border-radius: var(--radius-md)
+  border: 1px solid var(--neo-border)
+
+.userDetails
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-1)
+  flex: 1
+  min-width: 0
+
+.userName
+  font-size: var(--font-size-base)
+  font-weight: 600
+  color: var(--neo-text-primary)
+  overflow: hidden
+  text-overflow: ellipsis
+  white-space: nowrap
+
+.userTitle
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+  font-weight: 400
+  overflow: hidden
+  text-overflow: ellipsis
+  white-space: nowrap
+
+.backButton
+  background: none
+  border: none
+  color: var(--neo-accent)
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  cursor: pointer
+  padding: var(--spacing-1) var(--spacing-2)
+  border-radius: var(--radius-sm)
+  transition: background-color var(--transition-fast)
+  flex-shrink: 0
+
+  &:hover
+    background: var(--neo-surface)
+
+  &:focus-visible
+    outline: 2px solid var(--neo-accent)
+    outline-offset: 2px
+
+// ============================================
+// Messages
+// ============================================
+
+.errorMessage
+  padding: var(--spacing-3)
+  background: var(--neo-error)
+  color: white
+  border-radius: var(--radius-md)
+  text-align: center
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  animation: fadeIn 0.2s ease-out
+
+// ============================================
+// Footer
+// ============================================
+
+.footer
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-3)
+
+.footerLink
+  text-align: center
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+
+  a
+    color: var(--neo-accent)
+    text-decoration: none
+    font-weight: 500
+    transition: opacity var(--transition-fast)
+
+    &:hover
+      opacity: 0.8
+      text-decoration: underline

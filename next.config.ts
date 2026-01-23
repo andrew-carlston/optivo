@@ -1,8 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
+  // Use local temp directory to avoid iCloud sync issues
+  distDir: '/tmp/optivo-next',
 };
 
 export default nextConfig;

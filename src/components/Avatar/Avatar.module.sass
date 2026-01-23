@@ -1,0 +1,103 @@
+.avatar
+  display: inline-block
+  position: relative
+
+  &.editable
+    cursor: pointer
+
+    .avatarImage:hover
+      .overlay
+        opacity: 1
+
+.sm
+  .avatarImage
+    width: 32px
+    height: 32px
+  .overlay svg
+    width: 12px
+    height: 12px
+
+.md
+  .avatarImage
+    width: 48px
+    height: 48px
+  .overlay svg
+    width: 16px
+    height: 16px
+
+.lg
+  .avatarImage
+    width: 64px
+    height: 64px
+  .overlay svg
+    width: 20px
+    height: 20px
+
+.xl
+  .avatarImage
+    width: 96px
+    height: 96px
+  .overlay svg
+    width: 24px
+    height: 24px
+
+.xxl
+  .avatarImage
+    width: 128px
+    height: 128px
+  .overlay svg
+    width: 32px
+    height: 32px
+
+.avatarImage
+  border-radius: var(--radius-lg)
+  background: var(--neo-background)
+  border: 2px solid var(--neo-border)
+  display: flex
+  align-items: center
+  justify-content: center
+  overflow: hidden
+  background-size: cover
+  background-position: center
+  background-repeat: no-repeat
+  transition: all var(--transition-fast)
+  box-shadow: var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+  position: relative
+
+  &:hover
+    border-color: var(--neo-accent)
+
+.overlay
+  position: absolute
+  inset: 0
+  background: rgba(0, 0, 0, 0.5)
+  display: flex
+  align-items: center
+  justify-content: center
+  opacity: 0
+  transition: opacity var(--transition-fast)
+  border-radius: var(--radius-lg)
+
+  svg
+    color: white
+
+.placeholder
+  color: var(--neo-text-secondary)
+  font-size: var(--font-size-xs)
+  font-weight: 500
+  text-align: center
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: var(--spacing-1)
+
+  svg
+    color: var(--neo-text-secondary)
+    opacity: 0.6
+
+.fileInput
+  position: absolute
+  opacity: 0
+  pointer-events: none
+  width: 0
+  height: 0

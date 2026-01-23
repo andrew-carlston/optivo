@@ -1,0 +1,54 @@
+.triggerButton
+  display: flex
+  align-items: center
+  justify-content: center
+  width: var(--spacing-10)
+  height: var(--spacing-10)
+  padding: 0
+  background: var(--neo-background)
+  border: 1px solid var(--neo-border)
+  border-radius: var(--radius-md)
+  cursor: pointer
+  color: var(--neo-text-primary)
+  box-shadow: var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+  transition: all var(--transition-fast)
+
+  svg
+    width: var(--spacing-5)
+    height: var(--spacing-5)
+
+  span
+    font-size: var(--font-size-lg)
+
+  &:hover
+    color: var(--neo-accent)
+
+  &:active
+    box-shadow: inset var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), inset calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+
+.icon
+  display: flex
+  align-items: center
+  justify-content: center
+  width: var(--spacing-5)
+  height: var(--spacing-5)
+  font-size: var(--font-size-lg)
+
+.colorDot
+  width: 14px
+  height: 14px
+  border-radius: 50%
+  flex-shrink: 0
+  border: 2px solid var(--neo-border)
+
+.corporate
+  background: linear-gradient(135deg, #3b82f6 50%, #1e40af 50%)
+
+.forest
+  background: linear-gradient(135deg, #7aa383 50%, #1e2a22 50%)
+
+.dracula
+  background: linear-gradient(135deg, #a855f7 50%, #7e22ce 50%)
+
+.forecast
+  background: linear-gradient(135deg, #5ba3e0 50%, #1a2533 50%)

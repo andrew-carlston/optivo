@@ -1,0 +1,84 @@
+.preview
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: var(--spacing-4)
+  padding: var(--spacing-5)
+  background: var(--neo-surface-secondary)
+  border: 2px solid var(--neo-success)
+  border-radius: var(--radius-md)
+  position: relative
+  animation: fadeIn 0.3s ease-out
+
+@keyframes fadeIn
+  from
+    opacity: 0
+    transform: translateY(-8px)
+  to
+    opacity: 1
+    transform: translateY(0)
+
+.successBadge
+  position: absolute
+  top: calc(var(--spacing-3) * -1)
+  right: var(--spacing-3)
+  width: 36px
+  height: 36px
+  background: var(--neo-success)
+  border-radius: 50%
+  display: flex
+  align-items: center
+  justify-content: center
+  color: white
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15)
+
+.content
+  display: flex
+  align-items: center
+  gap: var(--spacing-4)
+  width: 100%
+
+  @media (max-width: 480px)
+    flex-direction: column
+    text-align: center
+
+.logoWrapper
+  flex-shrink: 0
+
+.info
+  flex: 1
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-1)
+
+  @media (max-width: 480px)
+    align-items: center
+
+.name
+  font-size: var(--font-size-xl)
+  font-weight: 600
+  color: var(--neo-text-primary)
+  margin: 0
+
+.tagline
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+  margin: 0
+
+.slug
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  color: var(--neo-accent)
+  background: var(--neo-background)
+  padding: var(--spacing-1) var(--spacing-2)
+  border-radius: var(--radius-sm)
+  margin-top: var(--spacing-1)
+  display: inline-block
+
+.foundMessage
+  font-size: var(--font-size-sm)
+  color: var(--neo-success)
+  font-weight: 500
+  margin: 0
+  text-align: center

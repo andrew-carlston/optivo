@@ -1,0 +1,100 @@
+.page
+  min-height: 100vh
+  background: var(--neo-background)
+  color: var(--neo-text-primary)
+
+.themeSwitcherWrapper
+  position: fixed
+  top: var(--spacing-4)
+  right: var(--spacing-4)
+  z-index: 100
+
+.findDomain
+  display: flex
+  align-items: center
+  justify-content: center
+  min-height: 100vh
+  padding: var(--spacing-6)
+
+  @media (max-width: 640px)
+    padding: var(--spacing-3)
+
+.findDomainCard
+  max-width: 480px
+  width: 100%
+  margin: 0 auto
+
+.findDomainTitle
+  font-size: var(--font-size-3xl)
+  font-weight: 700
+  margin-bottom: var(--spacing-2)
+  color: var(--neo-text-primary)
+  text-align: center
+
+  @media (max-width: 640px)
+    font-size: var(--font-size-xl)
+    margin-bottom: var(--spacing-1)
+
+  .accent
+    color: var(--neo-accent)
+
+.findDomainSubtitle
+  font-size: var(--font-size-base)
+  color: var(--neo-text-secondary)
+  margin-bottom: var(--spacing-2)
+  text-align: center
+
+  @media (max-width: 640px)
+    font-size: var(--font-size-sm)
+    margin-bottom: var(--spacing-1)
+
+// Form content area
+.formContent
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-4)
+
+// Error message
+.errorMessage
+  padding: var(--spacing-3)
+  background: var(--neo-error)
+  color: white
+  border-radius: var(--radius-md)
+  text-align: center
+  font-size: var(--font-size-sm)
+  font-weight: 500
+
+// Not found message
+.notFoundMessage
+  padding: var(--spacing-4)
+  background: var(--neo-surface-secondary)
+  border: 1px solid var(--neo-border)
+  border-radius: var(--radius-md)
+  text-align: center
+
+.notFoundTitle
+  font-size: var(--font-size-base)
+  font-weight: 600
+  color: var(--neo-text-primary)
+  margin: 0 0 var(--spacing-2) 0
+
+.notFoundText
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+  margin: 0
+
+// Register link
+.registerLink
+  text-align: center
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+
+  a
+    color: var(--neo-accent)
+    text-decoration: none
+    font-weight: 500
+    transition: opacity var(--transition-fast)
+
+    &:hover
+      opacity: 0.8
+      text-decoration: underline

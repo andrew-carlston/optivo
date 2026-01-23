@@ -1,0 +1,5 @@
+export { default as StepIndicator } from './StepIndicator'
+export { default as WelcomeStep } from './WelcomeStep'
+export { default as PersonalStep } from './PersonalStep'
+export { default as AddressStep } from './AddressStep'
+export { default as CompleteStep } from './CompleteStep'

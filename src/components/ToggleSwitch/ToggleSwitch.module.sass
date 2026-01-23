@@ -1,0 +1,46 @@
+.toggleSwitch
+  display: inline-flex
+  background: var(--neo-background)
+  border: 1px solid var(--neo-border)
+  border-radius: var(--radius-md)
+  padding: var(--spacing-1)
+  box-shadow: inset var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), inset calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+
+.option
+  display: flex
+  align-items: center
+  justify-content: center
+  background: transparent
+  border: none
+  border-radius: var(--radius-sm)
+  color: var(--neo-text-secondary)
+  cursor: pointer
+  transition: all var(--transition-fast)
+
+  &:hover
+    color: var(--neo-text-primary)
+
+.active
+  background: var(--neo-background)
+  color: var(--neo-text-primary)
+  border: 1px solid var(--neo-border)
+  box-shadow: var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+
+// Size variants
+.sm
+  .option
+    padding: var(--spacing-1) var(--spacing-2)
+    font-size: var(--font-size-xs)
+
+    svg
+      width: calc(var(--spacing-3) + var(--spacing-1) / 2)
+      height: calc(var(--spacing-3) + var(--spacing-1) / 2)
+
+.md
+  .option
+    padding: var(--spacing-2) var(--spacing-3)
+    font-size: var(--font-size-sm)
+
+    svg
+      width: calc(var(--spacing-4) + var(--spacing-1) / 2)
+      height: calc(var(--spacing-4) + var(--spacing-1) / 2)

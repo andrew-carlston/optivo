@@ -1,0 +1,403 @@
+// Creating Progress Page Styles
+// Neomorphic design with animated progress steps
+@use 'sass:math'
+
+.page
+  min-height: 100vh
+  background: var(--neo-background)
+  color: var(--neo-text-primary)
+
+.themeSwitcherWrapper
+  position: fixed
+  top: var(--spacing-4)
+  right: var(--spacing-4)
+  z-index: 100
+
+.creating
+  display: flex
+  align-items: center
+  justify-content: center
+  min-height: 100vh
+  padding: var(--spacing-6)
+
+  @media (max-width: 640px)
+    padding: var(--spacing-3)
+
+.creatingCard
+  max-width: 480px
+  width: 100%
+  margin: 0 auto
+
+.header
+  text-align: center
+  margin-bottom: var(--spacing-6)
+
+.title
+  font-size: var(--font-size-2xl)
+  font-weight: 700
+  margin-bottom: var(--spacing-2)
+  color: var(--neo-text-primary)
+
+  @media (max-width: 640px)
+    font-size: var(--font-size-xl)
+
+  .accent
+    color: var(--neo-accent)
+
+.subtitle
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+
+// Progress Steps Container
+.stepsContainer
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-3)
+  padding: var(--spacing-4) 0
+
+// Individual Step
+.step
+  display: flex
+  align-items: center
+  gap: var(--spacing-3)
+  padding: var(--spacing-3) var(--spacing-4)
+  background: var(--neo-surface-secondary)
+  border-radius: var(--radius-md)
+  transition: all var(--transition-normal)
+  opacity: 0.5
+  transform: translateX(-8px)
+
+  &.pending
+    opacity: 0.4
+    transform: translateX(-8px)
+
+  &.inProgress
+    opacity: 1
+    transform: translateX(0)
+    background: var(--neo-background)
+    box-shadow: var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+
+  &.completed
+    opacity: 1
+    transform: translateX(0)
+
+// Step Icon Container
+.stepIcon
+  width: 32px
+  height: 32px
+  border-radius: 50%
+  display: flex
+  align-items: center
+  justify-content: center
+  flex-shrink: 0
+  background: var(--neo-surface-secondary)
+  transition: all var(--transition-normal)
+
+  .inProgress &
+    background: var(--neo-accent)
+
+  .completed &
+    background: var(--neo-success)
+
+// Spinner Animation
+.spinner
+  width: 18px
+  height: 18px
+  border: 2px solid rgba(255, 255, 255, 0.3)
+  border-top-color: white
+  border-radius: 50%
+  animation: spin 0.8s linear infinite
+
+@keyframes spin
+  to
+    transform: rotate(360deg)
+
+// Checkmark Animation
+.checkmark
+  width: 18px
+  height: 18px
+  position: relative
+
+  &::after
+    content: ''
+    position: absolute
+    left: 6px
+    top: 2px
+    width: 5px
+    height: 10px
+    border: solid white
+    border-width: 0 2px 2px 0
+    transform: rotate(45deg) scale(0)
+    animation: checkmarkPop 0.3s ease forwards
+
+@keyframes checkmarkPop
+  0%
+    transform: rotate(45deg) scale(0)
+  50%
+    transform: rotate(45deg) scale(1.2)
+  100%
+    transform: rotate(45deg) scale(1)
+
+// Pending Dot
+.pendingDot
+  width: 8px
+  height: 8px
+  border-radius: 50%
+  background: var(--neo-text-secondary)
+  opacity: 0.4
+
+// Step Label
+.stepLabel
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  color: var(--neo-text-secondary)
+  transition: color var(--transition-normal)
+
+  .inProgress &
+    color: var(--neo-text-primary)
+
+  .completed &
+    color: var(--neo-text-primary)
+
+// Success Container
+.successContainer
+  display: flex
+  flex-direction: column
+  align-items: center
+  justify-content: center
+  padding: var(--spacing-8) var(--spacing-4)
+  animation: fadeIn 0.5s ease
+
+@keyframes fadeIn
+  from
+    opacity: 0
+    transform: translateY(10px)
+  to
+    opacity: 1
+    transform: translateY(0)
+
+// Success Burst Animation
+.successBurst
+  position: relative
+  width: 120px
+  height: 120px
+  margin-bottom: var(--spacing-6)
+
+.burstCircle
+  position: absolute
+  top: 50%
+  left: 50%
+  width: 80px
+  height: 80px
+  margin-left: -40px
+  margin-top: -40px
+  background: var(--neo-success)
+  border-radius: 50%
+  display: flex
+  align-items: center
+  justify-content: center
+  animation: burstPop 0.6s ease forwards
+  z-index: 2
+
+@keyframes burstPop
+  0%
+    transform: scale(0)
+  50%
+    transform: scale(1.1)
+  100%
+    transform: scale(1)
+
+.burstCheckmark
+  width: 40px
+  height: 40px
+  position: relative
+
+  &::after
+    content: ''
+    position: absolute
+    left: 12px
+    top: 4px
+    width: 12px
+    height: 24px
+    border: solid white
+    border-width: 0 4px 4px 0
+    transform: rotate(45deg) scale(0)
+    animation: bigCheckmarkPop 0.4s ease 0.3s forwards
+
+@keyframes bigCheckmarkPop
+  0%
+    transform: rotate(45deg) scale(0)
+  60%
+    transform: rotate(45deg) scale(1.2)
+  100%
+    transform: rotate(45deg) scale(1)
+
+// Confetti Particles
+.confetti
+  position: absolute
+  top: 50%
+  left: 50%
+  width: 10px
+  height: 10px
+  border-radius: 2px
+  animation: confettiPop 0.8s ease forwards
+
+  @for $i from 1 through 12
+    &:nth-child(#{$i})
+      $angle: ($i - 1) * 30deg
+      $distance: 50px + math.random(20)
+      $color-index: $i % 4
+
+      @if $color-index == 0
+        background: var(--neo-accent)
+      @else if $color-index == 1
+        background: var(--neo-success)
+      @else if $color-index == 2
+        background: #f59e0b
+      @else
+        background: #ec4899
+
+      animation-delay: #{$i * 0.02}s
+      --confetti-x: #{math.cos($angle) * $distance}
+      --confetti-y: #{math.sin($angle) * $distance}
+      --confetti-rotate: #{math.random(360)}deg
+
+@keyframes confettiPop
+  0%
+    transform: translate(-50%, -50%) scale(0)
+    opacity: 1
+  30%
+    transform: translate(calc(-50% + var(--confetti-x) * 0.5), calc(-50% + var(--confetti-y) * 0.5)) scale(1) rotate(0deg)
+    opacity: 1
+  100%
+    transform: translate(calc(-50% + var(--confetti-x)), calc(-50% + var(--confetti-y) + 20px)) scale(0.5) rotate(var(--confetti-rotate))
+    opacity: 0
+
+// Fallback confetti with explicit positions
+.confetti1
+  --confetti-x: 50px
+  --confetti-y: 0px
+  --confetti-rotate: 45deg
+  background: var(--neo-accent)
+
+.confetti2
+  --confetti-x: 43px
+  --confetti-y: 25px
+  --confetti-rotate: 90deg
+  background: var(--neo-success)
+
+.confetti3
+  --confetti-x: 25px
+  --confetti-y: 43px
+  --confetti-rotate: 135deg
+  background: #f59e0b
+
+.confetti4
+  --confetti-x: 0px
+  --confetti-y: 50px
+  --confetti-rotate: 180deg
+  background: #ec4899
+
+.confetti5
+  --confetti-x: -25px
+  --confetti-y: 43px
+  --confetti-rotate: 225deg
+  background: var(--neo-accent)
+
+.confetti6
+  --confetti-x: -43px
+  --confetti-y: 25px
+  --confetti-rotate: 270deg
+  background: var(--neo-success)
+
+.confetti7
+  --confetti-x: -50px
+  --confetti-y: 0px
+  --confetti-rotate: 315deg
+  background: #f59e0b
+
+.confetti8
+  --confetti-x: -43px
+  --confetti-y: -25px
+  --confetti-rotate: 360deg
+  background: #ec4899
+
+.confetti9
+  --confetti-x: -25px
+  --confetti-y: -43px
+  --confetti-rotate: 405deg
+  background: var(--neo-accent)
+
+.confetti10
+  --confetti-x: 0px
+  --confetti-y: -50px
+  --confetti-rotate: 450deg
+  background: var(--neo-success)
+
+.confetti11
+  --confetti-x: 25px
+  --confetti-y: -43px
+  --confetti-rotate: 495deg
+  background: #f59e0b
+
+.confetti12
+  --confetti-x: 43px
+  --confetti-y: -25px
+  --confetti-rotate: 540deg
+  background: #ec4899
+
+// Success Text
+.successTitle
+  font-size: var(--font-size-2xl)
+  font-weight: 700
+  color: var(--neo-text-primary)
+  margin-bottom: var(--spacing-2)
+  text-align: center
+
+  @media (max-width: 640px)
+    font-size: var(--font-size-xl)
+
+.successSubtitle
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+  text-align: center
+
+// Redirecting indicator
+.redirecting
+  display: flex
+  align-items: center
+  gap: var(--spacing-2)
+  margin-top: var(--spacing-4)
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+
+.redirectingSpinner
+  width: 14px
+  height: 14px
+  border: 2px solid var(--neo-border)
+  border-top-color: var(--neo-accent)
+  border-radius: 50%
+  animation: spin 0.8s linear infinite
+
+// Progress bar at top
+.progressBar
+  position: absolute
+  top: 0
+  left: 0
+  right: 0
+  height: 3px
+  background: var(--neo-border)
+  overflow: hidden
+  border-radius: var(--radius-md) var(--radius-md) 0 0
+
+.progressFill
+  height: 100%
+  background: var(--neo-accent)
+  transition: width 0.3s ease
+
+  &.complete
+    background: var(--neo-success)
+
+// Card wrapper with progress bar
+.cardWrapper
+  position: relative

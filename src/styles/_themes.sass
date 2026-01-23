@@ -1,0 +1,34 @@
+// Theme CSS Custom Properties
+
+@use 'variables' as *
+
+// ===================
+// Light Theme (Default)
+// ===================
+:root
+  --neo-background: #{$light-background}
+  --neo-text-primary: #{$light-text-primary}
+  --neo-text-secondary: #{$light-text-secondary}
+  --neo-shadow-light: #{$light-shadow-light}
+  --neo-shadow-dark: #{$light-shadow-dark}
+  --neo-accent: #{$accent-primary}
+  --neo-accent-light: #{$accent-primary-light}
+  --neo-error: #{$accent-error}
+  --neo-success: #{$accent-success}
+  --neo-border: rgba(0, 0, 0, 0.06)
+
+// ===================
+// Dark Theme
+// ===================
+@media (prefers-color-scheme: dark)
+  :root
+    --neo-background: #{$dark-background}
+    --neo-text-primary: #{$dark-text-primary}
+    --neo-text-secondary: #{$dark-text-secondary}
+    --neo-shadow-light: #{$dark-shadow-light}
+    --neo-shadow-dark: #{$dark-shadow-dark}
+    --neo-accent: #{$accent-primary-light}
+    --neo-accent-light: #{$accent-primary}
+    --neo-error: #f87171
+    --neo-success: #4ade80
+    --neo-border: rgba(255, 255, 255, 0.06)

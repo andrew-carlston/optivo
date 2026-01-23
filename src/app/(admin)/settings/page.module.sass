@@ -1,0 +1,140 @@
+.page
+  min-height: 100vh
+  background: var(--neo-background)
+  color: var(--neo-text-primary)
+  padding: var(--spacing-6)
+
+.container
+  max-width: 900px
+  margin: 0 auto
+
+.title
+  font-size: var(--font-size-2xl)
+  font-weight: 700
+  margin-bottom: var(--spacing-2)
+
+.subtitle
+  font-size: var(--font-size-base)
+  color: var(--neo-text-secondary)
+  margin-bottom: var(--spacing-6)
+
+.tabs
+  display: flex
+  gap: var(--spacing-2)
+  margin-bottom: var(--spacing-4)
+  border-bottom: 1px solid var(--neo-border)
+  padding-bottom: var(--spacing-2)
+
+.tab
+  padding: var(--spacing-2) var(--spacing-4)
+  background: none
+  border: none
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  color: var(--neo-text-secondary)
+  cursor: pointer
+  border-radius: var(--radius-md)
+  transition: all var(--transition-fast)
+
+  &:hover
+    color: var(--neo-text-primary)
+    background: var(--neo-surface-secondary)
+
+  &.active
+    color: var(--neo-accent)
+    background: var(--neo-surface-secondary)
+
+.content
+  padding: var(--spacing-5)
+
+.sectionTitle
+  font-size: var(--font-size-lg)
+  font-weight: 600
+  margin-bottom: var(--spacing-4)
+
+.addForm
+  display: grid
+  grid-template-columns: 1fr 2fr auto
+  gap: var(--spacing-3)
+  align-items: flex-end
+  margin-bottom: var(--spacing-5)
+  padding-bottom: var(--spacing-4)
+  border-bottom: 1px solid var(--neo-border)
+
+  @media (max-width: 640px)
+    grid-template-columns: 1fr
+
+.countryFilter
+  margin-bottom: var(--spacing-4)
+
+.label
+  display: block
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  color: var(--neo-text-primary)
+  margin-bottom: var(--spacing-2)
+
+.select
+  width: 100%
+  max-width: 300px
+  padding: var(--spacing-2) var(--spacing-3)
+  background: var(--neo-background)
+  border: 1px solid var(--neo-border)
+  border-radius: var(--radius-md)
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-primary)
+  cursor: pointer
+
+  &:focus
+    outline: none
+    border-color: var(--neo-accent)
+
+.list
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-2)
+
+.listItem
+  display: flex
+  align-items: center
+  gap: var(--spacing-3)
+  padding: var(--spacing-3)
+  background: var(--neo-surface-secondary)
+  border-radius: var(--radius-md)
+  border: 1px solid var(--neo-border)
+
+.code
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace
+  font-size: var(--font-size-sm)
+  font-weight: 600
+  color: var(--neo-accent)
+  min-width: 80px
+
+.name
+  flex: 1
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-primary)
+
+.deleteBtn
+  background: none
+  border: none
+  color: var(--neo-text-secondary)
+  cursor: pointer
+  padding: var(--spacing-1)
+  border-radius: var(--radius-sm)
+  transition: all var(--transition-fast)
+
+  &:hover
+    color: var(--neo-error)
+    background: var(--neo-surface-secondary)
+
+.note
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+  font-style: italic
+  margin-top: var(--spacing-4)
+
+.saveSection
+  margin-top: var(--spacing-6)
+  display: flex
+  justify-content: flex-end

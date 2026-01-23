@@ -1,0 +1,78 @@
+.inputWrapper
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-2)
+  width: 100%
+
+.label
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  color: var(--neo-text-primary)
+
+.inputContainer
+  display: flex
+  align-items: stretch
+  width: 100%
+  border-radius: var(--radius-md)
+  overflow: hidden
+  border: 1px solid var(--neo-border)
+  box-shadow: inset var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), inset calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+
+  &:focus-within
+    box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+.prefix
+  display: flex
+  align-items: center
+  padding: var(--spacing-3) var(--spacing-3)
+  font-size: var(--font-size-base)
+  font-family: var(--font-mono)
+  color: var(--neo-text-secondary)
+  background-color: var(--neo-surface)
+  border-right: 1px solid var(--neo-border)
+  white-space: nowrap
+  user-select: none
+
+.input
+  width: 100%
+  padding: var(--spacing-3) var(--spacing-4)
+  font-size: var(--font-size-base)
+  color: var(--neo-text-primary)
+  background-color: var(--neo-background)
+  border: 1px solid var(--neo-border)
+  border-radius: var(--radius-md)
+  box-shadow: inset var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), inset calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+  transition: all var(--transition-fast)
+
+  &::placeholder
+    color: var(--neo-text-secondary)
+
+  &:focus
+    outline: none
+    box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+  &:disabled
+    opacity: 0.6
+    cursor: not-allowed
+
+.inputWithPrefix
+  border: none
+  border-radius: 0
+  box-shadow: none
+
+  &:focus
+    box-shadow: none
+
+.inputError
+  box-shadow: inset var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), inset calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light), 0 0 0 1px var(--neo-error)
+
+  &:focus
+    box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light), 0 0 0 var(--shadow-distance-sm) var(--neo-error)
+
+.hint
+  font-size: var(--font-size-xs)
+  color: var(--neo-text-secondary)
+
+.error
+  font-size: var(--font-size-xs)
+  color: var(--neo-error)

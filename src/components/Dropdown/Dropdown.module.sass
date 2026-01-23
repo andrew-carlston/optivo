@@ -1,0 +1,150 @@
+.dropdown
+  position: relative
+  width: 100%
+
+  &.disabled
+    opacity: 0.5
+    pointer-events: none
+
+.trigger
+  width: 100%
+  padding: var(--spacing-3) var(--spacing-4)
+  background: var(--neo-background)
+  border: 1px solid var(--neo-border)
+  border-radius: var(--radius-md)
+  color: var(--neo-text-primary)
+  font-size: var(--font-size-base)
+  text-align: left
+  cursor: pointer
+  display: flex
+  align-items: center
+  justify-content: space-between
+  transition: all var(--transition-fast)
+  box-shadow: var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+
+  &:hover
+    box-shadow: var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+  &:focus
+    outline: none
+    border-color: var(--neo-accent)
+
+.open
+  .trigger
+    box-shadow: inset var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), inset calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+
+.selected
+  color: var(--neo-text-primary)
+
+.placeholder
+  color: var(--neo-text-secondary)
+
+.arrow
+  color: var(--neo-text-secondary)
+  transition: transform var(--transition-fast)
+  flex-shrink: 0
+
+  &.rotated
+    transform: rotate(180deg)
+
+.menu
+  background: var(--neo-background)
+  border: 1px solid var(--neo-border)
+  border-radius: var(--radius-md)
+  box-shadow: var(--shadow-distance-lg) var(--shadow-distance-lg) var(--shadow-blur-lg) var(--neo-shadow-dark), calc(var(--shadow-distance-lg) * -1) calc(var(--shadow-distance-lg) * -1) var(--shadow-blur-lg) var(--neo-shadow-light)
+  z-index: 9999
+  overflow: hidden
+
+  &.menuUpward
+    // Same shadow for upward menus
+
+// Search input wrapper
+.searchWrapper
+  display: flex
+  align-items: center
+  gap: var(--spacing-2)
+  padding: var(--spacing-2) var(--spacing-3)
+  border-bottom: 1px solid var(--neo-border)
+  background: var(--neo-surface-secondary)
+
+.searchIcon
+  color: var(--neo-text-secondary)
+  flex-shrink: 0
+
+.searchInput
+  flex: 1
+  background: transparent
+  border: none
+  outline: none
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-primary)
+
+  &::placeholder
+    color: var(--neo-text-secondary)
+
+// Options container
+.options
+  max-height: 200px
+  overflow-y: auto
+  padding: var(--spacing-2)
+
+  // Webkit scrollbar (Chrome, Safari, Edge)
+  &::-webkit-scrollbar
+    width: 8px
+
+  &::-webkit-scrollbar-track
+    background: var(--neo-background)
+    border-radius: var(--radius-sm)
+
+  &::-webkit-scrollbar-thumb
+    background: var(--neo-border)
+    border-radius: var(--radius-sm)
+
+    &:hover
+      background: var(--neo-text-secondary)
+
+  // Firefox
+  scrollbar-width: thin
+  scrollbar-color: var(--neo-border) var(--neo-background)
+
+.option
+  width: 100%
+  padding: var(--spacing-2) var(--spacing-3)
+  background: transparent
+  border: none
+  border-radius: var(--radius-sm)
+  color: var(--neo-text-primary)
+  font-size: var(--font-size-sm)
+  text-align: left
+  cursor: pointer
+  transition: all var(--transition-fast)
+
+  &:hover
+    background: var(--neo-surface-secondary)
+    box-shadow: inset var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), inset calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+
+  &:active
+    box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+.optionSelected
+  background: var(--neo-surface-secondary)
+  color: var(--neo-accent)
+  font-weight: 500
+
+.optionHighlighted
+  background: var(--neo-surface-secondary)
+  box-shadow: inset var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), inset calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+
+.optionDisabled
+  color: var(--neo-text-secondary)
+  cursor: not-allowed
+  opacity: 0.5
+
+  &:hover
+    background: transparent
+
+.noResults
+  padding: var(--spacing-3)
+  text-align: center
+  color: var(--neo-text-secondary)
+  font-size: var(--font-size-sm)

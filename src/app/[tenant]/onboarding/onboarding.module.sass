@@ -1,0 +1,303 @@
+.page
+  min-height: 100vh
+  background: var(--neo-background)
+  color: var(--neo-text-primary)
+
+.themeSwitcherWrapper
+  position: fixed
+  top: var(--spacing-4)
+  right: var(--spacing-4)
+  z-index: 100
+
+.onboarding
+  display: flex
+  align-items: center
+  justify-content: center
+  min-height: 100vh
+  padding: var(--spacing-6)
+
+  @media (max-width: 640px)
+    padding: var(--spacing-3)
+
+.onboardingCard
+  max-width: 640px
+  width: 100%
+  margin: 0 auto
+
+.onboardingTitle
+  font-size: var(--font-size-3xl)
+  font-weight: 700
+  margin-bottom: var(--spacing-2)
+  color: var(--neo-text-primary)
+  text-align: center
+
+  @media (max-width: 640px)
+    font-size: var(--font-size-xl)
+    margin-bottom: var(--spacing-1)
+
+  .accent
+    color: var(--neo-accent)
+
+.onboardingSubtitle
+  font-size: var(--font-size-base)
+  color: var(--neo-text-secondary)
+  margin-bottom: var(--spacing-8)
+  text-align: center
+
+  @media (max-width: 640px)
+    font-size: var(--font-size-sm)
+    margin-bottom: var(--spacing-3)
+
+// Step Indicator
+.stepIndicator
+  display: flex
+  justify-content: center
+  align-items: flex-start
+  gap: 0
+  margin-top: var(--spacing-4)
+
+  @media (max-width: 640px)
+    margin-top: var(--spacing-2)
+
+.stepWrapper
+  display: flex
+  flex-direction: column
+  align-items: center
+  position: relative
+  flex: 1
+  max-width: 120px
+
+  @media (max-width: 640px)
+    max-width: 80px
+
+.step
+  width: 40px
+  height: 40px
+  border-radius: 50%
+  display: flex
+  align-items: center
+  justify-content: center
+  font-weight: 600
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+  background: var(--neo-background)
+  border: 2px solid var(--neo-border)
+  transition: all var(--transition-normal)
+  position: relative
+  z-index: 2
+
+  @media (max-width: 640px)
+    width: 32px
+    height: 32px
+    font-size: var(--font-size-xs)
+
+  &.active
+    background: var(--neo-accent)
+    color: white
+    border-color: var(--neo-accent)
+
+  &.completed
+    background: var(--neo-success)
+    color: white
+    border-color: var(--neo-success)
+
+.stepLabel
+  margin-top: var(--spacing-2)
+  font-size: var(--font-size-xs)
+  color: var(--neo-text-secondary)
+  font-weight: 500
+  text-align: center
+
+  @media (max-width: 640px)
+    display: none
+
+  &.active
+    color: var(--neo-accent)
+    font-weight: 600
+
+  &.completed
+    color: var(--neo-success)
+
+.stepLine
+  position: absolute
+  top: 20px
+  left: calc(50% + 24px)
+  width: calc(100% - 48px)
+  height: 2px
+  background: var(--neo-border)
+  z-index: 1
+
+  @media (max-width: 640px)
+    top: 16px
+    left: calc(50% + 20px)
+    width: calc(100% - 40px)
+
+  &.completed
+    background: var(--neo-success)
+
+// Step Content
+.stepTitle
+  font-size: var(--font-size-xl)
+  font-weight: 600
+  color: var(--neo-text-primary)
+  margin-bottom: var(--spacing-4)
+  text-align: center
+
+.formGroup
+  margin-bottom: var(--spacing-3)
+
+.label
+  display: block
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  color: var(--neo-text-primary)
+  margin-bottom: var(--spacing-2)
+
+.fieldError
+  display: block
+  font-size: var(--font-size-xs)
+  color: var(--neo-error)
+  margin-top: var(--spacing-1)
+
+// Two Column Layout
+.twoColumn
+  display: grid
+  grid-template-columns: 1fr 1fr
+  gap: var(--spacing-2)
+
+  @media (max-width: 480px)
+    grid-template-columns: 1fr
+
+// Welcome Step
+.welcomeStep
+  text-align: center
+
+.welcomeText
+  font-size: var(--font-size-base)
+  color: var(--neo-text-secondary)
+  line-height: 1.6
+  margin-bottom: var(--spacing-6)
+
+.featureList
+  background: var(--neo-surface-secondary)
+  border-radius: var(--radius-md)
+  padding: var(--spacing-4)
+  margin-bottom: var(--spacing-4)
+  text-align: left
+
+.featureTitle
+  font-size: var(--font-size-sm)
+  font-weight: 600
+  color: var(--neo-text-primary)
+  margin-bottom: var(--spacing-3)
+
+.features
+  list-style: none
+  padding: 0
+  margin: 0
+
+.featureItem
+  display: flex
+  align-items: center
+  gap: var(--spacing-2)
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+  padding: var(--spacing-2) 0
+
+  .checkIcon
+    color: var(--neo-success)
+    flex-shrink: 0
+
+.privacyNote
+  font-size: var(--font-size-xs)
+  color: var(--neo-text-secondary)
+  font-style: italic
+
+// Personal Step
+.personalHeader
+  display: flex
+  align-items: flex-start
+  gap: var(--spacing-4)
+  margin-bottom: var(--spacing-4)
+
+  @media (max-width: 480px)
+    flex-direction: column
+    align-items: center
+
+.avatar
+  margin-top: var(--spacing-6)
+
+.personalDetails
+  flex: 1
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-2)
+
+  @media (max-width: 480px)
+    width: 100%
+
+// Complete Step
+.completeStep
+  text-align: center
+
+.successIcon
+  color: var(--neo-success)
+  margin-bottom: var(--spacing-4)
+
+  svg
+    display: inline-block
+
+.completeText
+  font-size: var(--font-size-base)
+  color: var(--neo-text-secondary)
+  line-height: 1.6
+  margin-bottom: var(--spacing-6)
+
+.nextSteps
+  background: var(--neo-surface-secondary)
+  border-radius: var(--radius-md)
+  padding: var(--spacing-4)
+  text-align: left
+
+.nextStepsTitle
+  font-size: var(--font-size-sm)
+  font-weight: 600
+  color: var(--neo-text-primary)
+  margin-bottom: var(--spacing-3)
+
+.nextStepsList
+  list-style: none
+  padding: 0
+  margin: 0
+
+  li
+    font-size: var(--font-size-sm)
+    color: var(--neo-text-secondary)
+    padding: var(--spacing-2) 0
+    display: flex
+    align-items: center
+    gap: var(--spacing-2)
+
+    &::before
+      content: '\2192'
+      color: var(--neo-accent)
+      font-weight: bold
+
+// Messages
+.successMessage
+  margin-top: var(--spacing-6)
+  padding: var(--spacing-4)
+  background: var(--neo-success)
+  color: white
+  border-radius: var(--radius-md)
+  text-align: center
+  font-weight: 500
+
+.errorMessage
+  margin-top: var(--spacing-6)
+  padding: var(--spacing-4)
+  background: var(--neo-error)
+  color: white
+  border-radius: var(--radius-md)
+  text-align: center
+  font-weight: 500
