@@ -1,0 +1,135 @@
+// Modal Component Styles
+// Neomorphic design system
+
+.overlay
+  position: fixed
+  inset: 0
+  background: rgba(0, 0, 0, 0.5)
+  display: flex
+  align-items: center
+  justify-content: center
+  padding: var(--spacing-4)
+  z-index: 1000
+  animation: fadeIn var(--transition-fast) ease-out
+
+.modal
+  position: relative
+  z-index: 1001
+  background: var(--neo-background)
+  border-radius: var(--radius-lg)
+  box-shadow: var(--shadow-distance-lg) var(--shadow-distance-lg) var(--shadow-blur-lg) var(--neo-shadow-dark), calc(var(--shadow-distance-lg) * -1) calc(var(--shadow-distance-lg) * -1) var(--shadow-blur-lg) var(--neo-shadow-light), 0 25px 50px -12px rgba(0, 0, 0, 0.25)
+  display: flex
+  flex-direction: column
+  max-height: calc(100vh - var(--spacing-8))
+  animation: slideIn var(--transition-normal) ease-out
+
+  @media (max-width: 640px)
+    border-radius: var(--radius-md)
+    max-height: calc(100vh - var(--spacing-4))
+
+// Size variants
+.sm
+  width: 100%
+  max-width: 400px
+
+.md
+  width: 100%
+  max-width: 500px
+
+.lg
+  width: 100%
+  max-width: 640px
+
+.header
+  display: flex
+  align-items: center
+  justify-content: space-between
+  padding: var(--spacing-5) var(--spacing-6)
+  border-bottom: 1px solid var(--neo-border)
+  flex-shrink: 0
+
+  @media (max-width: 640px)
+    padding: var(--spacing-4)
+
+.title
+  margin: 0
+  font-size: var(--font-size-lg)
+  font-weight: 600
+  color: var(--neo-text-primary)
+
+.closeButton
+  display: flex
+  align-items: center
+  justify-content: center
+  width: 32px
+  height: 32px
+  padding: 0
+  background: var(--neo-background)
+  border: none
+  border-radius: var(--radius-md)
+  color: var(--neo-text-secondary)
+  cursor: pointer
+  transition: all var(--transition-fast)
+  box-shadow: var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+  &:hover
+    color: var(--neo-text-primary)
+    box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+  &:focus-visible
+    outline: 2px solid var(--neo-accent)
+    outline-offset: 2px
+
+.content
+  flex: 1
+  padding: var(--spacing-6)
+  overflow-y: auto
+
+  @media (max-width: 640px)
+    padding: var(--spacing-4)
+
+  // Webkit scrollbar
+  &::-webkit-scrollbar
+    width: 8px
+
+  &::-webkit-scrollbar-track
+    background: var(--neo-background)
+    border-radius: var(--radius-sm)
+
+  &::-webkit-scrollbar-thumb
+    background: var(--neo-border)
+    border-radius: var(--radius-sm)
+
+    &:hover
+      background: var(--neo-text-secondary)
+
+  // Firefox
+  scrollbar-width: thin
+  scrollbar-color: var(--neo-border) var(--neo-background)
+
+.footer
+  display: flex
+  align-items: center
+  justify-content: flex-end
+  gap: var(--spacing-3)
+  padding: var(--spacing-4) var(--spacing-6)
+  border-top: 1px solid var(--neo-border)
+  flex-shrink: 0
+
+  @media (max-width: 640px)
+    padding: var(--spacing-3) var(--spacing-4)
+
+// Animations
+@keyframes fadeIn
+  from
+    opacity: 0
+  to
+    opacity: 1
+
+@keyframes slideIn
+  from
+    opacity: 0
+    transform: translateY(-20px) scale(0.95)
+  to
+    opacity: 1
+    transform: translateY(0) scale(1)

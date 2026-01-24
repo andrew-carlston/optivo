@@ -357,6 +357,162 @@ class SchemaProvider implements TenantDbProvider {
       )
     `)
 
+    // Create core_appearance table for tenant appearance/badge configurations
+    await this.prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "${slug}".core_appearance (
+        id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+
+        -- Badge configurations stored as JSONB
+        -- Structure: { "status": { shape: "pill", fill: "solid", ... }, "tag": { ... } }
+        badge_configs JSONB DEFAULT '{
+          "status": {
+            "shape": "pill",
+            "fill": "solid",
+            "colorEnabled": true
+          },
+          "tag": {
+            "shape": "square",
+            "fill": "fill",
+            "colorEnabled": true
+          },
+          "priority": {
+            "shape": "pill",
+            "fill": "raised",
+            "colorEnabled": true
+          },
+          "label": {
+            "shape": "leaf",
+            "fill": "outline",
+            "leafSide": "left",
+            "colorEnabled": true
+          }
+        }',
+
+        -- Default colors for badge types
+        badge_colors JSONB DEFAULT '{
+          "default": { "bg": "#6b7280", "text": "#ffffff" },
+          "primary": { "bg": "#3b82f6", "text": "#ffffff" },
+          "success": { "bg": "#10b981", "text": "#ffffff" },
+          "warning": { "bg": "#f59e0b", "text": "#000000" },
+          "danger": { "bg": "#ef4444", "text": "#ffffff" },
+          "info": { "bg": "#06b6d4", "text": "#ffffff" }
+        }',
+
+        -- Future: theme overrides, custom CSS variables, etc.
+        theme_overrides JSONB DEFAULT '{}',
+
+        -- Timestamps
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `)
+
+    // ========================================
+    // RBAC (Role-Based Access Control) Tables
+    // ========================================
+
+    // core_rbac_roles - Role definitions with hierarchy support
+    await this.prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "${slug}".core_rbac_roles (
+        id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+        name TEXT UNIQUE NOT NULL,
+        display_name TEXT NOT NULL,
+        description TEXT,
+        color TEXT DEFAULT '#6b7280',
+        icon TEXT DEFAULT 'shield',
+        is_system_role BOOLEAN DEFAULT FALSE,
+        is_default BOOLEAN DEFAULT FALSE,
+        parent_role_id TEXT REFERENCES "${slug}".core_rbac_roles(id),
+        priority INTEGER DEFAULT 0,
+        created_by TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `)
+
+    // core_rbac_permissions - Granular permissions for each role
+    await this.prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "${slug}".core_rbac_permissions (
+        id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+        role_id TEXT NOT NULL REFERENCES "${slug}".core_rbac_roles(id) ON DELETE CASCADE,
+        page_permissions JSONB DEFAULT '{}',
+        table_permissions JSONB DEFAULT '{}',
+        data_scope JSONB DEFAULT '{"scopeType": "self", "includeIndirectReports": false, "includeCrossDepartment": false, "excludeTerminated": true}',
+        tag_permissions JSONB DEFAULT '{}',
+        label_permissions JSONB DEFAULT '{}',
+        cascade_to_children BOOLEAN DEFAULT TRUE,
+        inherit_from_parent BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW(),
+        UNIQUE(role_id)
+      )
+    `)
+
+    // core_rbac_tags - Categorization tags for permissions and roles
+    await this.prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "${slug}".core_rbac_tags (
+        id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+        name TEXT UNIQUE NOT NULL,
+        display_name TEXT NOT NULL,
+        description TEXT,
+        is_archived BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `)
+
+    // Create indexes for RBAC tables
+    await this.prisma.$executeRawUnsafe(`
+      CREATE INDEX IF NOT EXISTS "${slug}_rbac_roles_name_idx" ON "${slug}".core_rbac_roles(name)
+    `)
+
+    await this.prisma.$executeRawUnsafe(`
+      CREATE INDEX IF NOT EXISTS "${slug}_rbac_permissions_role_idx" ON "${slug}".core_rbac_permissions(role_id)
+    `)
+
+    await this.prisma.$executeRawUnsafe(`
+      CREATE INDEX IF NOT EXISTS "${slug}_rbac_tags_name_idx" ON "${slug}".core_rbac_tags(name)
+    `)
+
+    await this.prisma.$executeRawUnsafe(`
+      CREATE INDEX IF NOT EXISTS "${slug}_rbac_tags_archived_idx" ON "${slug}".core_rbac_tags(is_archived)
+    `)
+
+    // ========================================
+    // Seed Super Admin Role
+    // ========================================
+
+    // Insert Super Admin role (system role with full access)
+    await this.prisma.$executeRawUnsafe(`
+      INSERT INTO "${slug}".core_rbac_roles (
+        id, name, display_name, description, color, icon, is_system_role, priority
+      ) VALUES (
+        'role-super-admin',
+        'super_admin',
+        'Super Admin',
+        'Full access to all features and data. Cannot be deleted or modified.',
+        '#7c3aed',
+        'crown',
+        TRUE,
+        1000
+      ) ON CONFLICT (name) DO NOTHING
+    `)
+
+    // Insert Super Admin permissions (full access to everything)
+    await this.prisma.$executeRawUnsafe(`
+      INSERT INTO "${slug}".core_rbac_permissions (
+        id, role_id, page_permissions, table_permissions, data_scope, tag_permissions, label_permissions
+      ) VALUES (
+        'perm-super-admin',
+        'role-super-admin',
+        '{"*": {"access": true, "views": {"*": true}}}',
+        '{"*": {"visible": true, "columns": {"*": true}}}',
+        '{"scopeType": "all", "includeIndirectReports": true, "includeCrossDepartment": true, "excludeTerminated": false}',
+        '{"canCreateTags": true, "canEditTags": true, "canDeleteTags": true, "visibleTags": null, "editableTags": null}',
+        '{"canCreateLabels": true, "canEditLabels": true, "canDeleteLabels": true, "visibleLabels": null, "editableLabels": null}'
+      ) ON CONFLICT (role_id) DO NOTHING
+    `)
+
     return {
       type: 'schema',
       schema: slug,

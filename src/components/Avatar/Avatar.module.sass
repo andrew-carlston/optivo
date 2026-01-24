@@ -19,6 +19,23 @@
     width: 12px
     height: 12px
 
+.header
+  .avatarImage
+    width: 40px
+    height: 40px
+
+    @media (max-width: 768px)
+      width: 32px
+      height: 32px
+
+  .overlay svg
+    width: 14px
+    height: 14px
+
+    @media (max-width: 768px)
+      width: 12px
+      height: 12px
+
 .md
   .avatarImage
     width: 48px
@@ -45,26 +62,24 @@
 
 .xxl
   .avatarImage
-    width: 128px
-    height: 128px
+    width: 280px
+    height: 140px
   .overlay svg
     width: 32px
     height: 32px
 
 .avatarImage
-  border-radius: var(--radius-lg)
-  background: var(--neo-background)
-  border: 2px solid var(--neo-border)
+  background: transparent
   display: flex
   align-items: center
   justify-content: center
-  overflow: hidden
   background-size: cover
   background-position: center
   background-repeat: no-repeat
   transition: all var(--transition-fast)
-  box-shadow: var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
   position: relative
+  border-radius: var(--radius-md)
+  overflow: hidden
 
 .overlay
   position: absolute
@@ -75,7 +90,7 @@
   justify-content: center
   opacity: 0
   transition: opacity var(--transition-fast)
-  border-radius: var(--radius-lg)
+  border-radius: var(--radius-md)
 
   svg
     color: white

@@ -5,12 +5,12 @@
   width: var(--spacing-10)
   height: var(--spacing-10)
   padding: 0
-  background: var(--neo-background)
-  border: 1px solid var(--neo-border)
+  background: transparent
+  border: none
   border-radius: var(--radius-md)
   cursor: pointer
   color: var(--neo-text-primary)
-  box-shadow: var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+  box-shadow: none
   transition: all var(--transition-fast)
 
   svg
@@ -22,9 +22,16 @@
 
   &:hover
     color: var(--neo-accent)
+    background: var(--neo-background)
+    box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
 
   &:active
-    box-shadow: inset var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), inset calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+    background: var(--neo-background)
+    box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+  &:focus-visible
+    outline: var(--shadow-distance-sm) solid var(--neo-accent)
+    outline-offset: var(--shadow-distance-sm)
 
 .icon
   display: flex

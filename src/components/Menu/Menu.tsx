@@ -6,7 +6,7 @@ import styles from './Menu.module.sass'
 interface MenuProps {
   trigger: React.ReactNode
   children: React.ReactNode
-  align?: 'left' | 'right'
+  align?: 'left' | 'right' | 'center'
 }
 
 export default function Menu({ trigger, children, align = 'left' }: MenuProps) {

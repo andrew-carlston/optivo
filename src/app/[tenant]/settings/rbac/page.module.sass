@@ -1,0 +1,2148 @@
+// RBAC Settings Page Styles
+// Neomorphic design system
+
+// ===================
+// Page Layout
+// ===================
+.page
+  min-height: 100vh
+  background: var(--neo-background)
+  color: var(--neo-text-primary)
+  padding: var(--spacing-6)
+
+  @media (max-width: 640px)
+    padding: var(--spacing-4)
+
+.header
+  display: flex
+  align-items: center
+  justify-content: space-between
+  margin-bottom: var(--spacing-6)
+  flex-wrap: wrap
+  gap: var(--spacing-4)
+
+  @media (max-width: 640px)
+    margin-bottom: var(--spacing-4)
+
+.headerTitle
+  margin: 0
+  font-size: var(--font-size-2xl)
+  font-weight: 600
+  color: var(--neo-text-primary)
+
+  @media (max-width: 640px)
+    font-size: var(--font-size-xl)
+
+.headerDescription
+  margin: var(--spacing-1) 0 0
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+
+.headerActions
+  display: flex
+  gap: var(--spacing-3)
+  align-items: center
+
+  @media (max-width: 480px)
+    flex-wrap: wrap
+    justify-content: flex-end
+
+// ===================
+// Role Group Sections
+// ===================
+.roleGroupSection
+  margin-bottom: var(--spacing-6)
+
+  &:last-child
+    margin-bottom: 0
+
+.roleGroupHeader
+  display: flex
+  align-items: center
+  gap: var(--spacing-3)
+  margin-bottom: var(--spacing-4)
+
+.roleGroupColor
+  width: 12px
+  height: 12px
+  border-radius: var(--radius-full)
+  flex-shrink: 0
+
+.roleGroupTitle
+  margin: 0
+  font-size: var(--font-size-lg)
+  font-weight: 600
+  color: var(--neo-text-primary)
+
+.roleGroupCount
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+  background: var(--neo-surface)
+  padding: var(--spacing-1) var(--spacing-2)
+  border-radius: var(--radius-md)
+
+// ===================
+// Groups Container (side-by-side layout)
+// ===================
+.groupsContainer
+  display: flex
+  flex-wrap: wrap
+  gap: var(--spacing-6)
+  align-items: flex-start
+
+  @media (max-width: 768px)
+    flex-direction: column
+
+.groupColumn
+  flex: 1
+  min-width: 280px
+  max-width: 400px
+
+  @media (max-width: 768px)
+    max-width: 100%
+    width: 100%
+
+.groupColumnHeader
+  display: flex
+  align-items: center
+  gap: var(--spacing-2)
+  margin-bottom: var(--spacing-4)
+  padding-bottom: var(--spacing-3)
+  border-bottom: 1px solid var(--neo-border)
+
+.groupColumnRoles
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-3)
+
+.emptyGroupText
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+  font-style: italic
+  padding: var(--spacing-4)
+  text-align: center
+
+// ===================
+// Role Card Grid
+// ===================
+.roleGrid
+  display: grid
+  grid-template-columns: repeat(3, 1fr)
+  gap: var(--spacing-5)
+
+  @media (max-width: 1024px)
+    grid-template-columns: repeat(2, 1fr)
+
+  @media (max-width: 640px)
+    grid-template-columns: 1fr
+    gap: var(--spacing-4)
+
+// ===================
+// Role Card
+// ===================
+.roleCard
+  background: var(--neo-background)
+  border-radius: var(--radius-lg)
+  padding: var(--spacing-5)
+  cursor: pointer
+  transition: all var(--transition-normal)
+  box-shadow: var(--shadow-distance-lg) var(--shadow-distance-lg) var(--shadow-blur-lg) var(--neo-shadow-dark), calc(var(--shadow-distance-lg) * -1) calc(var(--shadow-distance-lg) * -1) var(--shadow-blur-lg) var(--neo-shadow-light)
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-3)
+  position: relative
+  overflow: hidden
+  min-height: 160px
+
+  &::before
+    content: ''
+    position: absolute
+    top: 0
+    left: 0
+    width: 4px
+    height: 100%
+    background: var(--role-color, var(--neo-accent))
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg)
+
+  &:hover
+    transform: translateY(calc(var(--spacing-1) * -1))
+    box-shadow: calc(var(--shadow-distance-lg) + 2px) calc(var(--shadow-distance-lg) + 2px) calc(var(--shadow-blur-lg) + 4px) var(--neo-shadow-dark), calc((var(--shadow-distance-lg) + 2px) * -1) calc((var(--shadow-distance-lg) + 2px) * -1) calc(var(--shadow-blur-lg) + 4px) var(--neo-shadow-light)
+
+  &:focus-visible
+    outline: 2px solid var(--neo-accent)
+    outline-offset: 2px
+
+  @media (max-width: 640px)
+    padding: var(--spacing-4)
+    min-height: 140px
+
+.roleCardHeadcount
+  position: absolute
+  top: var(--spacing-3)
+  right: var(--spacing-3)
+  display: flex
+  align-items: center
+  gap: var(--spacing-1)
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+  background: var(--neo-surface)
+  padding: var(--spacing-1) var(--spacing-2)
+  border-radius: var(--radius-md)
+
+  svg
+    width: 14px
+    height: 14px
+
+.roleCardContent
+  display: flex
+  align-items: flex-start
+  gap: var(--spacing-3)
+  padding-right: 60px
+
+.roleCardIcon
+  display: flex
+  align-items: center
+  justify-content: center
+  width: 44px
+  height: 44px
+  border-radius: var(--radius-md)
+  background: var(--neo-surface)
+  color: var(--role-color, var(--neo-accent))
+  flex-shrink: 0
+  box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+  svg
+    width: 22px
+    height: 22px
+
+  @media (max-width: 640px)
+    width: 40px
+    height: 40px
+
+    svg
+      width: 20px
+      height: 20px
+
+.roleCardInfo
+  flex: 1
+  min-width: 0
+
+.roleCardTitle
+  margin: 0
+  font-size: var(--font-size-base)
+  font-weight: 600
+  color: var(--neo-text-primary)
+
+.roleCardDescription
+  margin: var(--spacing-1) 0 0
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+  line-height: 1.4
+  display: -webkit-box
+  -webkit-line-clamp: 2
+  -webkit-box-orient: vertical
+  overflow: hidden
+
+.roleCardParent
+  display: flex
+  align-items: center
+  gap: var(--spacing-1)
+  margin: var(--spacing-2) 0 0
+  font-size: var(--font-size-xs)
+  color: var(--neo-text-tertiary)
+
+  svg
+    opacity: 0.7
+
+.roleCardNoTags
+  margin: var(--spacing-2) 0 0
+  font-size: var(--font-size-xs)
+  color: var(--neo-text-tertiary)
+  font-style: italic
+
+.roleCardBadges
+  display: flex
+  align-items: center
+  gap: var(--spacing-2)
+  flex-wrap: wrap
+  min-height: 24px
+
+.roleCardTagsSection
+  border-top: 1px solid var(--neo-border)
+  padding-top: var(--spacing-2)
+  margin-top: auto
+
+.roleCardTagsToggle
+  display: flex
+  align-items: center
+  gap: var(--spacing-2)
+  width: 100%
+  background: none
+  border: none
+  padding: var(--spacing-1) 0
+  cursor: pointer
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+  transition: color var(--transition-fast)
+  border-radius: var(--radius-sm)
+
+  &:hover
+    color: var(--neo-text-primary)
+
+  &:focus-visible
+    outline: 2px solid var(--neo-accent)
+    outline-offset: 2px
+
+  svg
+    width: 14px
+    height: 14px
+
+    &:last-child
+      margin-left: auto
+
+.roleCardTagsList
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-1)
+  margin-top: var(--spacing-2)
+  max-height: 120px
+  overflow-y: auto
+
+.roleCardTag
+  font-size: var(--font-size-xs)
+  background: var(--neo-surface)
+  color: var(--neo-text-secondary)
+  padding: var(--spacing-1) var(--spacing-2)
+  border-radius: var(--radius-sm)
+  display: block
+
+.roleCardSpecialBadge
+  display: inline-flex
+  align-self: flex-start
+
+.roleCardTagCount
+  background: var(--neo-surface)
+  padding: var(--spacing-1) var(--spacing-2)
+  border-radius: var(--radius-sm)
+  font-weight: 500
+  color: var(--neo-text-primary)
+
+// Legacy styles for backwards compatibility
+.roleCardHeader
+  display: flex
+  align-items: flex-start
+  gap: var(--spacing-3)
+
+.roleCardMeta
+  display: flex
+  align-items: center
+  gap: var(--spacing-3)
+  padding-top: var(--spacing-2)
+  border-top: 1px solid var(--neo-border)
+  margin-top: auto
+
+.memberCount
+  display: flex
+  align-items: center
+  gap: var(--spacing-1)
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+
+  svg
+    width: 14px
+    height: 14px
+
+.defaultIndicator
+  font-size: var(--font-size-xs)
+  color: var(--neo-accent)
+  font-weight: 500
+  padding: 2px 8px
+  background: var(--neo-surface)
+  border-radius: var(--radius-full)
+  box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+.systemBadge
+  font-size: var(--font-size-xs)
+  color: var(--neo-text-secondary)
+  font-weight: 500
+  padding: 2px 8px
+  background: var(--neo-surface)
+  border-radius: var(--radius-full)
+  box-shadow: var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+// ===================
+// Create Role Button
+// ===================
+.createRoleBtn
+  display: flex
+  align-items: center
+  gap: var(--spacing-2)
+
+  svg
+    width: 18px
+    height: 18px
+
+// ===================
+// Loading Skeleton
+// ===================
+.skeleton
+  background: linear-gradient(90deg, var(--neo-surface) 25%, var(--neo-background) 50%, var(--neo-surface) 75%)
+  background-size: 200% 100%
+  animation: shimmer 1.5s infinite
+  border-radius: var(--radius-md)
+
+.skeletonCard
+  background: var(--neo-background)
+  border-radius: var(--radius-lg)
+  padding: var(--spacing-5)
+  cursor: default
+  pointer-events: none
+  box-shadow: var(--shadow-distance-lg) var(--shadow-distance-lg) var(--shadow-blur-lg) var(--neo-shadow-dark), calc(var(--shadow-distance-lg) * -1) calc(var(--shadow-distance-lg) * -1) var(--shadow-blur-lg) var(--neo-shadow-light)
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-3)
+  position: relative
+  overflow: hidden
+
+  // Skeleton color bar on left side
+  &::before
+    content: ''
+    position: absolute
+    top: 0
+    left: 0
+    width: 4px
+    height: 100%
+    background: var(--neo-surface-secondary)
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg)
+    animation: shimmer 1.5s infinite
+    background: linear-gradient(90deg, var(--neo-surface-secondary) 25%, var(--neo-surface) 50%, var(--neo-surface-secondary) 75%)
+    background-size: 200% 100%
+
+  @media (max-width: 640px)
+    padding: var(--spacing-4)
+
+.skeletonCardHeader
+  display: flex
+  align-items: flex-start
+  gap: var(--spacing-3)
+
+.skeletonCardInfo
+  flex: 1
+  min-width: 0
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-2)
+
+.skeletonIcon
+  width: 44px
+  height: 44px
+  border-radius: var(--radius-md)
+  flex-shrink: 0
+  @extend .skeleton
+
+.skeletonTitle
+  width: 60%
+  height: 20px
+  @extend .skeleton
+
+.skeletonDescription
+  width: 100%
+  height: 14px
+  @extend .skeleton
+
+.skeletonMeta
+  width: 40%
+  height: 14px
+  margin-top: auto
+  padding-top: var(--spacing-2)
+  border-top: 1px solid var(--neo-border)
+  @extend .skeleton
+
+@keyframes shimmer
+  0%
+    background-position: 200% 0
+  100%
+    background-position: -200% 0
+
+// ===================
+// Empty State
+// ===================
+.emptyState
+  grid-column: 1 / -1
+  display: flex
+  flex-direction: column
+  align-items: center
+  justify-content: center
+  padding: var(--spacing-8)
+  text-align: center
+  background: var(--neo-surface)
+  border-radius: var(--radius-lg)
+  box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+.emptyStateIcon
+  width: 64px
+  height: 64px
+  color: var(--neo-text-secondary)
+  margin-bottom: var(--spacing-4)
+
+.emptyStateTitle
+  margin: 0 0 var(--spacing-2)
+  font-size: var(--font-size-lg)
+  font-weight: 600
+  color: var(--neo-text-primary)
+
+.emptyStateDescription
+  margin: 0 0 var(--spacing-4)
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+  max-width: 300px
+
+// ===================
+// Create Role Modal
+// ===================
+.formGroup
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-4)
+
+.formRow
+  display: grid
+  grid-template-columns: 1fr 1fr
+  gap: var(--spacing-4)
+
+  @media (max-width: 480px)
+    grid-template-columns: 1fr
+
+.iconSelector
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-2)
+
+.iconSelectorLabel
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  color: var(--neo-text-primary)
+
+.iconGrid
+  display: flex
+  flex-wrap: wrap
+  gap: var(--spacing-2)
+
+.iconOption
+  display: flex
+  align-items: center
+  justify-content: center
+  width: 40px
+  height: 40px
+  background: var(--neo-background)
+  border: none
+  border-radius: var(--radius-md)
+  color: var(--neo-text-secondary)
+  cursor: pointer
+  transition: all var(--transition-fast)
+  box-shadow: var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+  &:hover
+    color: var(--neo-accent)
+    box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+  &:focus-visible
+    outline: 2px solid var(--neo-accent)
+    outline-offset: 2px
+
+  svg
+    width: 20px
+    height: 20px
+
+.iconOptionSelected
+  color: var(--neo-accent)
+  box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+.colorSelector
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-2)
+
+.colorSelectorLabel
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  color: var(--neo-text-primary)
+
+.colorGrid
+  display: flex
+  flex-wrap: wrap
+  gap: var(--spacing-2)
+
+.colorOption
+  width: 32px
+  height: 32px
+  border: none
+  border-radius: var(--radius-full)
+  cursor: pointer
+  transition: all var(--transition-fast)
+  box-shadow: var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+  position: relative
+
+  &:hover
+    transform: scale(1.1)
+
+  &:focus-visible
+    outline: 2px solid var(--neo-text-primary)
+    outline-offset: 2px
+
+.colorOptionSelected
+  box-shadow: inset var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) rgba(0, 0, 0, 0.3), inset calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) rgba(255, 255, 255, 0.3)
+
+  &::after
+    content: ''
+    position: absolute
+    inset: 4px
+    border: 2px solid white
+    border-radius: var(--radius-full)
+
+.checkboxGroup
+  display: flex
+  align-items: center
+  gap: var(--spacing-3)
+  padding: var(--spacing-3)
+  background: var(--neo-surface)
+  border-radius: var(--radius-md)
+  box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+.checkboxLabel
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-primary)
+
+.checkboxDescription
+  font-size: var(--font-size-xs)
+  color: var(--neo-text-secondary)
+  margin-top: var(--spacing-1)
+
+.errorMessage
+  color: var(--neo-error)
+  font-size: var(--font-size-sm)
+  padding: var(--spacing-2) var(--spacing-3)
+  background: rgba(239, 68, 68, 0.1)
+  border-radius: var(--radius-md)
+
+.successMessage
+  color: var(--neo-success)
+  font-size: var(--font-size-sm)
+  padding: var(--spacing-2) var(--spacing-3)
+  background: rgba(16, 185, 129, 0.1)
+  border-radius: var(--radius-md)
+  animation: fadeIn 200ms ease-out
+
+.unsavedWarning
+  color: var(--neo-warning, #f59e0b)
+  font-size: var(--font-size-sm)
+  padding: var(--spacing-2) var(--spacing-3)
+  background: rgba(245, 158, 11, 0.1)
+  border-radius: var(--radius-md)
+  display: flex
+  align-items: center
+  gap: var(--spacing-2)
+  animation: fadeIn 200ms ease-out
+  &::before
+    content: "●"
+    animation: pulse 1.5s ease-in-out infinite
+
+@keyframes fadeIn
+  from
+    opacity: 0
+  to
+    opacity: 1
+
+@keyframes pulse
+  0%, 100%
+    opacity: 1
+  50%
+    opacity: 0.4
+
+// ===================
+// Detail Panel
+// ===================
+.detailPanel
+  background: var(--neo-background)
+  border-radius: var(--radius-lg)
+  box-shadow: var(--shadow-distance-lg) var(--shadow-distance-lg) var(--shadow-blur-lg) var(--neo-shadow-dark), calc(var(--shadow-distance-lg) * -1) calc(var(--shadow-distance-lg) * -1) var(--shadow-blur-lg) var(--neo-shadow-light)
+  overflow: hidden
+  animation: slideIn 250ms ease-out
+  max-width: 100%
+
+@keyframes slideIn
+  from
+    opacity: 0
+    transform: translateX(20px)
+  to
+    opacity: 1
+    transform: translateX(0)
+
+// Detail Panel Skeletons
+.detailPanelHeaderSkeleton
+  display: flex
+  align-items: center
+  gap: var(--spacing-4)
+  padding: var(--spacing-4) var(--spacing-6)
+  border-bottom: 1px solid var(--neo-surface-secondary)
+  background: var(--neo-surface-secondary)
+
+.skeletonBackButton
+  width: 120px
+  height: 36px
+  @extend .skeleton
+
+.skeletonDot
+  width: 12px
+  height: 12px
+  border-radius: 9999px
+  @extend .skeleton
+
+.skeletonTitleText
+  width: 150px
+  height: 24px
+  @extend .skeleton
+
+.detailPanelContentSkeleton
+  display: grid
+  grid-template-columns: 280px 1fr
+  min-height: 500px
+
+  @media (max-width: 1024px)
+    grid-template-columns: 1fr
+    min-height: auto
+
+.detailPanelSettingsSkeleton
+  padding: var(--spacing-6)
+  border-right: 1px solid var(--neo-surface-secondary)
+  background: var(--neo-surface-secondary)
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-4)
+
+  @media (max-width: 1024px)
+    border-right: none
+    border-bottom: 1px solid var(--neo-surface-secondary)
+
+.skeletonSectionTitle
+  width: 100px
+  height: 14px
+  margin-bottom: var(--spacing-2)
+  @extend .skeleton
+
+.skeletonInputGroup
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-2)
+
+.skeletonLabel
+  width: 80px
+  height: 14px
+  @extend .skeleton
+
+.skeletonInput
+  width: 100%
+  height: 40px
+  @extend .skeleton
+
+.skeletonTextarea
+  width: 100%
+  height: 80px
+  @extend .skeleton
+
+.skeletonColorRow
+  display: flex
+  gap: var(--spacing-2)
+
+.skeletonColorSwatch
+  width: 28px
+  height: 28px
+  border-radius: 9999px
+  @extend .skeleton
+
+.detailPanelPermissionsSkeleton
+  padding: var(--spacing-6)
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-4)
+
+.skeletonTabRow
+  display: flex
+  gap: var(--spacing-2)
+
+.skeletonTab
+  width: 80px
+  height: 36px
+  @extend .skeleton
+
+.skeletonPermissionList
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-2)
+
+.skeletonPermissionItem
+  width: 100%
+  height: 48px
+  @extend .skeleton
+
+.detailPanelFooterSkeleton
+  display: flex
+  align-items: center
+  justify-content: space-between
+  padding: var(--spacing-4) var(--spacing-6)
+  border-top: 1px solid var(--neo-surface-secondary)
+  background: var(--neo-surface-secondary)
+
+.skeletonButton
+  width: 100px
+  height: 40px
+  @extend .skeleton
+
+.skeletonButtonWide
+  width: 120px
+  height: 40px
+  @extend .skeleton
+
+.detailPanelHeader
+  display: flex
+  align-items: center
+  gap: var(--spacing-4)
+  padding: var(--spacing-4) var(--spacing-6)
+  border-bottom: 1px solid var(--neo-surface-secondary)
+
+  @media (max-width: 480px)
+    padding: var(--spacing-3) var(--spacing-4)
+    gap: var(--spacing-3)
+
+.backButton
+  display: flex
+  align-items: center
+  gap: var(--spacing-2)
+  padding: var(--spacing-2) var(--spacing-3)
+  background: var(--neo-surface)
+  border: none
+  border-radius: var(--radius-md)
+  color: var(--neo-text-secondary)
+  font-size: var(--font-size-sm)
+  cursor: pointer
+  box-shadow: var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+  transition: all 150ms ease
+
+  &:hover
+    color: var(--neo-text-primary)
+
+  &:focus-visible
+    outline: none
+    box-shadow: 0 0 0 3px var(--neo-accent), inset var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), inset calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+
+.detailPanelTitle
+  display: flex
+  align-items: center
+  gap: var(--spacing-3)
+  flex: 1
+
+  h2
+    font-size: var(--font-size-xl)
+    font-weight: 600
+    margin: 0
+
+.roleColorDot
+  width: 12px
+  height: 12px
+  border-radius: 9999px
+  flex-shrink: 0
+
+.detailPanelContent
+  display: grid
+  grid-template-columns: 280px 1fr
+  min-height: 500px
+
+  @media (max-width: 1024px)
+    grid-template-columns: 1fr
+    min-height: auto
+
+  @media (max-width: 480px)
+    overflow-x: hidden
+
+// Left sidebar - Role settings
+.detailPanelSettings
+  padding: var(--spacing-6)
+  border-right: 1px solid var(--neo-surface-secondary)
+  background: var(--neo-background)
+  overflow-x: hidden
+
+  @media (max-width: 1024px)
+    border-right: none
+    border-bottom: 1px solid var(--neo-surface-secondary)
+
+  @media (max-width: 480px)
+    padding: var(--spacing-4)
+
+.settingsSectionTitle
+  font-size: var(--font-size-sm)
+  font-weight: 600
+  text-transform: uppercase
+  letter-spacing: 0.05em
+  color: var(--neo-text-secondary)
+  margin: 0 0 var(--spacing-4)
+
+.settingsForm
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-4)
+  max-width: 100%
+
+.inputWrapper
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-2)
+  max-width: 100%
+
+.inputLabel
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  color: var(--neo-text-secondary)
+
+.inputHint
+  font-size: var(--font-size-xs)
+  color: var(--neo-text-secondary)
+  margin-top: var(--spacing-1)
+
+.textarea
+  padding: var(--spacing-3)
+  background: var(--neo-surface)
+  border: none
+  border-radius: var(--radius-md)
+  color: var(--neo-text-primary)
+  font-family: inherit
+  font-size: var(--font-size-sm)
+  resize: vertical
+  box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+  &:focus
+    outline: none
+    box-shadow: 0 0 0 2px var(--neo-accent), inset var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), inset calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+
+  &:disabled
+    opacity: 0.6
+    cursor: not-allowed
+
+  &::placeholder
+    color: var(--neo-text-secondary)
+
+// Color picker for detail panel
+.colorPicker
+  display: flex
+  flex-wrap: wrap
+  gap: var(--spacing-2)
+
+.colorSwatch
+  width: 28px
+  height: 28px
+  border: 2px solid transparent
+  border-radius: 9999px
+  cursor: pointer
+  transition: all 150ms ease
+  box-shadow: var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+  &:hover
+    transform: scale(1.1)
+
+  &:focus-visible
+    outline: 2px solid var(--neo-accent)
+    outline-offset: 2px
+
+  &:disabled
+    opacity: 0.6
+    cursor: not-allowed
+    transform: none
+
+  &.colorSwatchActive
+    border-color: var(--neo-text-primary)
+    box-shadow: none
+
+// Cascade options
+.cascadeOptions
+  margin-top: var(--spacing-6)
+  padding-top: var(--spacing-6)
+  border-top: 1px solid var(--neo-surface)
+
+.cascadeOptionsTitle
+  font-size: var(--font-size-sm)
+  font-weight: 600
+  color: var(--neo-text-secondary)
+  margin: 0 0 var(--spacing-4)
+
+.cascadeToggle
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-1)
+  margin-bottom: var(--spacing-3)
+
+.cascadeHint
+  font-size: var(--font-size-xs)
+  color: var(--neo-text-secondary)
+  padding-left: 40px
+
+// Right side - Permissions
+.detailPanelPermissions
+  padding: var(--spacing-6)
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-4)
+  overflow-x: hidden
+
+  @media (max-width: 480px)
+    padding: var(--spacing-4)
+
+.permissionsSectionTitle
+  font-size: var(--font-size-sm)
+  font-weight: 600
+  text-transform: uppercase
+  letter-spacing: 0.05em
+  color: var(--neo-text-secondary)
+  margin: 0
+
+// ===================
+// Permission Tabs
+// ===================
+.permissionTabs
+  display: flex
+  gap: var(--spacing-2)
+  padding-bottom: var(--spacing-4)
+  border-bottom: 1px solid var(--neo-surface-secondary)
+
+.permissionTab
+  display: flex
+  align-items: center
+  gap: var(--spacing-2)
+  padding: var(--spacing-2) var(--spacing-4)
+  background: var(--neo-surface)
+  border: none
+  border-radius: var(--radius-md)
+  color: var(--neo-text-secondary)
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  cursor: pointer
+  box-shadow: var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+  transition: all 150ms ease
+
+  svg
+    flex-shrink: 0
+
+  &:hover
+    color: var(--neo-text-primary)
+
+  &:focus-visible
+    outline: none
+    box-shadow: 0 0 0 3px var(--neo-accent), inset var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), inset calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+
+  &.permissionTabActive
+    color: var(--neo-accent)
+    box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+.permissionTabContent
+  flex: 1
+  overflow-y: auto
+
+.permissionTabPanel
+  animation: fadeIn 150ms ease-out
+
+@keyframes fadeIn
+  from
+    opacity: 0
+  to
+    opacity: 1
+
+// ===================
+// Page Permissions Tree
+// ===================
+.pageTree
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-2)
+
+.pageTreeItem
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-1)
+
+.pageTreeLabel
+  display: flex
+  align-items: center
+  gap: var(--spacing-3)
+  padding: var(--spacing-3)
+  background: var(--neo-surface-secondary)
+  border-radius: var(--radius-md)
+  cursor: pointer
+  transition: background 150ms ease
+
+  &:hover
+    background: color-mix(in srgb, var(--neo-surface-secondary) 80%, var(--neo-accent) 20%)
+
+.pageTreeCheckbox
+  width: 18px
+  height: 18px
+  accent-color: var(--neo-accent)
+  cursor: pointer
+
+.pageTreeName
+  font-weight: 500
+  color: var(--neo-text-primary)
+
+.pageTreeDescription
+  font-size: var(--font-size-xs)
+  color: var(--neo-text-secondary)
+  margin-left: auto
+
+.pageTreeChildren
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-1)
+  margin-left: var(--spacing-8)
+  padding-left: var(--spacing-4)
+  border-left: 2px solid var(--neo-surface-secondary)
+
+.pageTreeChild
+  display: flex
+  align-items: center
+  gap: var(--spacing-3)
+  padding: var(--spacing-2) var(--spacing-3)
+  border-radius: var(--radius-sm)
+  cursor: pointer
+  transition: background 150ms ease
+
+  &:hover
+    background: var(--neo-surface-secondary)
+
+// ===================
+// Table Permissions Matrix
+// ===================
+.tableMatrix
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-2)
+  padding: var(--spacing-4)
+  background: var(--neo-surface)
+  border-radius: var(--radius-lg)
+  box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+  font-size: var(--font-size-sm)
+
+.tableMatrixHeader
+  display: grid
+  grid-template-columns: 200px 80px 1fr
+  gap: var(--spacing-4)
+  padding: var(--spacing-2) var(--spacing-3)
+  font-weight: 600
+  color: var(--neo-text-secondary)
+  border-bottom: 1px solid var(--neo-surface-secondary)
+
+  @media (max-width: 768px)
+    display: none
+
+.tableMatrixHeaderCell
+  text-transform: uppercase
+  font-size: var(--font-size-xs)
+  letter-spacing: 0.05em
+
+.tableRow
+  display: grid
+  grid-template-columns: 200px 80px 1fr
+  gap: var(--spacing-4)
+  padding: var(--spacing-3)
+  background: var(--neo-background)
+  border-radius: var(--radius-md)
+  align-items: center
+
+  @media (max-width: 768px)
+    grid-template-columns: 1fr
+    gap: var(--spacing-3)
+
+.tableCell
+  &.tableCellName
+    display: flex
+    align-items: center
+    gap: var(--spacing-2)
+
+  &.tableCellToggle
+    display: flex
+    align-items: center
+    justify-content: center
+
+    @media (max-width: 768px)
+      justify-content: flex-start
+
+  &.tableCellColumns
+    overflow-x: auto
+
+.tableName
+  font-weight: 500
+  color: var(--neo-text-primary)
+
+.sensitivityBadge
+  padding: 2px 6px
+  font-size: var(--font-size-xs)
+  font-weight: 700
+  border-radius: var(--radius-sm)
+
+  &.sensitivityHigh
+    background: rgba(245, 158, 11, 0.2)
+    color: #f59e0b
+
+  &.sensitivityCritical
+    background: rgba(239, 68, 68, 0.2)
+    color: #ef4444
+
+.columnGrid
+  display: flex
+  flex-wrap: wrap
+  gap: var(--spacing-2)
+
+.columnToggle
+  display: flex
+  align-items: center
+  gap: var(--spacing-1)
+  padding: var(--spacing-1) var(--spacing-2)
+  background: var(--neo-surface)
+  border-radius: var(--radius-sm)
+  font-size: var(--font-size-xs)
+  cursor: pointer
+  transition: all 150ms ease
+
+  &:hover:not(.columnToggleDisabled)
+    background: color-mix(in srgb, var(--neo-surface) 80%, var(--neo-accent) 20%)
+
+  &.columnToggleDisabled
+    opacity: 0.5
+    cursor: not-allowed
+
+.columnCheckbox
+  width: 14px
+  height: 14px
+  accent-color: var(--neo-accent)
+  cursor: pointer
+
+  &:disabled
+    cursor: not-allowed
+
+.columnName
+  color: var(--neo-text-primary)
+  white-space: nowrap
+
+// ===================
+// Data Scope Selector
+// ===================
+.scopeSelector
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-6)
+
+.scopeOptions
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-2)
+
+.scopeOption
+  display: flex
+  align-items: flex-start
+  gap: var(--spacing-3)
+  padding: var(--spacing-4)
+  background: var(--neo-surface-secondary)
+  border-radius: var(--radius-md)
+  cursor: pointer
+  transition: all 150ms ease
+  position: relative
+
+  &:hover
+    background: color-mix(in srgb, var(--neo-surface-secondary) 80%, var(--neo-accent) 20%)
+
+  &.scopeOptionSelected
+    background: color-mix(in srgb, var(--neo-surface-secondary) 70%, var(--neo-accent) 30%)
+    box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+.scopeRadio
+  width: 18px
+  height: 18px
+  accent-color: var(--neo-accent)
+  margin-top: 2px
+  cursor: pointer
+
+.scopeOptionContent
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-1)
+  flex: 1
+
+.scopeOptionLabel
+  font-weight: 500
+  color: var(--neo-text-primary)
+
+.scopeOptionDescription
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+
+.scopeIndicator
+  width: 8px
+  height: 8px
+  border-radius: 9999px
+  background: transparent
+  border: 2px solid var(--neo-text-secondary)
+  transition: all 150ms ease
+
+  &.scopeIndicatorActive
+    background: var(--neo-accent)
+    border-color: var(--neo-accent)
+
+// Advanced options
+.advancedOptions
+  padding: var(--spacing-4)
+  background: var(--neo-surface-secondary)
+  border-radius: var(--radius-md)
+  box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+.advancedOptionsTitle
+  font-size: var(--font-size-sm)
+  font-weight: 600
+  color: var(--neo-text-secondary)
+  margin: 0 0 var(--spacing-4)
+
+.advancedOptionsList
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-4)
+
+.advancedOption
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-1)
+
+.advancedOptionHint
+  font-size: var(--font-size-xs)
+  color: var(--neo-text-secondary)
+  padding-left: 40px
+
+// ===================
+// Tag/Label Permissions
+// ===================
+.tagLabelPermissions
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-6)
+
+.tagLabelSection
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-4)
+
+.tagLabelSectionTitle
+  display: flex
+  align-items: center
+  gap: var(--spacing-2)
+  font-size: var(--font-size-sm)
+  font-weight: 600
+  color: var(--neo-text-primary)
+  margin: 0
+  padding-bottom: var(--spacing-2)
+  border-bottom: 1px solid var(--neo-surface-secondary)
+
+  svg
+    color: var(--neo-accent)
+
+.tagLabelToggles
+  display: grid
+  grid-template-columns: repeat(2, 1fr)
+  gap: var(--spacing-4)
+
+  @media (max-width: 640px)
+    grid-template-columns: 1fr
+
+.tagLabelToggle
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-1)
+  padding: var(--spacing-3)
+  background: var(--neo-surface-secondary)
+  border-radius: var(--radius-md)
+
+.tagLabelToggleHint
+  font-size: var(--font-size-xs)
+  color: var(--neo-text-secondary)
+  padding-left: 40px
+
+// ===================
+// Footer
+// ===================
+.detailPanelFooter
+  display: flex
+  align-items: center
+  justify-content: space-between
+  padding: var(--spacing-4) var(--spacing-6)
+  border-top: 1px solid var(--neo-surface-secondary)
+
+  @media (max-width: 640px)
+    flex-direction: column
+    gap: var(--spacing-4)
+
+  @media (max-width: 480px)
+    padding: var(--spacing-3) var(--spacing-4)
+
+.footerLeft
+  display: flex
+  align-items: center
+  gap: var(--spacing-3)
+
+.footerRight
+  display: flex
+  align-items: center
+  gap: var(--spacing-3)
+
+// ===================
+// Page Permissions (New)
+// ===================
+.pagePermissions
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-4)
+  padding: var(--spacing-4)
+  background: var(--neo-surface)
+  border-radius: var(--radius-lg)
+  box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+.emptyMessage
+  color: var(--neo-text-secondary)
+  text-align: center
+  padding: var(--spacing-4)
+
+.masterScopeSection
+  padding: var(--spacing-4)
+  background: var(--neo-background)
+  border-radius: var(--radius-md)
+
+.masterScopeHeader
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-1)
+  margin-bottom: var(--spacing-3)
+
+.masterScopeLabel
+  font-size: var(--font-size-sm)
+  font-weight: 600
+  color: var(--neo-text-primary)
+
+.masterScopeHint
+  font-size: var(--font-size-xs)
+  color: var(--neo-text-secondary)
+
+.pagesList
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-2)
+
+.pageItem
+  background: var(--neo-background)
+  border-radius: var(--radius-md)
+  overflow: hidden
+  max-width: 100%
+
+  @media (max-width: 480px)
+    overflow: visible
+
+.pageHeader
+  display: flex
+  align-items: center
+  gap: var(--spacing-3)
+  padding: var(--spacing-3)
+
+  @media (max-width: 480px)
+    flex-direction: column
+    align-items: flex-start
+    gap: var(--spacing-2)
+
+.pageExpandBtn
+  display: flex
+  align-items: center
+  justify-content: center
+  width: 28px
+  height: 28px
+  background: var(--neo-surface)
+  border: none
+  border-radius: var(--radius-sm)
+  color: var(--neo-text-secondary)
+  cursor: pointer
+  transition: all 150ms ease
+  flex-shrink: 0
+
+  &:hover:not(:disabled)
+    color: var(--neo-text-primary)
+
+  &:focus-visible
+    outline: 2px solid var(--neo-accent)
+    outline-offset: 2px
+
+  &:disabled
+    opacity: 0.4
+    cursor: not-allowed
+
+  @media (max-width: 480px)
+    order: 0
+
+.pageInfo
+  flex: 1
+  min-width: 0
+  display: flex
+  flex-direction: column
+  gap: 2px
+  width: 100%
+
+  @media (max-width: 480px)
+    order: 1
+
+.pageName
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  color: var(--neo-text-primary)
+
+.pageDescription
+  font-size: var(--font-size-xs)
+  color: var(--neo-text-secondary)
+
+.pageControls
+  display: flex
+  align-items: center
+  gap: var(--spacing-3)
+  flex-shrink: 0
+
+  @media (max-width: 480px)
+    order: 2
+    width: 100%
+    flex-wrap: wrap
+    justify-content: flex-start
+
+.viewsList
+  padding: 0 var(--spacing-3) var(--spacing-3) calc(var(--spacing-3) + 28px + var(--spacing-3))
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-2)
+  border-top: 1px solid var(--neo-surface)
+  margin-top: 0
+  padding-top: var(--spacing-3)
+
+  @media (max-width: 480px)
+    padding-left: var(--spacing-3)
+    padding-right: var(--spacing-2)
+
+.viewItem
+  background: var(--neo-surface)
+  border-radius: var(--radius-sm)
+  padding: var(--spacing-3)
+  overflow: hidden
+
+  @media (max-width: 480px)
+    padding: var(--spacing-2)
+
+.viewHeader
+  display: flex
+  align-items: center
+  gap: var(--spacing-3)
+  flex-wrap: wrap
+
+  @media (max-width: 480px)
+    flex-direction: column
+    align-items: flex-start
+    gap: var(--spacing-2)
+
+.viewInfo
+  flex: 1
+  min-width: 0
+  display: flex
+  flex-direction: column
+  gap: 2px
+  width: 100%
+
+  @media (max-width: 480px)
+    order: 1
+
+.viewName
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  color: var(--neo-text-primary)
+
+.viewDescription
+  font-size: var(--font-size-xs)
+  color: var(--neo-text-secondary)
+
+.viewOptions
+  display: flex
+  flex-wrap: wrap
+  gap: var(--spacing-4)
+  margin-top: var(--spacing-3)
+  padding-top: var(--spacing-3)
+  border-top: 1px solid var(--neo-surface-secondary)
+
+  @media (max-width: 480px)
+    gap: var(--spacing-3)
+
+.viewOption
+  display: flex
+  align-items: center
+  gap: var(--spacing-2)
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+  cursor: pointer
+
+  input[type="checkbox"]
+    width: 16px
+    height: 16px
+    accent-color: var(--neo-accent)
+    cursor: pointer
+
+  &:hover
+    color: var(--neo-text-primary)
+
+// ===================
+// Tags Management
+// ===================
+.tagsSection
+  margin-top: var(--spacing-6)
+  padding-top: var(--spacing-6)
+  border-top: 1px solid var(--neo-surface)
+
+.tagsSectionTitle
+  font-size: var(--font-size-sm)
+  font-weight: 600
+  color: var(--neo-text-secondary)
+  margin: 0 0 var(--spacing-4)
+
+.tagsList
+  display: flex
+  flex-wrap: wrap
+  gap: var(--spacing-2)
+
+.tagItem
+  display: flex
+  align-items: center
+  gap: var(--spacing-2)
+  padding: var(--spacing-2) var(--spacing-3)
+  background: var(--neo-surface)
+  border-radius: var(--radius-full)
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-primary)
+
+.tagDeleteBtn
+  display: flex
+  align-items: center
+  justify-content: center
+  width: 16px
+  height: 16px
+  padding: 0
+  background: transparent
+  border: none
+  color: var(--neo-text-secondary)
+  cursor: pointer
+  border-radius: var(--radius-full)
+  transition: all 150ms ease
+
+  &:hover
+    color: var(--neo-error)
+    background: rgba(239, 68, 68, 0.1)
+
+.addTagForm
+  display: flex
+  gap: var(--spacing-2)
+  margin-top: var(--spacing-3)
+
+.addTagInput
+  flex: 1
+  min-width: 0
+
+// ===================
+// Scope Option Disabled
+// ===================
+.scopeOptionDisabled
+  opacity: 0.5
+  cursor: not-allowed
+
+  label
+    cursor: not-allowed
+
+// ===================
+// Permission Disabled (Parent Ceiling)
+// ===================
+.permissionDisabled
+  opacity: 0.5
+  cursor: not-allowed
+  position: relative
+
+  &:hover::after
+    content: attr(data-tooltip)
+    position: absolute
+    background: var(--neo-surface)
+    padding: var(--spacing-2)
+    border-radius: var(--radius-sm)
+    font-size: var(--font-size-xs)
+    white-space: nowrap
+    z-index: 10
+
+// ===================
+// Manage Tags & Groups Modal
+// ===================
+.manageTabs
+  display: flex
+  gap: var(--spacing-2)
+  padding-bottom: var(--spacing-4)
+  border-bottom: 1px solid var(--neo-border)
+  margin-bottom: var(--spacing-4)
+
+.manageTab
+  display: flex
+  align-items: center
+  gap: var(--spacing-2)
+  padding: var(--spacing-2) var(--spacing-4)
+  background: var(--neo-surface)
+  border: none
+  border-radius: var(--radius-md)
+  color: var(--neo-text-secondary)
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  cursor: pointer
+  box-shadow: var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+  transition: all 150ms ease
+
+  svg
+    flex-shrink: 0
+
+  &:hover
+    color: var(--neo-text-primary)
+
+  &:focus-visible
+    outline: none
+    box-shadow: 0 0 0 2px var(--neo-accent)
+
+.manageTabActive
+  color: var(--neo-accent)
+  box-shadow: inset var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), inset calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+.manageTabCount
+  background: var(--neo-surface-secondary)
+  padding: 2px 6px
+  border-radius: var(--radius-sm)
+  font-size: var(--font-size-xs)
+  font-weight: 600
+
+.manageContent
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-4)
+
+.manageHeader
+  display: flex
+  justify-content: space-between
+  align-items: flex-start
+  gap: var(--spacing-3)
+  flex-wrap: wrap
+
+.manageDescription
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+  margin: 0
+  flex: 1
+
+.manageHeaderActions
+  display: flex
+  align-items: center
+  gap: var(--spacing-3)
+
+.manageShowArchived
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-secondary)
+  background: none
+  border: none
+  cursor: pointer
+  padding: 0
+  text-decoration: underline
+  text-underline-offset: 2px
+
+  &:hover
+    color: var(--neo-text-primary)
+
+.manageList
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-2)
+  max-height: 400px
+  overflow-y: auto
+  padding-right: var(--spacing-2)
+
+.manageEmptyState
+  display: flex
+  flex-direction: column
+  align-items: center
+  justify-content: center
+  padding: var(--spacing-8)
+  text-align: center
+  color: var(--neo-text-secondary)
+  gap: var(--spacing-3)
+
+  svg
+    width: 32px
+    height: 32px
+    opacity: 0.5
+
+  p
+    margin: 0
+    font-size: var(--font-size-sm)
+
+.manageItem
+  display: flex
+  align-items: center
+  justify-content: space-between
+  gap: var(--spacing-3)
+  padding: var(--spacing-3)
+  background: var(--neo-surface-secondary)
+  border-radius: var(--radius-md)
+  transition: background 150ms ease
+
+  &:hover
+    background: color-mix(in srgb, var(--neo-surface-secondary) 90%, var(--neo-accent) 10%)
+
+.manageItemArchived
+  opacity: 0.6
+
+.manageItemInfo
+  display: flex
+  align-items: center
+  gap: var(--spacing-3)
+  flex: 1
+  min-width: 0
+
+.manageItemColor
+  width: 12px
+  height: 12px
+  border-radius: var(--radius-full)
+  flex-shrink: 0
+
+.manageItemDetails
+  display: flex
+  flex-direction: column
+  gap: 2px
+  min-width: 0
+
+.manageItemName
+  font-size: var(--font-size-sm)
+  font-weight: 500
+  color: var(--neo-text-primary)
+  display: flex
+  align-items: center
+  gap: var(--spacing-2)
+
+.manageItemDescription
+  font-size: var(--font-size-xs)
+  color: var(--neo-text-secondary)
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+
+.manageItemMeta
+  font-size: var(--font-size-xs)
+  color: var(--neo-text-secondary)
+
+.manageItemArchivedBadge
+  font-size: var(--font-size-xs)
+  padding: 2px 6px
+  background: var(--neo-surface)
+  border-radius: var(--radius-sm)
+  color: var(--neo-text-secondary)
+  font-weight: 400
+
+.manageItemActions
+  display: flex
+  align-items: center
+  gap: var(--spacing-1)
+  flex-shrink: 0
+
+.manageItemAction
+  display: flex
+  align-items: center
+  justify-content: center
+  width: 28px
+  height: 28px
+  background: var(--neo-surface)
+  border: none
+  border-radius: var(--radius-sm)
+  color: var(--neo-text-secondary)
+  cursor: pointer
+  transition: all 150ms ease
+
+  &:hover
+    color: var(--neo-text-primary)
+    background: var(--neo-background)
+
+  &:focus-visible
+    outline: 2px solid var(--neo-accent)
+    outline-offset: 1px
+
+.manageItemActionDanger
+  &:hover
+    color: var(--neo-error)
+    background: rgba(239, 68, 68, 0.1)
+
+.manageItemForm
+  width: 100%
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-4)
+  padding: var(--spacing-3)
+  background: var(--neo-surface)
+  border-radius: var(--radius-md)
+  box-shadow: inset var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), inset calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+
+.manageItemFormFields
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-3)
+
+.manageFormRow
+  display: flex
+  gap: var(--spacing-4)
+  flex-wrap: wrap
+
+  .iconSelector,
+  .colorSelector
+    flex: 1
+    min-width: 120px
+
+.manageItemFormActions
+  display: flex
+  justify-content: flex-end
+  gap: var(--spacing-2)
+  padding-top: var(--spacing-2)
+  border-top: 1px solid var(--neo-border)
+
+.manageItemDelete
+  width: 100%
+  display: flex
+  flex-direction: column
+  gap: var(--spacing-2)
+  padding: var(--spacing-3)
+  background: rgba(239, 68, 68, 0.05)
+  border-radius: var(--radius-md)
+  border: 1px solid rgba(239, 68, 68, 0.2)
+
+  p
+    margin: 0
+    font-size: var(--font-size-sm)
+    color: var(--neo-text-primary)
+
+.manageItemDeleteWarning
+  color: var(--neo-error) !important
+  font-size: var(--font-size-xs) !important
+
+.manageItemDeleteActions
+  display: flex
+  justify-content: flex-end
+  gap: var(--spacing-2)
+  margin-top: var(--spacing-2)
+
+// ===================
+// Multi-Select Dropdown (Tags)
+// ===================
+.selectedTagsList
+  display: flex
+  flex-wrap: wrap
+  gap: var(--spacing-2)
+  margin-bottom: var(--spacing-3)
+
+.selectedTag
+  display: inline-flex
+  align-items: center
+  gap: var(--spacing-2)
+  padding: var(--spacing-1) var(--spacing-3)
+  background: var(--neo-surface)
+  border-radius: var(--radius-full)
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-primary)
+  box-shadow: var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+
+.removeTagBtn
+  display: flex
+  align-items: center
+  justify-content: center
+  width: 16px
+  height: 16px
+  padding: 0
+  background: transparent
+  border: none
+  color: var(--neo-text-secondary)
+  cursor: pointer
+  border-radius: var(--radius-full)
+  transition: all 150ms ease
+
+  &:hover
+    color: var(--neo-error)
+    background: rgba(239, 68, 68, 0.1)
+
+  &:focus-visible
+    outline: 2px solid var(--neo-accent)
+    outline-offset: 1px
+
+.multiSelectTrigger
+  width: 100%
+  padding: var(--spacing-3) var(--spacing-4)
+  background: var(--neo-background)
+  border: 1px solid var(--neo-border)
+  border-radius: var(--radius-md)
+  color: var(--neo-text-primary)
+  font-size: var(--font-size-base)
+  text-align: left
+  cursor: pointer
+  display: flex
+  align-items: center
+  justify-content: space-between
+  transition: all var(--transition-fast)
+  box-shadow: var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+
+  &:hover
+    box-shadow: var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+  &:focus
+    outline: none
+    border-color: var(--neo-accent)
+
+  &:focus-visible
+    outline: 2px solid var(--neo-accent)
+    outline-offset: 2px
+
+.selected
+  color: var(--neo-text-primary)
+
+.placeholder
+  color: var(--neo-text-secondary)
+
+.arrow
+  color: var(--neo-text-secondary)
+  transition: transform var(--transition-fast)
+  flex-shrink: 0
+
+  &.rotated
+    transform: rotate(180deg)
+
+.multiSelectMenu
+  background: var(--neo-background)
+  border: 1px solid var(--neo-border)
+  border-radius: var(--radius-md)
+  box-shadow: var(--shadow-distance-lg) var(--shadow-distance-lg) var(--shadow-blur-lg) var(--neo-shadow-dark), calc(var(--shadow-distance-lg) * -1) calc(var(--shadow-distance-lg) * -1) var(--shadow-blur-lg) var(--neo-shadow-light)
+  z-index: 9999
+  overflow: hidden
+
+.multiSelectSearchWrapper
+  display: flex
+  align-items: center
+  gap: var(--spacing-2)
+  padding: var(--spacing-2) var(--spacing-3)
+  border-bottom: 1px solid var(--neo-border)
+  background: var(--neo-surface-secondary)
+
+.searchIcon
+  color: var(--neo-text-secondary)
+  flex-shrink: 0
+
+.multiSelectSearchInput
+  flex: 1
+  background: transparent
+  border: none
+  outline: none
+  font-size: var(--font-size-sm)
+  color: var(--neo-text-primary)
+
+  &::placeholder
+    color: var(--neo-text-secondary)
+
+.multiSelectOptions
+  max-height: 200px
+  overflow-y: auto
+  padding: var(--spacing-2)
+
+  // Webkit scrollbar
+  &::-webkit-scrollbar
+    width: 8px
+
+  &::-webkit-scrollbar-track
+    background: var(--neo-background)
+    border-radius: var(--radius-sm)
+
+  &::-webkit-scrollbar-thumb
+    background: var(--neo-border)
+    border-radius: var(--radius-sm)
+
+    &:hover
+      background: var(--neo-text-secondary)
+
+  // Firefox
+  scrollbar-width: thin
+  scrollbar-color: var(--neo-border) var(--neo-background)
+
+.multiSelectOption
+  display: flex
+  align-items: center
+  gap: var(--spacing-2)
+  width: 100%
+  padding: var(--spacing-2) var(--spacing-3)
+  background: transparent
+  border: none
+  border-radius: var(--radius-sm)
+  color: var(--neo-text-primary)
+  font-size: var(--font-size-sm)
+  text-align: left
+  cursor: pointer
+  transition: all var(--transition-fast)
+
+  &:hover
+    background: var(--neo-surface-secondary)
+
+.multiSelectOptionSelected
+  background: var(--neo-surface-secondary)
+  color: var(--neo-accent)
+
+.multiSelectCheckbox
+  width: 16px
+  height: 16px
+  accent-color: var(--neo-accent)
+  cursor: pointer
+
+  &:focus-visible
+    outline: 2px solid var(--neo-accent)
+    outline-offset: 2px
+
+.multiSelectOptionLabel
+  flex: 1
+
+.createTagOption
+  display: flex
+  align-items: center
+  gap: var(--spacing-2)
+  width: 100%
+  padding: var(--spacing-2) var(--spacing-3)
+  background: transparent
+  border: none
+  border-radius: var(--radius-sm)
+  color: var(--neo-accent)
+  font-size: var(--font-size-sm)
+  text-align: left
+  cursor: pointer
+  transition: all var(--transition-fast)
+
+  &:hover
+    background: var(--neo-surface-secondary)
+
+  &:focus-visible
+    outline: 2px solid var(--neo-accent)
+    outline-offset: 2px
+
+  svg
+    flex-shrink: 0
+
+.noResults
+  padding: var(--spacing-3)
+  text-align: center
+  color: var(--neo-text-secondary)
+  font-size: var(--font-size-sm)

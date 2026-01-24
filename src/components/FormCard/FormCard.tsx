@@ -10,6 +10,8 @@ interface FormCardProps {
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
   className?: string
   maxHeight?: string
+  /** Max width: 'default' (1200px), 'full' (100%), or custom pixels */
+  maxWidth?: 'default' | 'full' | number
 }
 
 const FormCard: React.FC<FormCardProps> = ({
@@ -18,32 +20,38 @@ const FormCard: React.FC<FormCardProps> = ({
   footer,
   onSubmit,
   className,
-  maxHeight = '80vh'
+  maxHeight,
+  maxWidth,
 }) => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     onSubmit?.(event)
   }
 
+  const formCardClasses = [
+    styles.formCard,
+    maxWidth === 'default' && styles.formCardDefault,
+    maxWidth === 'full' && styles.formCardFull,
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  // Inline styles
+  const inlineStyle: React.CSSProperties = {
+    ...(maxHeight ? { maxHeight } : {}),
+    ...(typeof maxWidth === 'number' ? { maxWidth: `${maxWidth}px` } : {}),
+  }
+
   return (
     <form
-      className={`${styles.formCard} ${className || ''}`.trim()}
+      className={formCardClasses}
       onSubmit={handleSubmit}
-      style={{ maxHeight }}
+      style={Object.keys(inlineStyle).length > 0 ? inlineStyle : undefined}
     >
-      {header && (
-        <div className={styles.header}>
-          {header}
-        </div>
-      )}
-      <div className={styles.content}>
-        {children}
-      </div>
-      {footer && (
-        <div className={styles.footer}>
-          {footer}
-        </div>
-      )}
+      {header && <div className={styles.header}>{header}</div>}
+      <div className={styles.content}>{children}</div>
+      {footer && <div className={styles.footer}>{footer}</div>}
     </form>
   )
 }

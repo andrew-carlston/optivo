@@ -1,0 +1,303 @@
+// Badge Component Styles
+// Neomorphic design system with multiple variants, fills, sizes, and colors
+
+// ===================
+// Color Variables
+// ===================
+// Using CSS custom properties for theme compatibility
+// Colors are defined per the design spec
+
+// ===================
+// Base Badge
+// ===================
+.badge
+  display: inline-flex
+  align-items: center
+  gap: var(--spacing-1)
+  font-weight: 500
+  line-height: 1
+  white-space: nowrap
+  transition: all var(--transition-fast)
+  vertical-align: middle
+  padding: 4px 12px
+  font-size: 14px
+
+// ===================
+// Variant Styles (Shape)
+// ===================
+.pill
+  border-radius: var(--radius-full)
+
+.square
+  border-radius: 0
+
+// Leaf variants - diagonal corners rounded
+.leafLeft
+  // top-left and bottom-right corners rounded
+  border-radius: var(--radius-md) 0 var(--radius-md) 0
+
+.leafRight
+  // top-right and bottom-left corners rounded
+  border-radius: 0 var(--radius-md) 0 var(--radius-md)
+
+// Corner variants - all corners rounded except one
+.cornerTopLeft
+  border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md)
+
+.cornerTopRight
+  border-radius: var(--radius-md) 0 var(--radius-md) var(--radius-md)
+
+.cornerBottomLeft
+  border-radius: var(--radius-md) var(--radius-md) var(--radius-md) 0
+
+.cornerBottomRight
+  border-radius: var(--radius-md) var(--radius-md) 0 var(--radius-md)
+
+// ===================
+// Fill Styles
+// ===================
+.solid
+  // Subtle neomorphic shadow for depth
+  box-shadow: var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+
+.outline
+  background: transparent
+  border-width: 1px
+  border-style: solid
+
+.raised
+  // Neomorphic raised/embossed effect (outward shadows)
+  box-shadow: var(--shadow-distance-md) var(--shadow-distance-md) var(--shadow-blur-md) var(--neo-shadow-dark), calc(var(--shadow-distance-md) * -1) calc(var(--shadow-distance-md) * -1) var(--shadow-blur-md) var(--neo-shadow-light)
+
+.inset
+  // Neomorphic pressed/inward effect
+  box-shadow: inset var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), inset calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+
+.fill
+  // Flat filled, no shadow
+  box-shadow: none
+
+// ===================
+// Color Styles
+// Colors defined per design spec
+// ===================
+
+// Default (neutral gray)
+// bg: #6b7280, text: #fff
+.colorDefault
+  --badge-bg: #6b7280
+  --badge-text: #fff
+  --badge-inset-bg: #5a626b
+
+  &.solid
+    background: var(--badge-bg)
+    color: var(--badge-text)
+
+  &.outline
+    border-color: var(--badge-bg)
+    color: var(--badge-bg)
+
+  &.raised
+    background: var(--badge-bg)
+    color: var(--badge-text)
+
+  &.inset
+    background: var(--badge-inset-bg)
+    color: var(--badge-text)
+
+  &.fill
+    background: var(--badge-bg)
+    color: var(--badge-text)
+
+// Primary (brand/accent)
+// bg: var(--neo-accent), text: #fff
+.colorPrimary
+  --badge-inset-bg: rgba(59, 130, 246, 0.85)
+
+  &.solid
+    background: var(--neo-accent)
+    color: #fff
+
+  &.outline
+    border-color: var(--neo-accent)
+    color: var(--neo-accent)
+
+  &.raised
+    background: var(--neo-accent)
+    color: #fff
+
+  &.inset
+    background: var(--badge-inset-bg)
+    color: #fff
+
+  &.fill
+    background: var(--neo-accent)
+    color: #fff
+
+// Success (green)
+// bg: #10b981, text: #fff
+.colorSuccess
+  --badge-bg: #10b981
+  --badge-text: #fff
+  --badge-inset-bg: #0ea574
+
+  &.solid
+    background: var(--badge-bg)
+    color: var(--badge-text)
+
+  &.outline
+    border-color: var(--badge-bg)
+    color: var(--badge-bg)
+
+  &.raised
+    background: var(--badge-bg)
+    color: var(--badge-text)
+
+  &.inset
+    background: var(--badge-inset-bg)
+    color: var(--badge-text)
+
+  &.fill
+    background: var(--badge-bg)
+    color: var(--badge-text)
+
+// Warning (orange/yellow)
+// bg: #f59e0b, text: #000
+.colorWarning
+  --badge-bg: #f59e0b
+  --badge-text: #000
+  --badge-inset-bg: #d98f0a
+
+  &.solid
+    background: var(--badge-bg)
+    color: var(--badge-text)
+
+  &.outline
+    border-color: var(--badge-bg)
+    color: #b45309
+
+  &.raised
+    background: var(--badge-bg)
+    color: var(--badge-text)
+
+  &.inset
+    background: var(--badge-inset-bg)
+    color: var(--badge-text)
+
+  &.fill
+    background: var(--badge-bg)
+    color: var(--badge-text)
+
+// Danger (red)
+// bg: #ef4444, text: #fff
+.colorDanger
+  --badge-bg: #ef4444
+  --badge-text: #fff
+  --badge-inset-bg: #dc3030
+
+  &.solid
+    background: var(--badge-bg)
+    color: var(--badge-text)
+
+  &.outline
+    border-color: var(--badge-bg)
+    color: var(--badge-bg)
+
+  &.raised
+    background: var(--badge-bg)
+    color: var(--badge-text)
+
+  &.inset
+    background: var(--badge-inset-bg)
+    color: var(--badge-text)
+
+  &.fill
+    background: var(--badge-bg)
+    color: var(--badge-text)
+
+// Info (cyan/blue)
+// bg: #06b6d4, text: #fff
+.colorInfo
+  --badge-bg: #06b6d4
+  --badge-text: #fff
+  --badge-inset-bg: #05a3bf
+
+  &.solid
+    background: var(--badge-bg)
+    color: var(--badge-text)
+
+  &.outline
+    border-color: var(--badge-bg)
+    color: var(--badge-bg)
+
+  &.raised
+    background: var(--badge-bg)
+    color: var(--badge-text)
+
+  &.inset
+    background: var(--badge-inset-bg)
+    color: var(--badge-text)
+
+  &.fill
+    background: var(--badge-bg)
+    color: var(--badge-text)
+
+// ===================
+// Icon Styles
+// ===================
+.icon
+  display: inline-flex
+  align-items: center
+  justify-content: center
+  flex-shrink: 0
+
+  svg
+    width: 100%
+    height: 100%
+
+// ===================
+// Content
+// ===================
+.content
+  display: inline-block
+
+// ===================
+// Remove Button
+// ===================
+.removeButton
+  display: inline-flex
+  align-items: center
+  justify-content: center
+  flex-shrink: 0
+  background: transparent
+  border: none
+  border-radius: var(--radius-full)
+  cursor: pointer
+  opacity: 0.6
+  transition: opacity var(--transition-fast), background var(--transition-fast)
+  padding: 0
+  color: inherit
+
+  // On non-touch devices, show remove button more subtly
+  @media (hover: hover)
+    opacity: 0.5
+
+    &:hover
+      opacity: 1
+      background: rgba(0, 0, 0, 0.1)
+
+  // On touch devices, keep button visible
+  @media (hover: none)
+    opacity: 0.7
+
+  &:hover
+    opacity: 1
+
+  &:focus-visible
+    outline: 2px solid currentColor
+    outline-offset: 1px
+    opacity: 1
+
+  svg
+    width: 100%
+    height: 100%

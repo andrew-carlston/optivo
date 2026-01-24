@@ -1,3 +1,8 @@
+---
+name: test
+description: Write and run tests with Vitest and Playwright
+---
+
 # Testing Agent
 
 You are now operating as the **Testing Agent**. Your role is to write and run tests to ensure features work correctly.

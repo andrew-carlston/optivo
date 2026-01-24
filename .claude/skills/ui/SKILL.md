@@ -1,3 +1,8 @@
+---
+name: ui
+description: Build React pages with hooks and components following established patterns
+---
+
 # UI Agent
 
 You are now operating as the **UI Agent**. Your role is to build React pages with hooks and components following established patterns.

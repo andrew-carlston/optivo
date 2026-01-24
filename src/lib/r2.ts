@@ -6,10 +6,10 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
  *
  * R2 is S3-compatible, so we use the AWS SDK with R2 endpoint.
  *
- * File organization:
- * - avatars/{tenant}/{userId}.{ext}     - User profile pictures
- * - logos/{tenant}/logo.{ext}           - Company logos
- * - documents/{tenant}/{docId}.{ext}    - General documents
+ * File organization (tenant-first for better organization):
+ * - {tenant}/avatars/agents/{userId}.{ext}    - User/agent profile pictures
+ * - {tenant}/logos/company.{ext}              - Company logo
+ * - {tenant}/documents/{docId}.{ext}          - General documents
  */
 
 // Initialize S3 client for R2
@@ -37,6 +37,11 @@ interface UploadOptions {
 
 /**
  * Generate the storage key (path) for a file
+ *
+ * Structure:
+ * - {tenant}/avatars/agents/{userId}.{ext}
+ * - {tenant}/logos/company.{ext}
+ * - {tenant}/documents/{docId}.{ext}
  */
 function getStorageKey(options: UploadOptions, extension: string): string {
   const { type, tenant, userId, documentId, fileName } = options
@@ -44,15 +49,15 @@ function getStorageKey(options: UploadOptions, extension: string): string {
   switch (type) {
     case 'avatar':
       if (!userId) throw new Error('userId required for avatar upload')
-      return `avatars/${tenant}/${userId}.${extension}`
+      return `${tenant}/avatars/agents/${userId}.${extension}`
 
     case 'logo':
-      return `logos/${tenant}/logo.${extension}`
+      return `${tenant}/logos/company.${extension}`
 
     case 'document':
       if (!documentId && !fileName) throw new Error('documentId or fileName required for document upload')
       const name = fileName || documentId
-      return `documents/${tenant}/${name}.${extension}`
+      return `${tenant}/documents/${name}.${extension}`
 
     default:
       throw new Error(`Unknown upload type: ${type}`)

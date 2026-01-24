@@ -6,6 +6,7 @@ interface DropdownOption {
   value: string
   label: string
   disabled?: boolean
+  disabledTitle?: string
 }
 
 interface DropdownProps {
@@ -262,16 +263,20 @@ const Dropdown: React.FC<DropdownProps> = ({
           <div className={styles.options} ref={optionsRef}>
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option, index) => (
-                <button
+                <span
                   key={option.value}
-                  type="button"
-                  className={`${styles.option} ${option.disabled ? styles.optionDisabled : ''} ${option.value === value ? styles.optionSelected : ''} ${index === highlightedIndex ? styles.optionHighlighted : ''}`.trim()}
-                  onClick={() => handleSelect(option)}
-                  onMouseEnter={() => setHighlightedIndex(index)}
-                  disabled={option.disabled}
+                  title={option.disabled && option.disabledTitle ? option.disabledTitle : undefined}
                 >
-                  {option.label}
-                </button>
+                  <button
+                    type="button"
+                    className={`${styles.option} ${option.disabled ? styles.optionDisabled : ''} ${option.value === value ? styles.optionSelected : ''} ${index === highlightedIndex ? styles.optionHighlighted : ''}`.trim()}
+                    onClick={() => handleSelect(option)}
+                    onMouseEnter={() => setHighlightedIndex(index)}
+                    disabled={option.disabled}
+                  >
+                    {option.label}
+                  </button>
+                </span>
               ))
             ) : (
               <div className={styles.noResults}>No results found</div>

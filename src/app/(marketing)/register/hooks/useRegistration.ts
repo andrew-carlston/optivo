@@ -308,6 +308,23 @@ export function useRegistration() {
         const data = await response.json()
 
         if (response.ok) {
+          // Upload logo if one was selected
+          if (logoFile) {
+            try {
+              const formData = new FormData()
+              formData.append('file', logoFile)
+              formData.append('type', 'logo')
+
+              await fetch(`/api/${slug}/upload`, {
+                method: 'POST',
+                body: formData,
+              })
+              // Logo upload failure is non-blocking - company is still created
+            } catch (logoError) {
+              console.error('Logo upload failed:', logoError)
+            }
+          }
+
           setSubmitted(true)
           // Redirect to creating progress page
           router.push(`/register/creating?slug=${encodeURIComponent(slug)}`)

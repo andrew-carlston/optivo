@@ -2,56 +2,35 @@
   display: flex
   flex-direction: column
   width: 100%
-  background: var(--neo-surface)
+  background: var(--neo-background)
+  color: var(--neo-text-primary)
   border-radius: var(--radius-lg)
-  border: 1px solid var(--neo-border)
   box-shadow: var(--shadow-distance-lg) var(--shadow-distance-lg) var(--shadow-blur-lg) var(--neo-shadow-dark), calc(var(--shadow-distance-lg) * -1) calc(var(--shadow-distance-lg) * -1) var(--shadow-blur-lg) var(--neo-shadow-light)
-  overflow: hidden
+  transition: max-width var(--transition-normal)
 
-  @media (max-width: 640px)
-    border-radius: var(--radius-md)
+.formCardDefault
+  max-width: 1200px
+
+.formCardFull
+  max-width: 100%
 
 .header
   flex-shrink: 0
   padding: var(--spacing-6) var(--spacing-8)
-  border-bottom: 1px solid var(--neo-border)
-  background: var(--neo-surface)
 
   @media (max-width: 640px)
     padding: var(--spacing-3) var(--spacing-4)
 
 .content
   flex: 1
-  overflow-y: auto
   padding: var(--spacing-6) var(--spacing-8)
 
   @media (max-width: 640px)
     padding: var(--spacing-4)
 
-  // Webkit scrollbar (Chrome, Safari, Edge)
-  &::-webkit-scrollbar
-    width: 8px
-
-  &::-webkit-scrollbar-track
-    background: var(--neo-background)
-    border-radius: var(--radius-sm)
-
-  &::-webkit-scrollbar-thumb
-    background: var(--neo-border)
-    border-radius: var(--radius-sm)
-
-    &:hover
-      background: var(--neo-text-secondary)
-
-  // Firefox
-  scrollbar-width: thin
-  scrollbar-color: var(--neo-border) var(--neo-background)
-
 .footer
   flex-shrink: 0
   padding: var(--spacing-4) var(--spacing-8)
-  border-top: 1px solid var(--neo-border)
-  background: var(--neo-surface)
   display: flex
   justify-content: flex-end
   align-items: center

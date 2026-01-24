@@ -1,0 +1,273 @@
+@use '../../styles/mixins' as *
+
+$header-height: 72px
+
+.header
+  position: fixed
+  top: 0
+  left: 0
+  right: 0
+  height: $header-height
+  background: var(--neo-background)
+  border-radius: 0 0 $radius-lg $radius-lg
+  z-index: 1000
+  transition: transform $transition-normal, opacity $transition-normal
+  +neo-elevated
+
+  &.collapsed
+    transform: translateY(-100%)
+    opacity: 0
+    pointer-events: none
+
+.container
+  display: flex
+  align-items: center
+  justify-content: space-between
+  height: 100%
+  width: 100%
+  max-width: 1440px
+  margin: 0 auto
+  padding: 0 $spacing-6
+  transition: max-width $transition-normal
+
+  +media-max-md
+    padding: 0 $spacing-4
+
+  &.fullWidth
+    max-width: none
+
+// Left Section - Company Branding
+.leftSection
+  display: flex
+  align-items: center
+  gap: $spacing-3
+  flex-shrink: 0
+
+  +media-max-sm
+    gap: $spacing-2
+
+.companyInfo
+  display: flex
+  flex-direction: column
+  align-items: flex-start
+  min-width: 0
+
+  +media-max-md
+    display: none
+
+.companyName
+  font-size: $font-size-sm
+  font-weight: $font-weight-semibold
+  color: var(--neo-text-primary)
+  line-height: $line-height-tight
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+  max-width: 200px
+
+.companyTagline
+  font-size: $font-size-xs
+  color: var(--neo-text-secondary)
+  line-height: $line-height-tight
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+  max-width: 200px
+
+// Center Section - Navigation
+.centerSection
+  display: flex
+  align-items: center
+  justify-content: center
+  gap: $spacing-2
+  flex: 1
+  min-width: 0
+
+.desktopNav
+  display: flex
+  align-items: center
+  gap: $spacing-2
+
+  +media-max-md
+    display: none
+
+.navItem
+  +flex-center
+  position: relative
+  height: 40px
+  padding: 0 $spacing-4
+  border: none
+  background: transparent
+  color: var(--neo-text-secondary)
+  font-size: $font-size-sm
+  font-weight: $font-weight-medium
+  border-radius: $radius-md
+  cursor: pointer
+  transition: color $transition-normal
+  white-space: nowrap
+
+  // Indicator line
+  &::after
+    content: ''
+    position: absolute
+    bottom: 4px
+    left: $spacing-2
+    right: $spacing-2
+    height: 2px
+    border-radius: $radius-full
+    background: transparent
+    transform: scaleX(0)
+    transition: transform $transition-normal, background $transition-normal
+
+  &:hover
+    color: var(--neo-text-primary)
+
+    &::after
+      transform: scaleX(1)
+      background: linear-gradient(90deg, var(--neo-accent), var(--neo-text-primary))
+      background-size: 200% 100%
+      animation: gradientSlide 1s ease infinite
+
+  &:active
+    color: var(--neo-accent)
+
+  &.active
+    color: var(--neo-accent)
+    font-weight: $font-weight-semibold
+
+    &::after
+      transform: scaleX(1)
+      height: 3px
+      background: var(--neo-accent)
+
+  &:focus-visible
+    +focus-ring
+
+@keyframes gradientSlide
+  0%
+    background-position: 0% 50%
+  50%
+    background-position: 100% 50%
+  100%
+    background-position: 0% 50%
+
+// Right Section - User Controls
+.rightSection
+  display: flex
+  align-items: center
+  gap: $spacing-3
+  flex-shrink: 0
+
+  +media-max-md
+    gap: $spacing-2
+
+.desktopControls
+  display: flex
+  align-items: center
+  gap: $spacing-3
+
+  +media-max-md
+    display: none
+
+.layoutToggle
+  +flex-center
+  width: 36px
+  height: 36px
+  border: none
+  background: transparent
+  color: var(--neo-text-secondary)
+  border-radius: $radius-md
+  cursor: pointer
+  transition: all $transition-normal
+
+  &:hover
+    color: var(--neo-text-primary)
+    background: var(--neo-background)
+    +neo-inset-sm
+
+  &:focus-visible
+    +focus-ring
+
+.mobileControls
+  display: none
+
+  +media-max-md
+    display: block
+
+.mobileControlsRow
+  display: flex
+  align-items: center
+  justify-content: center
+  gap: $spacing-3
+  padding: $spacing-2 $spacing-3
+
+.avatarTrigger
+  +flex-center
+  cursor: pointer
+  transition: transform $transition-fast
+
+  &:hover
+    transform: scale(1.05)
+
+// Toggle Button
+.toggleButton
+  position: fixed
+  top: $header-height + 8px
+  left: 50%
+  transform: translateX(-50%)
+  +flex-center
+  width: 32px
+  height: 20px
+  border: none
+  background: var(--neo-background)
+  color: var(--neo-text-secondary)
+  border-radius: 0 0 $radius-md $radius-md
+  cursor: pointer
+  z-index: 999
+  transition: all $transition-normal
+  +neo-elevated-sm
+
+  &:hover
+    color: var(--neo-text-primary)
+
+  &:focus-visible
+    +focus-ring
+
+  &.collapsed
+    top: 8px
+    border-radius: $radius-md
+
+// Menu styling
+.menuIcon
+  +flex-center
+  margin-right: $spacing-2
+  color: var(--neo-text-secondary)
+
+  svg
+    display: block
+
+// Hamburger Menu (mobile only)
+.hamburgerButton
+  display: none
+
+  +media-max-md
+    display: block
+
+.hamburgerTrigger
+  +flex-center
+  width: 40px
+  height: 40px
+  border: none
+  background: transparent
+  color: var(--neo-text-secondary)
+  border-radius: $radius-lg
+  cursor: pointer
+  transition: all $transition-normal
+
+  &:hover
+    color: var(--neo-text-primary)
+    background: var(--neo-background)
+    +neo-inset-sm
+
+  &:focus-visible
+    +focus-ring

@@ -6,6 +6,24 @@ interface RouteParams {
   params: Promise<{ tenant: string }>
 }
 
+/**
+ * Extract the R2 storage key from a public URL
+ * e.g., "https://cdn.example.com/tenant/logos/company.png" -> "tenant/logos/company.png"
+ */
+function extractKeyFromUrl(url: string): string | null {
+  try {
+    const publicUrl = process.env.R2_PUBLIC_URL || ''
+    if (publicUrl && url.startsWith(publicUrl)) {
+      return url.slice(publicUrl.length + 1) // +1 for the trailing slash
+    }
+    // Fallback: try to extract path after the domain
+    const urlObj = new URL(url)
+    return urlObj.pathname.slice(1) // Remove leading slash
+  } catch {
+    return null
+  }
+}
+
 // Max file sizes in bytes
 const MAX_FILE_SIZES: Record<UploadType, number> = {
   avatar: 5 * 1024 * 1024,    // 5MB for avatars
@@ -103,6 +121,43 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     // Convert file to buffer
     const buffer = Buffer.from(await file.arrayBuffer())
+
+    // Delete old file from R2 before uploading new one
+    if (type === 'avatar' && userId) {
+      // Get current avatar URL from database
+      const escapedUserId = userId.replace(/'/g, "''")
+      const result = await prisma.$queryRawUnsafe<{ avatar: string | null }[]>(`
+        SELECT avatar FROM "${tenant}".core_directory_personal
+        WHERE directory_id = '${escapedUserId}'
+      `)
+
+      const currentAvatarUrl = result[0]?.avatar
+      if (currentAvatarUrl) {
+        // Extract key from URL and delete old file
+        const oldKey = extractKeyFromUrl(currentAvatarUrl)
+        if (oldKey) {
+          try {
+            await deleteFromR2(oldKey)
+          } catch (e) {
+            console.warn('Failed to delete old avatar:', e)
+          }
+        }
+      }
+    } else if (type === 'logo') {
+      // Get current logo URL from tenant record
+      const currentLogoUrl = tenantRecord.logo
+      if (currentLogoUrl) {
+        // Extract key from URL and delete old file
+        const oldKey = extractKeyFromUrl(currentLogoUrl)
+        if (oldKey) {
+          try {
+            await deleteFromR2(oldKey)
+          } catch (e) {
+            console.warn('Failed to delete old logo:', e)
+          }
+        }
+      }
+    }
 
     // Upload to R2
     const { url, key } = await uploadToR2(buffer, file.name, file.type, {

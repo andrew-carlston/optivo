@@ -239,7 +239,7 @@ export default function SettingsPage() {
         </Card>
 
         <div className={styles.saveSection}>
-          <Button variant="primary">Save Changes</Button>
+          <Button>Save Changes</Button>
         </div>
       </div>
     </div>

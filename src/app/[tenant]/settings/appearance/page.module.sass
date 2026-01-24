@@ -1,0 +1,239 @@
+@use '../../../../styles/_mixins' as *
+
+$header-height: 72px
+
+.page
+  min-height: 100vh
+  padding-bottom: $spacing-12
+  background: var(--neo-background)
+  color: var(--neo-text-primary)
+
+.loading
+  +flex-center
+  flex-direction: column
+  gap: $spacing-4
+  min-height: 100vh
+  color: var(--neo-text-secondary)
+
+.spinner
+  width: 40px
+  height: 40px
+  border: 3px solid var(--neo-surface-secondary)
+  border-top-color: var(--neo-accent)
+  border-radius: $radius-full
+  animation: spin 1s linear infinite
+
+@keyframes spin
+  to
+    transform: rotate(360deg)
+
+.main
+  padding-top: $header-height + $spacing-10
+  min-height: 100vh
+  animation: pageEnter $transition-normal ease-out
+
+@keyframes pageEnter
+  from
+    opacity: 0
+    transform: translateY(12px)
+  to
+    opacity: 1
+    transform: translateY(0)
+
+.container
+  max-width: 960px
+  margin: 0 auto
+  padding: 0 $spacing-6
+
+  +media-max-md
+    padding: 0 $spacing-4
+
+// Page header
+.header
+  margin-bottom: $spacing-8
+
+.headerContent
+  +flex-between
+  align-items: flex-start
+  gap: $spacing-4
+
+  +media-max-sm
+    flex-direction: column
+    align-items: stretch
+
+.headerText
+  h1
+    +heading-3
+    margin: 0 0 $spacing-2
+
+  p
+    +body-text
+    color: var(--neo-text-secondary)
+    margin: 0
+
+.headerActions
+  display: flex
+  gap: $spacing-3
+  flex-shrink: 0
+
+  +media-max-sm
+    justify-content: flex-end
+
+// Back link
+.backLink
+  display: inline-flex
+  align-items: center
+  gap: $spacing-2
+  margin-bottom: $spacing-4
+  padding: $spacing-2 $spacing-3
+  font-size: $font-size-sm
+  color: var(--neo-text-secondary)
+  text-decoration: none
+  border-radius: $radius-sm
+  transition: color $transition-fast, background-color $transition-fast
+
+  &:hover
+    color: var(--neo-text-primary)
+    background: var(--neo-surface-secondary)
+
+  svg
+    width: 16px
+    height: 16px
+
+// Content sections
+.content
+  +flex-column
+  gap: $spacing-6
+
+// Preview card
+.previewCard
+  padding: $spacing-6
+
+.previewHeader
+  margin-bottom: $spacing-6
+
+  h2
+    font-size: $font-size-lg
+    font-weight: $font-weight-semibold
+    margin: 0 0 $spacing-2
+
+  p
+    font-size: $font-size-sm
+    color: var(--neo-text-secondary)
+    margin: 0
+
+.previewSections
+  +flex-column
+  gap: $spacing-6
+
+.previewSection
+  padding-top: $spacing-4
+  border-top: 1px solid var(--neo-surface-secondary)
+
+  &:first-child
+    padding-top: 0
+    border-top: none
+
+.previewSectionTitle
+  font-size: $font-size-sm
+  font-weight: $font-weight-medium
+  color: var(--neo-text-secondary)
+  text-transform: uppercase
+  letter-spacing: 0.05em
+  margin: 0 0 $spacing-4
+
+.badgeGrid
+  display: flex
+  flex-wrap: wrap
+  gap: $spacing-3
+  align-items: center
+
+// Config card
+.configCard
+  padding: $spacing-6
+
+.configHeader
+  margin-bottom: $spacing-5
+
+  h3
+    font-size: $font-size-lg
+    font-weight: $font-weight-semibold
+    margin: 0 0 $spacing-2
+
+  p
+    font-size: $font-size-sm
+    color: var(--neo-text-secondary)
+    margin: 0
+
+.configGrid
+  display: grid
+  grid-template-columns: repeat(3, 1fr)
+  gap: $spacing-4
+
+  +media-max-md
+    grid-template-columns: repeat(2, 1fr)
+
+  +media-max-sm
+    grid-template-columns: 1fr
+
+.configField
+  +flex-column
+  gap: $spacing-2
+
+.configLabel
+  font-size: $font-size-sm
+  font-weight: $font-weight-medium
+  color: var(--neo-text-secondary)
+
+// Footer actions
+.footerActions
+  +flex-between
+  padding-top: $spacing-6
+  border-top: 1px solid var(--neo-surface-secondary)
+  margin-top: $spacing-2
+
+  +media-max-sm
+    flex-direction: column
+    gap: $spacing-4
+
+.footerLeft
+  display: flex
+  align-items: center
+  gap: $spacing-3
+
+.footerRight
+  display: flex
+  align-items: center
+  gap: $spacing-3
+
+// Messages
+.successMessage
+  font-size: $font-size-sm
+  color: var(--neo-success, #22c55e)
+  animation: fadeIn $transition-fast ease-out
+
+.errorMessage
+  font-size: $font-size-sm
+  color: var(--neo-error, #ef4444)
+  animation: fadeIn $transition-fast ease-out
+
+@keyframes fadeIn
+  from
+    opacity: 0
+  to
+    opacity: 1
+
+// Unsaved changes indicator
+.unsavedIndicator
+  display: flex
+  align-items: center
+  gap: $spacing-2
+  font-size: $font-size-sm
+  color: var(--neo-warning, #f59e0b)
+
+  &::before
+    content: ''
+    width: 8px
+    height: 8px
+    background: var(--neo-warning, #f59e0b)
+    border-radius: $radius-full

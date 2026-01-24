@@ -1,0 +1,564 @@
+@use '../../../styles/_mixins' as *
+
+$header-height: 72px
+$sidebar-width: 240px
+
+.page
+  min-height: 100vh
+  padding-bottom: 48px
+  background: var(--neo-background)
+  color: var(--neo-text-primary)
+
+// Skeleton Loading
+.skeleton
+  background: linear-gradient(90deg, var(--neo-surface) 25%, var(--neo-background) 50%, var(--neo-surface) 75%)
+  background-size: 200% 100%
+  animation: shimmer 1.5s infinite
+  border-radius: $radius-md
+
+@keyframes shimmer
+  0%
+    background-position: 200% 0
+  100%
+    background-position: -200% 0
+
+// Settings page skeleton layout
+.loadingSkeleton
+  padding-top: $header-height + $spacing-10
+  min-height: 100vh
+
+.skeletonContainer
+  display: flex
+  width: 100%
+  padding: 0 $spacing-6
+
+  +media-max-md
+    flex-direction: column
+    padding: 0 $spacing-4
+
+.skeletonSidebar
+  width: $sidebar-width
+  flex-shrink: 0
+  padding-right: $spacing-6
+  border-right: 1px solid var(--neo-surface-secondary)
+  +flex-column
+  gap: $spacing-2
+
+  +media-max-md
+    width: 100%
+    flex-direction: row
+    padding-right: 0
+    border-right: none
+    border-bottom: 1px solid var(--neo-surface-secondary)
+    padding-bottom: $spacing-4
+    margin-bottom: $spacing-4
+
+.skeletonNavItem
+  height: 40px
+  @extend .skeleton
+
+.skeletonContent
+  flex: 1
+  min-width: 0
+  padding-left: $spacing-6
+  +flex-column
+  gap: $spacing-4
+
+  +media-max-md
+    padding-left: 0
+
+.skeletonCard
+  background: var(--neo-surface)
+  border-radius: $radius-lg
+  padding: $spacing-6
+  box-shadow: var(--shadow-distance-lg) var(--shadow-distance-lg) var(--shadow-blur-lg) var(--neo-shadow-dark), calc(var(--shadow-distance-lg) * -1) calc(var(--shadow-distance-lg) * -1) var(--shadow-blur-lg) var(--neo-shadow-light)
+
+.skeletonTitle
+  width: 180px
+  height: 24px
+  margin-bottom: $spacing-2
+  @extend .skeleton
+
+.skeletonDescription
+  width: 280px
+  height: 16px
+  margin-bottom: $spacing-6
+  @extend .skeleton
+
+.skeletonInputLabel
+  width: 100px
+  height: 14px
+  margin-bottom: $spacing-2
+  @extend .skeleton
+
+.skeletonInput
+  width: 100%
+  height: 44px
+  @extend .skeleton
+
+.skeletonInputRow
+  display: flex
+  gap: $spacing-4
+  margin-bottom: $spacing-4
+
+.skeletonButton
+  width: 120px
+  height: 44px
+  @extend .skeleton
+
+// Appearance skeleton
+.appearanceSkeleton
+  +flex-column
+  gap: $spacing-4
+
+.skeletonTabRow
+  display: flex
+  gap: $spacing-2
+
+.skeletonTab
+  width: 80px
+  height: 36px
+  @extend .skeleton
+
+.skeletonTwoColumn
+  display: grid
+  grid-template-columns: 1fr 1fr
+  gap: $spacing-6
+
+  +media-max-md
+    grid-template-columns: 1fr
+
+.skeletonSettingsColumn
+  +flex-column
+  gap: $spacing-4
+
+.skeletonPreviewColumn
+  background: var(--neo-surface-secondary)
+  border-radius: $radius-lg
+  padding: $spacing-4
+  height: 200px
+  @extend .skeleton
+
+.main
+  padding-top: $header-height + $spacing-10
+  min-height: 100vh
+  animation: pageEnter $transition-normal ease-out
+
+@keyframes pageEnter
+  from
+    opacity: 0
+    transform: translateY(12px)
+  to
+    opacity: 1
+    transform: translateY(0)
+
+.container
+  display: flex
+  width: 100%
+  padding: 0 $spacing-6
+
+  +media-max-md
+    flex-direction: column
+    padding: 0 $spacing-4
+
+// Sidebar
+.sidebar
+  width: $sidebar-width
+  flex-shrink: 0
+  position: sticky
+  top: $header-height + $spacing-10
+  align-self: flex-start
+  padding-right: $spacing-6
+  border-right: 1px solid var(--neo-surface-secondary)
+
+  +media-max-md
+    width: 100%
+    position: relative
+    top: 0
+    padding-right: 0
+    padding-bottom: $spacing-4
+    margin-bottom: $spacing-4
+    border-right: none
+    border-bottom: 1px solid var(--neo-surface-secondary)
+
+.sidebarNav
+  +flex-column
+  gap: $spacing-1
+
+  +media-max-md
+    flex-direction: row
+    overflow-x: auto
+
+// Content
+.content
+  flex: 1
+  min-width: 0
+  padding-left: $spacing-6
+
+  +media-max-md
+    padding-left: 0
+
+.subTabs
+  display: flex
+  gap: $spacing-1
+  padding-bottom: $spacing-4
+  margin-bottom: $spacing-6
+  border-bottom: 1px solid var(--neo-surface-secondary)
+
+.viewContainer
+  width: 100%
+  animation: fadeIn $transition-normal ease-out
+
+@keyframes fadeIn
+  from
+    opacity: 0
+    transform: translateY(8px)
+  to
+    opacity: 1
+    transform: translateY(0)
+
+// Layout helpers
+.profileLayout
+  display: flex
+  gap: $spacing-6
+  align-items: flex-start
+
+  +media-max-sm
+    flex-direction: column
+    align-items: center
+
+.fieldsColumn
+  flex: 1
+  +flex-column
+  gap: $spacing-4
+
+  +media-max-sm
+    width: 100%
+
+.addressForm
+  +flex-column
+  gap: $spacing-4
+
+.twoColumnGrid
+  display: grid
+  grid-template-columns: 1fr 1fr
+  gap: $spacing-4
+
+  +media-max-sm
+    grid-template-columns: 1fr
+
+// Plan view
+.planHeader
+  +flex-between
+  align-items: center
+  gap: $spacing-4
+  margin-bottom: $spacing-3
+
+.planInfo
+  display: flex
+  align-items: center
+  gap: $spacing-3
+
+.planBadge
+  padding: $spacing-1 $spacing-3
+  background: var(--neo-accent)
+  color: var(--neo-background)
+  font-size: $font-size-xs
+  font-weight: $font-weight-semibold
+  border-radius: $radius-full
+  text-transform: uppercase
+
+.planDescription
+  font-size: $font-size-sm
+  color: var(--neo-text-secondary)
+  margin: 0 0 $spacing-4
+
+.featureList
+  margin: 0
+  padding-left: $spacing-5
+  font-size: $font-size-sm
+  color: var(--neo-text-secondary)
+
+// Payment view
+.paymentMethod
+  display: flex
+  align-items: center
+  gap: $spacing-4
+  margin-top: $spacing-4
+
+.cardIcon
+  width: 48px
+  height: 32px
+  +flex-center
+  background: var(--neo-surface-secondary)
+  border-radius: $radius-sm
+  font-weight: $font-weight-bold
+  font-size: $font-size-xs
+
+.cardDetails
+  flex: 1
+  +flex-column
+  gap: $spacing-1
+
+.cardExpiry
+  font-size: $font-size-xs
+  color: var(--neo-text-secondary)
+
+.noPayment
+  +flex-column
+  gap: $spacing-4
+  margin-top: $spacing-4
+
+// Messages
+.successMessage
+  font-size: $font-size-sm
+  color: var(--neo-success, #22c55e)
+
+.errorMessage
+  font-size: $font-size-sm
+  color: var(--neo-error, #ef4444)
+
+// Coming soon
+.comingSoon
+  +flex-center
+  flex-direction: column
+  gap: $spacing-4
+  padding: $spacing-8
+  text-align: center
+
+.comingSoonText
+  color: var(--neo-text-secondary)
+  margin-top: $spacing-4
+
+// Danger zone
+.dangerCard
+  border: 2px solid var(--neo-error, #ef4444)
+
+.dangerTitle
+  color: var(--neo-error, #ef4444)
+
+.dangerList
+  margin: $spacing-4 0
+  padding-left: $spacing-5
+  font-size: $font-size-sm
+  color: var(--neo-text-secondary)
+
+.deleteConfirm
+  +flex-column
+  gap: $spacing-4
+  margin-top: $spacing-4
+
+.dangerButton
+  background: var(--neo-error, #ef4444)
+  color: white
+
+  &:hover
+    background: color-mix(in srgb, var(--neo-error, #ef4444) 85%, black)
+
+// Appearance settings
+.appearanceContainer
+  +flex-column
+  gap: $spacing-6
+
+.appearanceSection
+  margin-bottom: $spacing-4
+
+  h2, h3
+    font-size: $font-size-lg
+    font-weight: $font-weight-semibold
+    margin: 0 0 $spacing-2
+
+.sectionDescription
+  font-size: $font-size-sm
+  color: var(--neo-text-secondary)
+  margin: 0
+
+.previewSections
+  +flex-column
+  gap: $spacing-6
+
+.previewSection
+  padding-top: $spacing-4
+  border-top: 1px solid var(--neo-surface-secondary)
+
+  &:first-child
+    padding-top: 0
+    border-top: none
+
+.previewSectionTitle
+  font-size: $font-size-sm
+  font-weight: $font-weight-medium
+  color: var(--neo-text-secondary)
+  text-transform: uppercase
+  letter-spacing: 0.05em
+  margin: 0 0 $spacing-4
+
+.badgeGrid
+  display: grid
+  grid-template-columns: repeat(2, auto)
+  gap: $spacing-3
+  justify-content: center
+
+.configGrid
+  display: grid
+  grid-template-columns: repeat(2, 1fr)
+  gap: $spacing-4
+
+  +media-max-sm
+    grid-template-columns: 1fr
+
+.configField
+  +flex-column
+  gap: $spacing-2
+
+.configLabel
+  font-size: $font-size-sm
+  font-weight: $font-weight-medium
+  color: var(--neo-text-secondary)
+
+.appearanceFooter
+  +flex-between
+  padding-top: $spacing-6
+  border-top: 1px solid var(--neo-surface-secondary)
+  margin-top: $spacing-2
+
+  +media-max-sm
+    flex-direction: column
+    gap: $spacing-4
+
+.footerLeft
+  display: flex
+  align-items: center
+  gap: $spacing-3
+
+.footerRight
+  display: flex
+  align-items: center
+  gap: $spacing-3
+
+.unsavedIndicator
+  display: flex
+  align-items: center
+  gap: $spacing-2
+  font-size: $font-size-sm
+  color: var(--neo-warning, #f59e0b)
+
+  &::before
+    content: ''
+    width: 8px
+    height: 8px
+    background: var(--neo-warning, #f59e0b)
+    border-radius: $radius-full
+
+// Badge type tabs
+.badgeTypeTabs
+  display: flex
+  gap: $spacing-1
+  padding-bottom: $spacing-4
+  margin-bottom: $spacing-4
+  border-bottom: 1px solid var(--neo-surface-secondary)
+  max-width: 100%
+  overflow-x: auto
+  -webkit-overflow-scrolling: touch
+
+// Two-column layout for appearance settings
+.appearanceLayout
+  display: grid
+  grid-template-columns: 1fr 1fr
+  gap: $spacing-6
+  align-items: start
+
+  @media (max-width: 768px)
+    grid-template-columns: 1fr
+    gap: $spacing-4
+
+// Settings column (left side)
+.settingsColumn
+  display: flex
+  flex-direction: column
+  gap: $spacing-4
+
+// Preview column (right side)
+.previewColumn
+  background: var(--neo-surface-secondary)
+  border-radius: $radius-lg
+  padding: $spacing-4
+  box-shadow: inset 2px 2px 4px var(--neo-shadow-dark), inset -2px -2px 4px var(--neo-shadow-light)
+
+// Toggle buttons for leaf side
+.toggleButtons
+  display: flex
+  gap: $spacing-2
+
+// Corner position 2x2 grid
+.cornerGrid
+  display: grid
+  grid-template-columns: 1fr 1fr
+  gap: $spacing-2
+
+// Toggle button states - raised (default) and pressed (active)
+.toggleInactive
+  box-shadow: var(--shadow-distance-sm) var(--shadow-distance-sm) var(--shadow-blur-sm) var(--neo-shadow-dark), calc(var(--shadow-distance-sm) * -1) calc(var(--shadow-distance-sm) * -1) var(--shadow-blur-sm) var(--neo-shadow-light)
+  color: var(--neo-text-secondary)
+  transition: all var(--transition-fast)
+
+  &:hover
+    color: var(--neo-text-primary)
+
+.toggleActive
+  box-shadow: inset 2px 2px 4px var(--neo-shadow-dark), inset -2px -2px 4px var(--neo-shadow-light)
+  color: var(--neo-accent)
+  transition: all var(--transition-fast)
+
+// Preview title
+.previewTitle
+  font-size: $font-size-sm
+  font-weight: $font-weight-medium
+  color: var(--neo-text-secondary)
+  text-transform: uppercase
+  letter-spacing: 0.05em
+  margin: 0 0 $spacing-3
+
+// Logo section in Company Profile
+.logoSection
+  +flex-column
+  gap: $spacing-3
+  min-width: 280px
+
+  +media-max-sm
+    width: 100%
+    min-width: auto
+
+.logoHint
+  font-size: $font-size-xs
+  color: var(--neo-text-secondary)
+  margin: 0
+
+// Text logo preview (when using text mode instead of uploaded image)
+.textLogoPreview
+  display: flex
+  flex-direction: column
+  gap: $spacing-1
+  padding: $spacing-6 $spacing-4
+  background: var(--neo-surface-secondary)
+  border-radius: $radius-lg
+  min-height: 140px
+  width: 280px
+  justify-content: center
+  align-items: center
+  box-shadow: inset 2px 2px 4px var(--neo-shadow-dark), inset -2px -2px 4px var(--neo-shadow-light)
+
+  +media-max-sm
+    width: 100%
+
+.textLogoName
+  font-size: $font-size-2xl
+  font-weight: $font-weight-bold
+  color: var(--neo-text-primary)
+  text-align: center
+  line-height: 1.2
+
+.textLogoTagline
+  font-size: $font-size-sm
+  color: var(--neo-text-secondary)
+  text-align: center

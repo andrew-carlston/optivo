@@ -1,0 +1,69 @@
+@use '../../styles/_mixins' as *
+
+.footer
+  position: fixed
+  bottom: 0
+  left: 0
+  right: 0
+  width: 100%
+  padding: $spacing-2 $spacing-4
+  background: var(--neo-background)
+  +neo-elevated
+  z-index: 100
+
+.container
+  +flex-between
+  align-items: center
+  max-width: 1400px
+  margin: 0 auto
+
+.branding
+  +flex-center
+  gap: $spacing-1
+
+.poweredBy
+  font-size: $font-size-xs
+  color: var(--neo-text-secondary)
+
+.logo
+  +flex-center
+  gap: 1px
+
+.logoText
+  font-size: $font-size-sm
+  font-weight: $font-weight-bold
+  background: linear-gradient(135deg, var(--neo-accent), var(--neo-text-primary))
+  -webkit-background-clip: text
+  -webkit-text-fill-color: transparent
+  background-clip: text
+  letter-spacing: -0.3px
+
+.logoDot
+  width: 4px
+  height: 4px
+  border-radius: $radius-full
+  background: var(--neo-accent)
+
+.links
+  +flex-center
+  gap: $spacing-4
+
+  +media-max-sm
+    display: none
+
+.link
+  font-size: $font-size-xs
+  color: var(--neo-text-secondary)
+  text-decoration: none
+  transition: color $transition-fast
+
+  &:hover
+    color: var(--neo-accent)
+
+.copyright
+  font-size: $font-size-xs
+  color: var(--neo-text-secondary)
+  opacity: 0.6
+
+  +media-max-sm
+    display: none

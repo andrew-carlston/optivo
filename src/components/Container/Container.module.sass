@@ -1,0 +1,19 @@
+@use '../../styles/_mixins' as *
+
+.container
+  width: 100%
+  max-width: 1440px
+  min-width: 960px
+  margin: 0 auto
+  padding: 0 $spacing-6
+
+  // Tablet and below: remove min-width, reduce padding
+  +media-max-lg
+    min-width: 0
+    padding: 0 $spacing-4
+
+.fullWidth
+  max-width: none
+
+.noPadding
+  padding: 0

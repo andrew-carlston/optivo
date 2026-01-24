@@ -1,10 +1,10 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import styles from './Avatar.module.sass'
 
 interface AvatarProps {
   src?: string
   alt?: string
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'xxl'
+  size?: 'sm' | 'header' | 'md' | 'lg' | 'xl' | 'xxl'
   editable?: boolean
   onChange?: (file: File | null) => void
   placeholder?: string
@@ -30,6 +30,13 @@ const Avatar: React.FC<AvatarProps> = ({
   const [preview, setPreview] = useState<string | null>(src || null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // Sync preview with src prop when it changes (e.g., async load)
+  useEffect(() => {
+    if (src) {
+      setPreview(src)
+    }
+  }, [src])
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null
     if (file) {
@@ -52,6 +59,7 @@ const Avatar: React.FC<AvatarProps> = ({
 
   const sizeClasses = {
     sm: styles.sm,
+    header: styles.header,
     md: styles.md,
     lg: styles.lg,
     xl: styles.xl,

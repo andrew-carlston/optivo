@@ -1,0 +1,183 @@
+@use '../../../styles/mixins' as *
+
+$header-height: 72px
+
+.page
+  min-height: 100vh
+  padding-bottom: 48px
+  background: var(--neo-background)
+  color: var(--neo-text-primary)
+
+.loading
+  +flex-center
+  flex-direction: column
+  gap: $spacing-4
+  min-height: 100vh
+  color: var(--neo-text-secondary)
+
+.spinner
+  width: 40px
+  height: 40px
+  border: 3px solid var(--neo-surface-secondary)
+  border-top-color: var(--neo-accent)
+  border-radius: $radius-full
+  animation: spin 1s linear infinite
+
+@keyframes spin
+  to
+    transform: rotate(360deg)
+
+.main
+  padding-top: $header-height + $spacing-10
+  min-height: 100vh
+  animation: pageEnter $transition-normal ease-out
+
+@keyframes pageEnter
+  from
+    opacity: 0
+    transform: translateY(12px)
+  to
+    opacity: 1
+    transform: translateY(0)
+
+.container
+  width: 100%
+  padding: 0 $spacing-6
+
+  +media-max-md
+    padding: 0 $spacing-4
+
+.pageHeader
+  margin-bottom: $spacing-8
+  text-align: center
+
+  +media-max-sm
+    margin-bottom: $spacing-6
+
+.title
+  +heading-2
+  color: var(--neo-text-primary)
+  margin-bottom: $spacing-2
+
+  +media-max-sm
+    +heading-3
+
+  .accent
+    color: var(--neo-accent)
+
+.subtitle
+  +body-text
+  color: var(--neo-text-secondary)
+
+// Stats Grid
+.statsGrid
+  display: grid
+  grid-template-columns: repeat(4, 1fr)
+  gap: $spacing-6
+  margin-bottom: $spacing-8
+
+  +media-max-lg
+    grid-template-columns: repeat(2, 1fr)
+    gap: $spacing-4
+
+  +media-max-sm
+    grid-template-columns: repeat(2, 1fr)
+    gap: $spacing-2
+
+.statCard
+  text-align: center
+  padding: $spacing-6
+
+  +media-max-sm
+    padding: $spacing-3
+
+.statValue
+  font-size: $font-size-4xl
+  font-weight: $font-weight-bold
+  color: var(--neo-accent)
+  line-height: $line-height-tight
+  margin-bottom: $spacing-2
+
+  +media-max-sm
+    font-size: $font-size-2xl
+    margin-bottom: $spacing-1
+
+.statLabel
+  font-size: $font-size-sm
+  color: var(--neo-text-secondary)
+  font-weight: $font-weight-medium
+
+  +media-max-sm
+    font-size: $font-size-xs
+
+// Content Grid
+.contentGrid
+  display: grid
+  grid-template-columns: 2fr 1fr
+  gap: $spacing-6
+
+  +media-max-lg
+    grid-template-columns: 1fr
+    gap: $spacing-4
+
+.contentCard
+  padding: $spacing-6
+
+  +media-max-sm
+    padding: $spacing-4
+
+.cardTitle
+  font-size: $font-size-lg
+  font-weight: $font-weight-semibold
+  color: var(--neo-text-primary)
+  margin-bottom: $spacing-4
+  padding-bottom: $spacing-3
+  border-bottom: 1px solid var(--neo-border)
+
+// Activity List
+.activityList
+  display: flex
+  flex-direction: column
+  gap: $spacing-4
+
+.activityItem
+  display: flex
+  align-items: flex-start
+  gap: $spacing-3
+
+.activityDot
+  width: 10px
+  height: 10px
+  border-radius: $radius-full
+  background: var(--neo-accent)
+  margin-top: 6px
+  flex-shrink: 0
+
+.activityContent
+  flex: 1
+  min-width: 0
+
+.activityText
+  font-size: $font-size-sm
+  color: var(--neo-text-primary)
+  margin: 0
+  line-height: $line-height-normal
+
+.activityTime
+  font-size: $font-size-xs
+  color: var(--neo-text-secondary)
+
+// Quick Actions
+.quickActions
+  display: flex
+  flex-direction: column
+  gap: $spacing-3
+
+.quickActionButton
+  justify-content: flex-start
+  gap: $spacing-3
+  width: 100%
+
+  svg
+    flex-shrink: 0
+    color: var(--neo-accent)
