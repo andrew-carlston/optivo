@@ -9,7 +9,7 @@ WFM/HR SaaS platform for contact centers — realtime monitoring, scheduling, fo
 | Database | Neon Postgres (serverless, per-company branching) |
 | ORM | Drizzle (typed schema, migrations) |
 | Framework | Next.js (App Router, server actions) |
-| Auth | Supabase Auth (Google/Microsoft SSO) |
+| Auth | Neon Auth (Google/Microsoft SSO, stored in your DB) |
 | Language | TypeScript (frontend + backend + workers) |
 | Styling | SCSS with CSS variable theming |
 
@@ -21,10 +21,11 @@ npm install
 
 # Set up environment
 cp .env.example .env.local
-# Add Neon + Supabase credentials
+# Add Neon DATABASE_URL (from Neon dashboard or `npx neonctl connection-string`)
 
-# Push schema to Neon
-npx drizzle-kit push
+# Generate + apply migrations
+npx drizzle-kit generate
+npx drizzle-kit migrate
 
 # Run dev server
 npm run dev

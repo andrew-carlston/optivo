@@ -18,9 +18,9 @@
           ┌────────────┼────────────┐
           ▼            ▼            ▼
 ┌──────────────┐ ┌──────────┐ ┌──────────────┐
-│ Supabase Auth│ │  Drizzle │ │   Workers    │
+│  Neon Auth   │ │  Drizzle │ │   Workers    │
 │ Google SSO   │ │   ORM    │ │ (TypeScript) │
-│ JWT Sessions │ │  Typed   │ │ Long-running │
+│ Users in DB  │ │  Typed   │ │ Long-running │
 └──────────────┘ │ Queries  │ │ + Cron jobs  │
                  └─────┬────┘ └──────┬───────┘
                        │             │
@@ -112,11 +112,18 @@ const hasForecasting = await db.query.featureFlags.findFirst({
 
 ```
 1. User visits /{slug}/login
-2. Google SSO via Supabase Auth
-3. Callback → JWT with company context
-4. Middleware validates JWT + resolves slug → branch
+2. Google/Microsoft SSO via Neon Auth (Stack Auth)
+3. Callback → session created, user stored in neon_auth schema
+4. Middleware validates session + resolves slug → Neon branch
 5. All subsequent requests scoped to that branch
+6. User data lives in YOUR database (queryable via Drizzle)
 ```
+
+### Neon Auth Advantages
+- Users stored in neon_auth.* schema — same database, no sync needed
+- Queryable via Drizzle like any other table
+- No external auth service dependency (no Supabase, no Clerk)
+- SSO providers: Google, Microsoft, GitHub, email/password
 
 ## Worker Management
 
@@ -151,12 +158,17 @@ All workers use the same Drizzle client and schema — one language, one codebas
 
 | Area | v1 (wfm-platform) | v2 (Optivo) |
 |------|-------------------|-------------|
-| Database | Supabase Postgres (fixed) | Neon (serverless, branching) |
-| Query layer | Supabase REST API (PostgREST) | Drizzle ORM (typed, transactions) |
+| Database | Supabase Postgres (fixed instance, $25/mo) | Neon Postgres 17 (serverless, scales to zero) |
+| Query layer | Supabase REST API (PostgREST, upsert quirks) | Drizzle ORM (typed, real transactions) |
+| Auth | Supabase Auth (separate service, JWT hooks) | Neon Auth (users in YOUR database, no sync) |
 | Tenant isolation | RLS (company_id on every table) | Neon branches (physical isolation) |
-| Schema management | Manual SQL in dashboard | drizzle-kit migrations in repo |
-| Workers | Python (daemon threads) | TypeScript (same language as app) |
-| Config | Hardcoded → retrofitted | Config-driven from day one |
-| Timestamps | Bare `time` → retrofitted UTC | UTC `timestamptz` from start |
-| Folder structure | Page-based (Next.js default) | Feature-module based |
-| Type safety | Runtime errors | Drizzle schema → TypeScript end-to-end |
+| Schema management | Manual SQL in Supabase dashboard | drizzle-kit generate + migrate in repo |
+| Schema namespaces | All tables in `public` schema | Postgres schemas: core.*, hr.*, attendance.*, etc. |
+| Workers | Python (daemon threads, crash silently) | TypeScript (same language, inside feature modules) |
+| Config | Hardcoded → retrofitted across 6+ files | Config-driven from day one (JSONB config tables) |
+| Timestamps | Bare `time` → retrofitted UTC | UTC `timestamptz` from start, per-user timezone |
+| Folder structure | Page-based (Next.js default) | Feature-module based (hooks/components/actions/worker) |
+| Type safety | Runtime errors, misspelled columns | Drizzle schema → TypeScript types end-to-end |
+| Dev environment | None — all changes hit production | Neon branching (instant dev/staging databases) |
+| Framework | Next.js 16 | Next.js 16.2.3 (latest) |
+| External services | Supabase (auth + DB + storage + realtime) | Neon only (auth + DB), S3/R2 for storage |

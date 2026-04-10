@@ -2,62 +2,82 @@
 
 WFM/HR SaaS platform — realtime monitoring, scheduling, forecasting, attendance, staff planning, cost planning.
 
+## Branch: `main`
+
 ## Stack
 
-- **Database**: Neon Postgres (serverless, per-company branching)
-- **ORM**: Drizzle (typed schema, migrations via drizzle-kit)
-- **Framework**: Next.js (latest, App Router, server actions)
-- **Auth**: Supabase Auth (Google/Microsoft SSO, JWT)
-- **Deploy**: EC2 (app + workers) or Railway
-- **Workers**: TypeScript (long-running processes inside each feature module)
+- **Database**: Neon Postgres 17 (serverless, per-company branching)
+- **ORM**: Drizzle (typed schema, migrations via drizzle-kit generate + migrate)
+- **Framework**: Next.js 16.2.3 (App Router, server actions, TypeScript strict)
+- **Auth**: Neon Auth (Google/Microsoft SSO, users stored in your DB)
+- **Language**: TypeScript everywhere (frontend + backend + workers)
+- **Styling**: SCSS with CSS variable theming
+- **Deploy**: TBD (EC2 or Railway)
 
 ## Architecture
 
 ```
-Neon Postgres (per-company branches)
+Neon Postgres 17 (per-company branches)
     ↑
 Drizzle ORM (typed schema + migrations)
     ↑
-Next.js App Router (server actions + API routes)
+Next.js 16 App Router (server actions + API routes)
     ↑
-Supabase Auth (SSO, sessions, JWT)
+Neon Auth (SSO, sessions — users in your DB)
     ↑
 React frontend (feature-based modules)
 ```
 
+## Neon Project
+
+- **Project**: optivo
+- **Region**: AWS US East 1 (N. Virginia)
+- **Postgres**: 17
+- **Neon Auth**: enabled (neon_auth schema)
+- **Connection**: `DATABASE_URL` in `.env.local`
+- **Branching**: main (schema only) → per-company branches
+
 ## URL Structure
 
 ```
-/login                          Auth (no company context)
-/{company-slug}/dashboard       Company-scoped pages
-/{company-slug}/directory
-/{company-slug}/realtime
-/{company-slug}/attendance
-/{company-slug}/schedule
-/{company-slug}/forecast
-/{company-slug}/staffing
-/{company-slug}/cost
-/{company-slug}/analytics
-/{company-slug}/hr
-/{company-slug}/settings
-/{company-slug}/profile
+/                               Landing page
+/(auth)/login                   Auth (no company context)
+/(auth)/callback                OAuth callback
+/[company]/dashboard            Company-scoped pages
+/[company]/directory
+/[company]/realtime
+/[company]/attendance
+/[company]/schedule
+/[company]/forecast
+/[company]/staffing
+/[company]/cost
+/[company]/analytics
+/[company]/hr
+/[company]/settings
+/[company]/profile
 ```
 
 ## Database Schemas (Postgres namespaces)
 
+32 tables across 7 namespaces + neon_auth:
+
 ```
-core.*          Companies, users, config, audit, notifications
-auth.*          Sessions, tokens, SSO providers, MFA
-hr.*            Employees, departments, divisions, LOBs, positions
-directory.*     Agent profiles, columns, custom fields, system connections
-realtime.*      Agent states, queue metrics, groups, status mappings
-attendance.*    Log, points, history, config, first_seen, disputes
-schedule.*      Shifts, templates, calendar tokens, availability
+core.*          companies, users, config, audit_log, notifications
+hr.*            employees, departments, divisions, lobs, positions
+attendance.*    config, log, points, point_history, first_seen, disputes
+realtime.*      agent_states, queue_metrics, queue_groups, queue_members, status_mappings
+schedule.*      shifts, templates, calendar_tokens
+system.*        integrations, feature_flags, jobs, api_keys, webhooks
+analytics.*     reports, saved_filters, agent_metrics
+neon_auth.*     Managed by Neon Auth (users, sessions)
+```
+
+Future namespaces (not yet created):
+```
 forecast.*      Models, predictions, actuals, scenarios
 staffing.*      Plans, headcount, skill groups, capacity
 cost.*          Budgets, rates, actuals, labor models
-analytics.*     Reports, dashboards, saved filters, agent/queue metrics
-system.*        Integrations, feature flags, jobs, API keys, webhooks
+directory.*     Agent profiles, columns, custom fields, system connections
 ```
 
 ## Project Structure
@@ -65,8 +85,13 @@ system.*        Integrations, feature flags, jobs, API keys, webhooks
 ```
 src/
   app/
+    page.tsx                    Landing page
+    layout.tsx                  Root layout (Geist font)
     (auth)/                     Auth pages (no company context)
+      login/
+      callback/
     [company]/                  Company-scoped routes (slug from URL)
+      layout.tsx                Company context provider + auth check
       dashboard/
       directory/
       realtime/
@@ -80,7 +105,7 @@ src/
       settings/
       profile/
   features/                     Feature modules (fully self-contained)
-    core/                       Shared: hooks, components, actions
+    core/
       hooks/
       components/
       actions/
@@ -112,13 +137,36 @@ src/
     analytics/
   db/
     schema/                     Drizzle schema files (one per namespace)
+      core.ts
+      hr.ts
+      attendance.ts
+      realtime.ts
+      schedule.ts
+      system.ts
+      analytics.ts
+      index.ts                  Namespaced exports (core.*, hr.*, etc.)
     migrations/                 Generated by drizzle-kit
-    client.ts                   Neon connection + Drizzle instance
-    index.ts                    Schema exports
+    client.ts                   Neon serverless connection + Drizzle instance
   components/ui/                Shared component library
   styles/themes/                Theme CSS variables
-  lib/                          Utilities, helpers
-docs/                           Planning docs
+  lib/
+    cn.ts                       Classname utility
+docs/
+  ARCHITECTURE.md               System design, data flows, v1 vs v2 comparison
+```
+
+## Drizzle Commands
+
+```bash
+# Generate migration from schema changes
+npx drizzle-kit generate
+
+# Apply migrations to Neon
+# (use node script — drizzle-kit migrate has issues with Neon serverless driver)
+node -e 'const {neon}=require("@neondatabase/serverless"); ...'
+
+# View current schema
+npx drizzle-kit studio
 ```
 
 ## Design System
@@ -128,13 +176,28 @@ docs/                           Planning docs
 - `--pop` is the accent color per theme
 - Component library: Button, Card, Dialog, Select, MultiSelect, DataTable, Switch, Input, Avatar
 - All timestamps UTC in DB, displayed in user's timezone
+- `cn()` utility for conditional classnames
 
 ## Key Principles
 
 1. **Config-driven** — every rule configurable per company (points, warnings, roles, features)
 2. **UTC everywhere** — all timestamps stored as `timestamptz`, timezone per user for display
-3. **Feature modules** — each feature owns its schema, hooks, components, actions
+3. **Feature modules** — each feature owns its schema, hooks, components, actions, worker
 4. **Typed end-to-end** — Drizzle schema → TypeScript types → React components
 5. **Multi-tenant via branching** — each company gets a Neon branch (data isolation without RLS)
 6. **Permanent audit trail** — first_seen, point_history, audit_log never cleaned up
 7. **No hardcoded thresholds** — read from config tables, settings UI for admins
+8. **One language** — TypeScript for frontend, backend, and workers
+9. **Transactions for mutations** — all multi-step operations use `db.transaction()`
+10. **Namespaced schemas** — each module gets its own Postgres schema with grant/revoke support
+
+## Skills (Claude)
+
+| Skill | Purpose |
+|-------|---------|
+| `/optivo-feature` | Scaffold a new feature module |
+| `/optivo-schema` | Add a Drizzle table to a namespace |
+| `/optivo-worker` | Create a worker inside a feature |
+| `/optivo-page` | Add a company-scoped page |
+| `/optivo-component` | Create a UI or feature component |
+| `/optivo-action` | Create a server action with transactions |
