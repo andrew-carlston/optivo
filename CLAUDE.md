@@ -9,7 +9,7 @@ WFM/HR SaaS platform — realtime monitoring, scheduling, forecasting, attendanc
 - **Framework**: Next.js (latest, App Router, server actions)
 - **Auth**: Supabase Auth (Google/Microsoft SSO, JWT)
 - **Deploy**: EC2 (app + workers) or Railway
-- **Workers**: Python (realtime consumers, schedule sync, attendance checker)
+- **Workers**: TypeScript (long-running processes inside each feature module)
 
 ## Architecture
 
@@ -79,15 +79,34 @@ src/
       hr/
       settings/
       profile/
-  features/                     Feature modules (self-contained)
+  features/                     Feature modules (fully self-contained)
     core/                       Shared: hooks, components, actions
+      hooks/
+      components/
+      actions/
     auth/
     hr/
     directory/
     realtime/
+      hooks/
+      components/
+      actions/
+      worker/                   Long-running: Five9 WS + Kinesis consumers
     attendance/
+      hooks/
+      components/
+      actions/
+      worker/                   Cron: attendance check + points
     schedule/
+      hooks/
+      components/
+      actions/
+      worker/                   Cron: schedule sync from external sources
     forecast/
+      hooks/
+      components/
+      actions/
+      worker/                   Scheduled: demand forecasting models
     staffing/
     cost/
     analytics/
@@ -99,11 +118,6 @@ src/
   components/ui/                Shared component library
   styles/themes/                Theme CSS variables
   lib/                          Utilities, helpers
-workers/
-  realtime/                     Agent state consumers (Five9, AWS Connect)
-  attendance/                   Attendance checker, points
-  schedule/                     Schedule sync
-  forecast/                     Forecast model runners
 docs/                           Planning docs
 ```
 
