@@ -1,0 +1,85 @@
+@use "../../../styles/tokens" as *;
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-sm;
+  padding: $space-sm $space-lg;
+  border: 1px solid var(--border);
+  border-radius: $radius-md;
+  font-size: $text-sm;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  min-height: $touch-min;
+  white-space: nowrap;
+  background: var(--surface);
+  color: var(--fg);
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: var(--pop);
+    background: var(--pop-muted);
+    color: var(--pop);
+  }
+
+  &:active { opacity: 0.9; }
+
+  &:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  // Primary — solid accent
+  &--primary {
+    background: var(--pop);
+    color: var(--pop-fg);
+    border-color: var(--pop);
+    &:hover { background: var(--pop); color: var(--pop-fg); border-color: var(--pop); filter: brightness(1.1); }
+    &:active { filter: brightness(0.95); }
+  }
+
+  // Outline
+  &--outline {
+    background: transparent;
+    &:hover { background: var(--pop-muted); border-color: var(--pop); color: var(--pop); }
+  }
+
+  // Ghost — no border
+  &--ghost {
+    background: transparent;
+    border-color: transparent;
+    &:hover { background: var(--accent); color: var(--fg); border-color: transparent; }
+  }
+
+  // Danger
+  &--danger {
+    background: var(--danger);
+    color: var(--danger-fg);
+    border-color: var(--danger);
+    &:hover { background: var(--danger); color: var(--danger-fg); filter: brightness(1.1); }
+  }
+
+  // Link
+  &--link {
+    background: transparent;
+    border-color: transparent;
+    color: var(--pop);
+    min-height: auto;
+    padding: $space-xs $space-sm;
+    &:hover { text-decoration: underline; background: transparent; border-color: transparent; }
+  }
+
+  // Sizes
+  &--sm { min-height: 30px; padding: $space-xs $space-md; font-size: $text-xs; }
+  &--lg { min-height: 44px; padding: $space-md $space-xl; font-size: $text-base; }
+  &--icon { width: $touch-min; padding: 0; }
+}

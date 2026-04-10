@@ -1,0 +1,26 @@
+@use "../../../styles/tokens" as *;
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: $radius-lg;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $space-lg;
+    border-bottom: 1px solid var(--border);
+  }
+
+  &__title {
+    font-size: $text-base;
+    font-weight: 600;
+    color: var(--fg);
+    margin: 0;
+  }
+
+  &__content {
+    padding: $space-lg;
+  }
+}

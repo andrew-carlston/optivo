@@ -1,0 +1,39 @@
+@use "../../../styles/tokens" as *;
+
+.input {
+  width: 100%;
+  padding: $space-sm $space-md;
+  border: 1px solid var(--border);
+  border-radius: $radius-md;
+  background: var(--input-bg);
+  color: var(--fg);
+  font-size: $text-sm;
+  font-family: inherit;
+  min-height: $touch-min;
+  outline: none;
+  transition: border-color 0.15s;
+
+  &::placeholder { color: var(--muted-fg); }
+  &:focus { border-color: var(--pop); }
+  &:disabled { opacity: 0.5; }
+
+  &--error { border-color: var(--danger); }
+  &--with-icon { padding-left: 2.25rem; }
+}
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+
+  &--error .input { border-color: var(--danger); }
+}
+
+.input-icon {
+  position: absolute;
+  left: $space-md;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted-fg);
+  display: flex;
+  pointer-events: none;
+}
