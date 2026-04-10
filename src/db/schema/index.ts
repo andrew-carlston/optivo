@@ -1,18 +1,17 @@
 // ── Optivo Database Schema ──
 // Each module uses its own Postgres schema (namespace)
-// Drizzle manages migrations across all schemas
+// Named exports to avoid collisions (e.g., core.config vs attendance.config)
 
-export * from "./core";
-export * from "./hr";
-export * from "./attendance";
-export * from "./realtime";
-export * from "./schedule";
-export * from "./system";
-export * from "./analytics";
+export * as core from "./core";
+export * as hr from "./hr";
+export * as attendance from "./attendance";
+export * as realtime from "./realtime";
+export * as schedule from "./schedule";
+export * as system from "./system";
+export * as analytics from "./analytics";
 
 // Future modules:
-// export * from "./forecast";
-// export * from "./staffing";
-// export * from "./cost";
-// export * from "./directory";
-// export * from "./auth";
+// export * as forecast from "./forecast";
+// export * as staffing from "./staffing";
+// export * as cost from "./cost";
+// export * as directory from "./directory";
