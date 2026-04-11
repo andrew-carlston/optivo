@@ -159,7 +159,11 @@ export function MultiSelect({
                   onClick={() => toggle(opt.value)}
                 >
                   <span className="select__option-label">{opt.label}</span>
-                  {isSelected && <Check size={14} className="select__option-check" />}
+                  {isSelected && (
+                    <span className="select__option-check">
+                      <Check size={12} />
+                    </span>
+                  )}
                 </button>
               );
             })}
