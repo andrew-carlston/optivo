@@ -117,7 +117,7 @@
     justify-content: center;
     gap: 5px;
     padding: 5px 8px;
-    border: none;
+    border: 1px solid transparent;
     border-radius: $radius-full;
     background: transparent;
     color: var(--muted-fg);
@@ -125,17 +125,18 @@
     font-weight: 500;
     font-family: inherit;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.15s;
 
     svg { flex-shrink: 0; }
 
-    &:hover { color: var(--fg); }
+    &:hover { color: var(--fg); border-color: var(--border-strong); }
 
     &--active {
       background: var(--surface);
-      color: var(--fg);
+      color: var(--pop);
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1), 0 0 1px rgba(0, 0, 0, 0.08);
       font-weight: 600;
+      border-color: var(--pop);
     }
   }
 
