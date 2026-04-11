@@ -27,6 +27,14 @@
     svg, img { width: 24px; height: 24px; }
   }
 
+  &__mobile-nav {
+    display: none;
+
+    @media (max-width: 768px) {
+      display: flex;
+    }
+  }
+
   &__nav {
     display: flex;
     align-items: center;

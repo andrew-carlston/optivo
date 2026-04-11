@@ -1,19 +1,17 @@
 import { betterAuth } from "better-auth";
-import { neon } from "@neondatabase/serverless";
+import { nextCookies } from "better-auth/next-js";
+import { Pool } from "@neondatabase/serverless";
 
 /**
  * Server-side auth instance.
- * Uses Neon Auth endpoint — users stored in neon_auth schema.
  *
- * After auth, we link the neon_auth user to our core.users table
- * via auth_user_id.
+ * Better Auth manages user/session/account tables on the main Neon branch.
+ * After auth, we link to core.users via auth_user_id on the company branch.
  */
 export const auth = betterAuth({
-  baseURL: process.env.NEXT_PUBLIC_NEON_AUTH_URL,
-  database: {
-    type: "postgres",
-    url: process.env.DATABASE_URL!,
-  },
+  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+  secret: process.env.BETTER_AUTH_SECRET,
+  database: new Pool({ connectionString: process.env.DATABASE_URL }),
   emailAndPassword: {
     enabled: true,
   },
@@ -23,4 +21,9 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     },
   },
+  session: {
+    expiresIn: 60 * 60 * 24 * 7, // 7 days
+    updateAge: 60 * 60 * 24,      // refresh daily
+  },
+  plugins: [nextCookies()],
 });

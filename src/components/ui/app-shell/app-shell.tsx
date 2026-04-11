@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback, ReactNode } from "react";
-import { ChevronDown, ChevronUp, Maximize2, Minimize2 } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/cn";
 import "./app-shell.scss";
 
@@ -14,15 +14,8 @@ interface AppShellProps {
 export function AppShell({ header, footer, children }: AppShellProps) {
   const [headerHidden, setHeaderHidden] = useState(false);
   const [peeking, setPeeking] = useState(false);
-  const [expanded, setExpanded] = useState(false);
   const lastScrollY = useRef(0);
   const mainRef = useRef<HTMLDivElement>(null);
-
-  // Restore expanded state from localStorage after mount (avoids hydration mismatch)
-  useEffect(() => {
-    const saved = localStorage.getItem("optivo-expanded");
-    if (saved === "true") setExpanded(true);
-  }, []);
 
   // Auto-hide header on scroll down, show on scroll up or at top
   useEffect(() => {
@@ -62,27 +55,15 @@ export function AppShell({ header, footer, children }: AppShellProps) {
     return () => document.removeEventListener("mousedown", onClick);
   }, [peeking]);
 
-  // Persist expanded state
-  const toggleExpanded = useCallback(() => {
-    setExpanded((prev) => {
-      const next = !prev;
-      localStorage.setItem("optivo-expanded", String(next));
-      return next;
-    });
-  }, []);
-
   const isVisible = !headerHidden || peeking;
 
   return (
-    <div className={cn("app-shell", expanded && "app-shell--expanded")}>
+    <div className="app-shell">
       {/* Header */}
       {header && (
         <header className={cn("app-shell__header", !isVisible && "app-shell__header--hidden")}>
           <div className="app-shell__header-inner">
             {header}
-            <button className="app-shell__expand-btn" onClick={toggleExpanded} title={expanded ? "Default width" : "Full width"}>
-              {expanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-            </button>
           </div>
         </header>
       )}

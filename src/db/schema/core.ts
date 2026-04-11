@@ -8,7 +8,8 @@ export const companies = core.table("companies", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
-  branch_id: text("branch_id"),             // Neon branch ID for routing
+  branch_id: text("branch_id"),             // Neon branch ID for reference
+  branch_host: text("branch_host"),         // Neon branch endpoint hostname (for DB connection)
   domain: text("domain"),
   logo_url: text("logo_url"),
   auth_methods: jsonb("auth_methods").default(["google", "password"]),
@@ -26,7 +27,7 @@ export const companies = core.table("companies", {
 export const users = core.table("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   company_id: uuid("company_id").references(() => companies.id, { onDelete: "cascade" }),
-  auth_user_id: uuid("auth_user_id").unique(),
+  auth_user_id: text("auth_user_id").unique(),
   email: text("email").notNull(),
   full_name: text("full_name").notNull(),
   avatar_url: text("avatar_url"),

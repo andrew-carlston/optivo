@@ -40,7 +40,7 @@ $shell-padding-mobile: $space-md;
     }
   }
 
-  &--expanded &__header {
+  html.expanded & &__header {
     max-width: 100%;
   }
 
@@ -122,7 +122,7 @@ $shell-padding-mobile: $space-md;
     }
   }
 
-  &--expanded &__main {
+  html.expanded & &__main {
     max-width: 100%;
   }
 
@@ -152,7 +152,7 @@ $shell-padding-mobile: $space-md;
     }
   }
 
-  &--expanded &__footer {
+  html.expanded & &__footer {
     max-width: 100%;
   }
 }

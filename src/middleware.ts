@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Public paths that don't need auth
-const PUBLIC_PATHS = ["/", "/ui", "/api/auth"];
+// Paths that never require auth
+const PUBLIC_PATHS = ["/", "/ui", "/api/auth", "/api/company"];
+
+// Cookie name used by Better Auth
+const SESSION_COOKIE = "better-auth.session_token";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -12,26 +15,29 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Company slug routes: /[company]/...
   const parts = pathname.split("/").filter(Boolean);
-  if (parts.length >= 1) {
-    const slug = parts[0];
-    const subpath = parts[1] || "";
 
-    // Allow login page without auth
-    if (subpath === "login") {
-      return NextResponse.next();
-    }
-
-    // TODO: Check session cookie here
-    // For now, allow all routes (auth not wired yet)
-    // When auth is ready:
-    // 1. Check session cookie
-    // 2. If no session → redirect to /[company]/login
-    // 3. If session → look up company slug on main → get branch_id
-    // 4. Set branch connection in request headers for server components
-
+  // Allow login pages without auth
+  if (parts[0] === "admin" && parts[1] === "login") {
     return NextResponse.next();
+  }
+  if (parts.length >= 2 && parts[1] === "login") {
+    return NextResponse.next();
+  }
+
+  // Check for session cookie (fast gate — full validation in layouts)
+  const hasSession = request.cookies.get(SESSION_COOKIE)?.value;
+
+  if (!hasSession) {
+    // Admin routes → admin login
+    if (parts[0] === "admin") {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
+    // Company routes → company login
+    if (parts.length >= 1) {
+      return NextResponse.redirect(new URL(`/${parts[0]}/login`, request.url));
+    }
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();

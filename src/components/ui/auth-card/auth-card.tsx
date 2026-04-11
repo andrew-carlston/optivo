@@ -47,12 +47,12 @@ export function AuthCard({
     return (
       <div className="auth-card">
         <div className="auth-card__branding">
-          <Skeleton width={200} height={28} radius="md" />
-          <Skeleton width={160} height={16} radius="sm" />
+          <Skeleton width={200} height={28} radius="md" className="auth-card__skeleton-center" />
+          <Skeleton width={140} height={14} radius="sm" className="auth-card__skeleton-center" />
         </div>
-        <Skeleton width="100%" height={42} radius="full" />
-        <Skeleton width="100%" height={42} radius="full" />
-        <Skeleton width="100%" height={42} radius="full" />
+        <Skeleton width="100%" height={42} radius="lg" />
+        <Skeleton width="100%" height={42} radius="lg" />
+        <Skeleton width="100%" height={42} radius="lg" />
       </div>
     );
   }

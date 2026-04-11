@@ -1,0 +1,10 @@
+@use "../../../styles/tokens" as *;
+
+.admin-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--bg);
+  padding: $space-lg;
+}

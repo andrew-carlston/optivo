@@ -73,7 +73,7 @@ export default function LoginPage() {
         logoUrl={company?.logo_url}
         allowGoogle={company?.auth_methods?.includes("google") ?? true}
         allowPassword={company?.auth_methods?.includes("password") ?? true}
-        loading={isPending || companyLoading}
+        loading={companyLoading}
         error={error}
         onGoogleSSO={handleGoogleSSO}
         onEmailSignIn={handleEmailSignIn}

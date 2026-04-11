@@ -1,13 +1,15 @@
-export default async function DashboardPage({
-  params,
-}: {
-  params: Promise<{ company: string }>;
-}) {
-  const { company } = await params;
+"use client";
+
+import { useCurrentCompany, useCurrentUser } from "@/features/core/providers/company-provider";
+
+export default function DashboardPage() {
+  const company = useCurrentCompany();
+  const user = useCurrentUser();
 
   return (
-    <main>
-      <h1>Dashboard — {company}</h1>
-    </main>
+    <div>
+      <h1>Dashboard</h1>
+      <p>Welcome back, {user.fullName}</p>
+    </div>
   );
 }

@@ -1,0 +1,43 @@
+@use "../../../styles/tokens" as *;
+
+.avatar {
+  border-radius: $radius-full;
+  background: var(--pop-muted);
+  color: var(--pop);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid var(--border);
+
+  &--sm {
+    width: 28px;
+    height: 28px;
+    font-size: $text-xs;
+  }
+
+  &--md {
+    width: 34px;
+    height: 34px;
+    font-size: $text-xs;
+  }
+
+  &--lg {
+    width: 44px;
+    height: 44px;
+    font-size: $text-sm;
+  }
+
+  &__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__initials {
+    font-weight: 700;
+    line-height: 1;
+    user-select: none;
+  }
+}

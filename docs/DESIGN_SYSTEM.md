@@ -326,19 +326,66 @@ import { AuthCard, AuthCardNotFound } from "@/components/ui/auth-card/auth-card"
 | `submitting` | `boolean` | `false` |
 | `footer` | `string` | `"Powered by Optivo"` |
 
-### ThemeProvider
+### Avatar
 
 ```tsx
-import { ThemeProvider } from "@/components/ui/theme-provider/theme-provider";
+import { Avatar } from "@/components/ui/avatar/avatar";
 
-// In root layout:
-<body>
-  <ThemeProvider />
-  {children}
-</body>
+<Avatar src="/photo.jpg" alt="Jane Doe" size="md" />
+<Avatar alt="Jane Doe" size="sm" />          // initials fallback ("JD")
+<Avatar src="/logo.png" alt="LawnStarter" size="lg" />
 ```
 
-Restores theme + mode from localStorage on mount. Handles system mode (prefers-color-scheme).
+Displays an image with initials fallback when `src` is missing or fails to load. Initials are derived from the first letter of each word in `alt`.
+
+| Prop | Type | Default |
+|------|------|---------|
+| `src` | `string \| null` | — |
+| `alt` | `string` | required |
+| `size` | `"sm" \| "md" \| "lg"` | `"md"` |
+
+Size mapping: `sm` = 28px, `md` = 34px, `lg` = 44px.
+
+### ThemeSwitcher
+
+```tsx
+import { ThemeSwitcher } from "@/components/ui/theme-switcher/theme-switcher";
+
+<ThemeSwitcher />
+```
+
+Radix DropdownMenu with two sections:
+- **Mode slider**: Light / System / Dark (3-position toggle)
+- **Theme picker**: Default / Midnight / Ember (radio-style selection)
+
+Persists selections to localStorage (`theme` and `mode` keys) and updates `data-theme` + `data-mode` attributes on `<html>`. Extracted from the UI preview page into a reusable component.
+
+> Note: The old `ThemeProvider` component has been removed. Theme initialization is handled by a blocking inline script in the root layout that reads localStorage before React hydrates.
+
+### NotificationBell
+
+```tsx
+import { NotificationBell } from "@/components/ui/notification-bell/notification-bell";
+
+<NotificationBell
+  notifications={[
+    { id: "1", title: "Shift swap approved", read: false, createdAt: "..." },
+    { id: "2", title: "Points threshold reached", read: true, createdAt: "..." },
+  ]}
+  onMarkRead={(id) => markRead(id)}
+  onMarkAllRead={() => markAllRead()}
+/>
+```
+
+Bell icon with unread count badge. Clicking opens a dropdown list of notifications with mark-read actions.
+
+| Prop | Type | Default |
+|------|------|---------|
+| `notifications` | `Notification[]` | required |
+| `onMarkRead` | `(id: string) => void` | required |
+| `onMarkAllRead` | `() => void` | required |
+
+Badge shows unread count; hidden when all are read.
 
 ## File Patterns
 

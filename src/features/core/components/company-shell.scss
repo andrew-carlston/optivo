@@ -1,0 +1,281 @@
+@use "../../../styles/tokens" as *;
+
+// ── Company logo ──
+
+.company-logo__name {
+  font-size: $text-base;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+// ── User avatar trigger ──
+
+.user-avatar-trigger {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  border-radius: $radius-full;
+
+  .avatar {
+    transition: border-color 0.15s;
+  }
+
+  &:hover .avatar,
+  &[data-state="open"] .avatar {
+    border-color: var(--pop);
+  }
+}
+
+// ── User menu dropdown ──
+
+.user-menu__content {
+  min-width: 220px;
+  padding: $space-xs;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: $radius-lg;
+  box-shadow: var(--shadow-md);
+  z-index: $z-dropdown;
+  animation: nav-dropdown-in 0.15s ease;
+}
+
+.user-menu__header {
+  padding: $space-sm $space-md;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-menu__name {
+  font-size: $text-sm;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.user-menu__email {
+  font-size: $text-xs;
+  color: var(--muted-fg);
+}
+
+.user-menu__separator {
+  height: 1px;
+  background: var(--border);
+  margin: $space-xs 0;
+}
+
+.user-menu__item {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  padding: $space-sm $space-md;
+  border-radius: $radius-md;
+  font-size: $text-sm;
+  font-weight: 500;
+  color: var(--fg);
+  cursor: pointer;
+  outline: none;
+  transition: all 0.12s;
+  border: 1px solid transparent;
+
+  &:hover,
+  &[data-highlighted] {
+    background: var(--surface-2);
+    border-color: var(--border);
+  }
+
+  svg {
+    color: var(--muted-fg);
+    flex-shrink: 0;
+  }
+
+  &--danger {
+    color: var(--danger);
+
+    svg { color: var(--danger); }
+
+    &:hover,
+    &[data-highlighted] {
+      background: var(--danger);
+      color: var(--danger-fg);
+      border-color: var(--danger);
+
+      svg { color: var(--danger-fg); }
+    }
+  }
+}
+
+// ── Expand button ──
+
+.expand-btn {
+  all: unset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: $radius-md;
+  color: var(--muted-fg);
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    background: var(--surface-2);
+    color: var(--fg);
+  }
+}
+
+// ── Mobile menu ──
+
+.mobile-menu__trigger {
+  all: unset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: $radius-md;
+  color: var(--muted-fg);
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    background: var(--surface-2);
+    color: var(--fg);
+  }
+
+  &[data-state="open"] {
+    background: var(--surface-2);
+    color: var(--fg);
+  }
+}
+
+.mobile-menu__content {
+  min-width: 240px;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: $space-xs;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: $radius-lg;
+  box-shadow: var(--shadow-md);
+  z-index: $z-dropdown;
+  animation: nav-dropdown-in 0.15s ease;
+}
+
+.mobile-menu__label {
+  padding: $space-sm $space-md $space-xs;
+  font-size: $text-xs;
+  font-weight: 600;
+  color: var(--muted-fg);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+// ── Nav dropdown trigger (matches NavItem style) ──
+
+.nav-dropdown__trigger {
+  display: flex;
+  align-items: center;
+  gap: $space-xs;
+  padding: $space-xs $space-md;
+  border-radius: $radius-full;
+  font-size: $text-sm;
+  font-weight: 500;
+  color: var(--muted-fg);
+  background: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  font-family: inherit;
+
+  &:hover {
+    color: var(--fg);
+    background: var(--surface-2);
+    border-color: var(--border);
+  }
+
+  &--active {
+    color: var(--pop);
+    background: var(--pop-muted);
+    border-color: var(--pop);
+    font-weight: 600;
+  }
+
+  &[data-state="open"] {
+    color: var(--fg);
+    background: var(--surface-2);
+    border-color: var(--border);
+  }
+
+  svg {
+    transition: transform 0.15s;
+  }
+
+  &[data-state="open"] svg {
+    transform: rotate(180deg);
+  }
+}
+
+// ── Dropdown content ──
+
+.nav-dropdown__content {
+  min-width: 180px;
+  padding: $space-xs;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: $radius-lg;
+  box-shadow: var(--shadow-md);
+  z-index: $z-dropdown;
+  animation: nav-dropdown-in 0.15s ease;
+}
+
+@keyframes nav-dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ── Dropdown item ──
+
+.nav-dropdown__item {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  padding: $space-sm $space-md;
+  border-radius: $radius-md;
+  font-size: $text-sm;
+  font-weight: 500;
+  color: var(--fg);
+  cursor: pointer;
+  outline: none;
+  transition: all 0.12s;
+  border: 1px solid transparent;
+
+  &:hover,
+  &[data-highlighted] {
+    background: var(--surface-2);
+    border-color: var(--border);
+  }
+
+  &--active {
+    color: var(--pop);
+    background: var(--pop-muted);
+    border-color: var(--pop);
+    font-weight: 600;
+  }
+
+  svg {
+    color: var(--muted-fg);
+    flex-shrink: 0;
+  }
+
+  &--active svg {
+    color: var(--pop);
+  }
+}

@@ -10,7 +10,7 @@ WFM/HR SaaS platform — realtime monitoring, scheduling, forecasting, attendanc
 - **ORM**: Drizzle (typed schema, migrations via drizzle-kit generate + migrate)
 - **UI Primitives**: Radix UI (select, popover, dropdown-menu, switch, dialog, tooltip, tabs, checkbox)
 - **Framework**: Next.js 16.2.3 (App Router, server actions, TypeScript strict)
-- **Auth**: Neon Auth / Better Auth (Google SSO, email/password, users in your DB)
+- **Auth**: Better Auth v1.6 (email/password, Google SSO ready, Neon Pool adapter)
 - **Language**: TypeScript everywhere (frontend + backend + workers)
 - **Styling**: SCSS with CSS variable theming (3 themes × 3 modes)
 - **Deploy**: TBD (EC2 or Railway)
@@ -46,8 +46,8 @@ React frontend (feature-based modules)
 ### Branch Architecture
 
 **Main (production):**
-- `core.companies` — slug → branch routing for all companies
-- `core.users` — super users only (platform admins)
+- `core.companies` — slug → branch routing for all companies (includes `branch_host` column)
+- `core.users` — super users only (platform admins), `auth_user_id` is text (not uuid)
 - `core.access_templates` + `core.template_access` — platform-level ReBAC
 - All other tables present as schema template (empty)
 
@@ -72,6 +72,8 @@ React frontend (feature-based modules)
 ```
 /                               Landing page
 /ui                             UI Kit preview (design system playground)
+/admin/login                    Super user login (email/password)
+/admin                          Company switcher (super users only)
 /api/auth/[...all]              Better Auth API handler
 /api/company/[slug]             Company lookup (queries main branch)
 /[company]/login                Company-scoped login page
@@ -119,7 +121,7 @@ directory.*     Agent profiles, columns, custom fields, system connections
 src/
   app/
     page.tsx                    Landing page
-    layout.tsx                  Root layout (Geist font, ThemeProvider)
+    layout.tsx                  Root layout (Geist font, blocking theme script)
     globals.scss                Reset, scrollbar, selection styles
     ui/                         UI Kit preview page (design system playground)
       page.tsx
@@ -127,19 +129,58 @@ src/
     api/
       auth/[...all]/route.ts    Better Auth API handler
       company/[slug]/route.ts   Company lookup (Drizzle query on main)
+    admin/                        Super user routes
+      layout.tsx                Validates super user access
+      page.tsx                  Company switcher
+      login/
+        page.tsx                Super user login (AuthCard, no signup)
+        login.scss
+      sign-out-button.tsx       Client sign-out component
+      admin.scss
     [company]/                  Company-scoped routes (slug from URL)
-      layout.tsx                Company context provider
+      layout.tsx                Auth + CompanyProvider (session → company → user)
       login/                    Login page (uses AuthCard component)
         page.tsx
         login.scss
       dashboard/
         page.tsx
+      realtime/
+        page.tsx                Stub page
+      attendance/
+        page.tsx                Stub page
+      schedule/
+        page.tsx                Stub page
+      forecast/
+        page.tsx                Stub page
+      directory/
+        page.tsx                Stub page
+      hr/
+        page.tsx                Stub page
+      staffing/
+        page.tsx                Stub page
+      cost/
+        page.tsx                Stub page
+      analytics/
+        page.tsx                Stub page
+      settings/
+        page.tsx                Stub page
+      profile/
+        page.tsx                Stub page
 
   features/                     Feature modules (fully self-contained)
     core/
+      lib/
+        session.ts              Server-side: getServerSession, requireSession,
+                                getCompanyBySlug, getOrCreateBranchUser,
+                                getSuperUser, getAllCompanies
+      providers/
+        company-provider.tsx    CompanyProvider context + hooks:
+                                useCompanyContext, useCurrentUser, useCurrentCompany
       hooks/
-        use-company.ts          Fetches company config from /api/company/[slug]
+        use-company.ts          Client hook: fetches company from /api/company/[slug]
       components/
+        company-shell.tsx       Company page wrapper (AppShell + Header + Footer + nav)
+        company-shell.scss
       actions/
     auth/
     hr/
@@ -171,17 +212,19 @@ src/
   components/ui/                Shared component library
     app-shell/                  Auto-hide header, expand toggle, sticky footer
     auth-card/                  Login/signup card (company-branded)
+    avatar/                     Image + initials fallback (sm 28px, md 34px, lg 44px)
     badge/                      Status badges (6 variants)
     button/                     Buttons (6 variants × 4 sizes + loading)
     card/                       Cards (flat, raised, inset)
     footer/                     App footer (brand + copyright)
     header/                     App header (logo, nav, actions)
     input/                      Text inputs (icon, error, loading)
+    notification-bell/          Bell icon + unread badge + dropdown list
     select/                     Single select (Radix) + MultiSelect (Radix Popover)
     skeleton/                   Shimmer loading placeholders
     switch/                     Toggle switch (Radix)
+    theme-switcher/             Mode slider + theme picker (Radix DropdownMenu, localStorage)
     access-gate/                Permission wrapper (ReBAC placeholder)
-    theme-provider/             Global theme/mode restore from localStorage
 
   styles/
     _tokens.scss                Spacing, typography, radius, z-index
@@ -209,7 +252,7 @@ src/
     auth-client.ts              Better Auth React client (signIn, signUp, useSession)
     auth-server.ts              Better Auth server instance
 
-  middleware.ts                 Route protection skeleton
+  middleware.ts                 Route protection (checks better-auth.session_token cookie)
 
 docs/
   PHASE-PLAN.md                 10 phases in build order
@@ -249,12 +292,30 @@ npx drizzle-kit studio
 - `--pop` is the accent color per theme
 - Shadow tokens: `--shadow-xs`, `--shadow-sm`, `--shadow-md`, `--shadow-lg`, `--shadow-inset`
 - Card variants: `flat` (default), `raised` (elevated), `inset` (recessed)
-- Components (14): Button, Card, Select, MultiSelect, Switch, Input, Badge, Skeleton, AccessGate, AppShell, Header, Footer, AuthCard, ThemeProvider
+- Components (17): Button, Card, Select, MultiSelect, Switch, Input, Badge, Skeleton, AccessGate, AppShell, Header, Footer, AuthCard, Avatar, ThemeSwitcher, NotificationBell, CompanyShell
 - Dropdown style: pill-shaped rows, filled circle check icons, hover border
 - Skeletons: left-to-right shimmer, 2.5s cycle, deterministic widths
 - All timestamps UTC in DB, displayed in user's timezone
 - `cn()` utility for conditional classnames
 - Preview page: `/ui`
+
+## Hydration / Theme Initialization
+
+A **blocking inline script** in `src/app/layout.tsx` reads `theme`, `mode`, and `expanded` from localStorage and sets `data-theme`, `data-mode`, and `.expanded` class on `<html>` **before** React hydrates. This eliminates the flash-of-wrong-theme problem entirely.
+
+- **No ThemeProvider component** — the blocking script replaces it
+- **AppShell** no longer manages expanded state — CSS reads `html.expanded` directly
+- **CompanyShell** syncs expanded state via `useEffect` (only for the toggle button icon)
+- Theme/mode persistence still uses localStorage; the ThemeSwitcher component writes to it and updates DOM attributes
+
+## Company Shell
+
+`src/features/core/components/company-shell.tsx` wraps all company-scoped pages with AppShell + Header + Footer.
+
+- **Nav groups** (Radix DropdownMenu): Dashboard (direct link) | Workforce (Realtime, Attendance, Schedule, Forecast) | People (Directory, HR, Staffing) | Business (Cost Planning, Analytics) | Settings (direct link)
+- **Mobile/tablet**: hamburger menu replaces nav, company name hidden (logo avatar only)
+- **Header actions**: ThemeSwitcher | NotificationBell | Expand toggle | User Avatar dropdown (Profile, Admin Panel for super users, Sign Out)
+- Expand button is a header action (not internal to AppShell)
 
 ## Key Principles
 
