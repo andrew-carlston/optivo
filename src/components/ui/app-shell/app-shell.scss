@@ -47,12 +47,15 @@ $shell-padding-mobile: $space-md;
   &__header-inner {
     display: flex;
     align-items: center;
-    gap: $space-md;
-    padding: $space-sm $space-lg;
+    gap: $space-sm;
+    padding: $space-sm $space-md;
     min-height: 52px;
 
+    // Header component takes available space
+    > .header { flex: 1; min-width: 0; }
+
     @media (max-width: 768px) {
-      padding: $space-sm $space-md;
+      padding: $space-sm $space-sm;
       min-height: 46px;
     }
   }
