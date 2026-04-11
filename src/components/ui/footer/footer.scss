@@ -1,0 +1,18 @@
+@use "../../../styles/tokens" as *;
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: $text-xs;
+  color: var(--muted-fg);
+
+  &__brand {
+    font-weight: 600;
+    color: var(--pop);
+  }
+
+  &__copy {
+    opacity: 0.6;
+  }
+}

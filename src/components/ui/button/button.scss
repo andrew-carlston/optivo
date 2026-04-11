@@ -84,4 +84,13 @@
   &--sm { min-height: 30px; padding: $space-xs $space-md; font-size: $text-xs; }
   &--lg { min-height: 44px; padding: $space-md $space-xl; font-size: $text-base; }
   &--icon { width: $touch-min; padding: 0; }
+
+  // Mobile — larger touch targets
+  @media (max-width: 768px) {
+    min-height: 40px;
+    font-size: $text-base;
+    &--sm { min-height: 34px; }
+    &--lg { min-height: 48px; }
+    &--icon { width: 40px; }
+  }
 }

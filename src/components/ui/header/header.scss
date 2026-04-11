@@ -1,0 +1,76 @@
+@use "../../../styles/tokens" as *;
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-lg;
+  flex: 1;
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: $space-lg;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    font-size: $text-base;
+    font-weight: 700;
+    color: var(--pop);
+    flex-shrink: 0;
+
+    svg, img { width: 24px; height: 24px; }
+  }
+
+  &__nav {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  &__nav-item {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+    padding: $space-xs $space-md;
+    border-radius: $radius-full;
+    font-size: $text-sm;
+    font-weight: 500;
+    color: var(--muted-fg);
+    text-decoration: none;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+    white-space: nowrap;
+
+    &:hover {
+      color: var(--fg);
+      background: var(--surface-2);
+      border-color: var(--border);
+    }
+
+    &--active {
+      color: var(--pop);
+      background: var(--pop-muted);
+      border-color: var(--pop);
+      font-weight: 600;
+    }
+
+    svg { width: 16px; height: 16px; }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    flex-shrink: 0;
+  }
+}

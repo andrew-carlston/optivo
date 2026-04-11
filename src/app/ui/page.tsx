@@ -9,7 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card/c
 import { Badge } from "@/components/ui/badge/badge";
 import { Skeleton, SkeletonText, SkeletonButton, SkeletonAvatar, SkeletonCard, SkeletonTable } from "@/components/ui/skeleton/skeleton";
 import { AccessGate } from "@/components/ui/access-gate/access-gate";
-import { Search, Mail, Plus, Trash2, Settings, Bell, Check, Sun, Moon, Monitor, Lock, Palette } from "lucide-react";
+import { AppShell } from "@/components/ui/app-shell/app-shell";
+import { Header, NavItem } from "@/components/ui/header/header";
+import { Footer } from "@/components/ui/footer/footer";
+import { Search, Mail, Plus, Trash2, Settings, Bell, Check, Sun, Moon, Monitor, Lock, Palette, LayoutGrid, Users, Clock, BarChart3 } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import "./ui-preview.scss";
 
@@ -59,20 +62,27 @@ export default function UIPreviewPage() {
     localStorage.setItem("optivo-theme", t);
   }
 
-  return (
-    <div className="ui-preview">
-      <div className="ui-preview__header">
-        <h1>Optivo UI Kit</h1>
+  const headerContent = (
+    <Header
+      logo={<><LayoutGrid size={20} /> Optivo</>}
+      nav={
+        <>
+          <NavItem href="/ui" active>UI Kit</NavItem>
+          <NavItem href="/ui"><Users size={15} /> Directory</NavItem>
+          <NavItem href="/ui"><Clock size={15} /> Realtime</NavItem>
+          <NavItem href="/ui"><BarChart3 size={15} /> Analytics</NavItem>
+        </>
+      }
+      actions={
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
-            <Button variant="outline" size="sm">
+            <Button variant="ghost" size="sm">
               <Palette size={14} /> Theme
             </Button>
           </DropdownMenu.Trigger>
           <DropdownMenu.Portal>
             <DropdownMenu.Content className="theme-menu" sideOffset={6} align="end">
               <DropdownMenu.Label className="theme-menu__label">Mode</DropdownMenu.Label>
-              {/* Segmented slider for mode */}
               <div className="theme-menu__slider">
                 {([
                   { id: "light" as const, icon: <Sun size={13} />, label: "Light" },
@@ -89,7 +99,6 @@ export default function UIPreviewPage() {
                   </button>
                 ))}
               </div>
-
               <DropdownMenu.Separator className="theme-menu__separator" />
               <DropdownMenu.Label className="theme-menu__label">Theme</DropdownMenu.Label>
               <div className="theme-menu__themes">
@@ -108,6 +117,15 @@ export default function UIPreviewPage() {
             </DropdownMenu.Content>
           </DropdownMenu.Portal>
         </DropdownMenu.Root>
+      }
+    />
+  );
+
+  return (
+    <AppShell header={headerContent} footer={<Footer />}>
+    <div className="ui-preview">
+      <div className="ui-preview__header">
+        <h1>UI Kit</h1>
       </div>
 
       {/* ── Colors ── */}
@@ -333,5 +351,6 @@ export default function UIPreviewPage() {
         </div>
       </section>
     </div>
+    </AppShell>
   );
 }

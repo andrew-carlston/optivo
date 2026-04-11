@@ -1,0 +1,142 @@
+@use "../../../styles/tokens" as *;
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  // ── Container — responsive with expand toggle ──
+
+  &__container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 $space-lg;
+
+    @media (max-width: 768px) {
+      padding: 0 $space-md;
+    }
+  }
+
+  &--expanded &__container {
+    max-width: 100%;
+  }
+
+  // ── Header ──
+
+  &__header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+
+    &--hidden {
+      transform: translateY(-100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+
+  &__header-inner {
+    display: flex;
+    align-items: center;
+    gap: $space-md;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: $space-sm $space-lg;
+    min-height: 56px;
+
+    @media (max-width: 768px) {
+      padding: $space-sm $space-md;
+      min-height: 48px;
+    }
+  }
+
+  &--expanded &__header-inner {
+    max-width: 100%;
+  }
+
+  // ── Expand button ──
+
+  &__expand-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: $radius-md;
+    background: transparent;
+    color: var(--muted-fg);
+    cursor: pointer;
+    transition: all 0.15s;
+    flex-shrink: 0;
+    margin-left: auto;
+
+    &:hover { background: var(--accent); color: var(--fg); }
+
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  // ── Peek button ──
+
+  &__peek {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 49;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 20px;
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 $radius-md $radius-md;
+    background: var(--surface);
+    color: var(--muted-fg);
+    cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+    &:hover { color: var(--fg); background: var(--surface-2); }
+  }
+
+  // ── Main ──
+
+  &__main {
+    flex: 1;
+    padding: $space-xl 0;
+
+    @media (max-width: 768px) {
+      padding: $space-lg 0;
+    }
+  }
+
+  // ── Footer ──
+
+  &__footer {
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    padding: $space-md 0;
+
+    @media (max-width: 768px) {
+      padding: $space-sm 0;
+    }
+  }
+}
+
+// ── Responsive utilities ──
+
+@media (max-width: 768px) {
+  .hide-mobile { display: none !important; }
+}
+
+@media (min-width: 769px) {
+  .hide-desktop { display: none !important; }
+}
