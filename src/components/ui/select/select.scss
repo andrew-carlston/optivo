@@ -10,28 +10,27 @@
   justify-content: space-between;
   gap: $space-sm;
   width: 100%;
-  height: 40px;
-  padding: 0 $space-md;
+  height: 38px;
+  padding: 0 12px;
   border: 1px solid var(--border);
-  border-radius: $radius-lg;
+  border-radius: $radius-md;
   background: var(--input-bg);
   color: var(--fg);
   font-size: $text-sm;
   font-family: inherit;
   cursor: pointer;
   outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 
-  &:hover { border-color: var(--pop); }
-  &:focus, &[data-state="open"] { border-color: var(--pop); box-shadow: 0 0 0 3px var(--pop-muted); }
+  &:hover { border-color: var(--border-strong); }
+  &:focus, &[data-state="open"] {
+    border-color: var(--pop);
+    box-shadow: 0 0 0 3px var(--pop-muted);
+  }
 
-  > svg, [data-radix-select-icon] { color: var(--muted-fg); flex-shrink: 0; }
-
-  &--disabled { opacity: 0.5; cursor: default; &:hover { border-color: var(--border); } }
-
+  > svg, [data-radix-select-icon] { color: var(--muted-fg); flex-shrink: 0; width: 14px; height: 14px; }
+  &--disabled { opacity: 0.5; cursor: default; }
   &--multi { flex-wrap: nowrap; }
-
-  // Radix injects a span for value
   [data-placeholder] { color: var(--muted-fg); }
 }
 
@@ -42,7 +41,7 @@
 .select__chips {
   display: flex;
   flex: 1;
-  gap: $space-xs;
+  gap: 4px;
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
@@ -53,48 +52,53 @@
 .select__chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 2px $space-sm;
+  gap: 3px;
+  padding: 1px 8px;
   border-radius: $radius-full;
-  background: var(--pop-muted);
-  color: var(--pop);
-  font-size: $text-xs;
-  font-weight: 600;
+  background: var(--accent);
+  color: var(--fg);
+  font-size: 11px;
+  font-weight: 500;
   white-space: nowrap;
   flex-shrink: 0;
+  border: 1px solid var(--border);
 }
 
 .select__chip-remove {
   display: flex;
   cursor: pointer;
-  color: var(--pop);
+  color: var(--muted-fg);
   opacity: 0.6;
-  &:hover { opacity: 1; }
+  &:hover { opacity: 1; color: var(--danger); }
 }
 
 .select__count {
   font-size: $text-sm;
   font-weight: 500;
-  color: var(--pop);
+  color: var(--muted-fg);
 }
 
-// ── Dropdown (shared by both Select and MultiSelect) ──
+// ── Dropdown — Apple-style floating panel ──
 
 .select__dropdown {
   width: var(--radix-select-trigger-width, var(--radix-popover-trigger-width, 100%));
-  min-width: 200px;
+  min-width: 180px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: $radius-lg;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.04),
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    0 12px 40px rgba(0, 0, 0, 0.06);
   z-index: $z-dropdown;
   overflow: hidden;
-  animation: selectSlideDown 0.15s ease;
+  backdrop-filter: blur(20px) saturate(1.2);
+  animation: selectAppear 0.18s cubic-bezier(0.2, 0, 0, 1);
 }
 
-@keyframes selectSlideDown {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes selectAppear {
+  from { opacity: 0; transform: scale(0.96) translateY(-6px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 // ── Search ──
@@ -103,15 +107,16 @@
   display: flex;
   align-items: center;
   gap: $space-sm;
-  padding: $space-sm $space-md;
+  padding: 8px 12px;
   border-bottom: 1px solid var(--border);
+  margin: 0;
 
-  svg { color: var(--muted-fg); flex-shrink: 0; }
+  svg { color: var(--muted-fg); flex-shrink: 0; width: 14px; height: 14px; }
 
   input {
     all: unset;
     flex: 1;
-    font-size: $text-sm;
+    font-size: 13px;
     font-family: inherit;
     color: var(--fg);
     &::placeholder { color: var(--muted-fg); }
@@ -123,13 +128,13 @@
 .select__bulk {
   display: flex;
   justify-content: space-between;
-  padding: $space-xs $space-md;
+  padding: 4px 12px 6px;
   border-bottom: 1px solid var(--border);
 
   button {
     all: unset;
-    font-size: $text-xs;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 500;
     color: var(--pop);
     cursor: pointer;
     &:hover { text-decoration: underline; }
@@ -139,12 +144,9 @@
 // ── Options ──
 
 .select__options {
-  max-height: 240px;
+  max-height: 220px;
   overflow-y: auto;
   padding: 4px;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
 }
 
 .select__option {
@@ -152,35 +154,45 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: $space-sm $space-md;
+  padding: 6px 10px;
   border: none;
   border-radius: $radius-sm;
   background: transparent;
   color: var(--fg);
-  font-size: $text-sm;
+  font-size: 13px;
   font-family: inherit;
   cursor: pointer;
   outline: none;
-  transition: background 0.1s;
+  transition: background 0.08s;
+  min-height: 30px;
 
-  &:hover, &[data-highlighted] { background: var(--accent); }
-  &--active, &[data-state="checked"] { background: var(--pop-muted); color: var(--pop); font-weight: 500; }
+  // Hover — soft highlight
+  &:hover, &[data-highlighted] {
+    background: var(--pop);
+    color: var(--pop-fg);
 
-  &--multi.select__option--active {
-    border-left: 2px solid var(--pop);
-    padding-left: calc(#{$space-md} - 2px);
+    .select__option-check { color: var(--pop-fg); }
+    [data-radix-select-item-indicator] { color: var(--pop-fg); }
   }
 
-  // Radix select item indicator
+  // Selected — subtle, not loud
+  &--active, &[data-state="checked"] {
+    font-weight: 500;
+  }
+
+  &--multi.select__option--active {
+    background: var(--accent);
+  }
+
   [data-radix-select-item-indicator] { display: flex; color: var(--pop); }
 }
 
 .select__option-label { flex: 1; text-align: left; }
-.select__option-check { color: var(--pop); }
+.select__option-check { color: var(--pop); flex-shrink: 0; }
 
 .select__empty {
-  padding: $space-lg;
+  padding: 12px;
   text-align: center;
-  font-size: $text-sm;
+  font-size: 13px;
   color: var(--muted-fg);
 }
