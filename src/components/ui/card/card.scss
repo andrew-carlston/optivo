@@ -4,6 +4,24 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: $radius-xl;
+  transition: box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+
+  // ── Raised — elevated off the surface ──
+  &--raised {
+    border-color: transparent;
+    box-shadow: var(--shadow-md);
+
+    &:hover {
+      box-shadow: var(--shadow-lg);
+    }
+  }
+
+  // ── Inset — recessed into the surface ──
+  &--inset {
+    background: var(--surface-2);
+    border-color: transparent;
+    box-shadow: var(--shadow-inset);
+  }
 
   &__header {
     display: flex;

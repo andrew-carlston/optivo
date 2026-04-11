@@ -2,8 +2,19 @@ import { HTMLAttributes } from "react";
 import { cn } from "@/lib/cn";
 import "./card.scss";
 
-export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("card", className)} {...props} />;
+type CardVariant = "flat" | "raised" | "inset";
+
+interface CardProps extends HTMLAttributes<HTMLDivElement> {
+  variant?: CardVariant;
+}
+
+export function Card({ className, variant = "flat", ...props }: CardProps) {
+  return (
+    <div
+      className={cn("card", variant !== "flat" && `card--${variant}`, className)}
+      {...props}
+    />
+  );
 }
 
 export function CardContent({ className, ...props }: HTMLAttributes<HTMLDivElement>) {

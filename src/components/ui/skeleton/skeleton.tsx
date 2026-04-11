@@ -53,17 +53,21 @@ export function SkeletonCard({ className }: { className?: string }) {
 
 /** Skeleton for a table */
 export function SkeletonTable({ rows = 5, cols = 4, className }: { rows?: number; cols?: number; className?: string }) {
+  // Deterministic widths to avoid hydration mismatch (no Math.random)
+  const headerWidths = [75, 60, 85, 70, 65, 80, 55, 90];
+  const rowWidths = [65, 50, 75, 55, 70, 60, 80, 45, 72, 58];
+
   return (
     <div className={cn("skeleton-table", className)}>
       <div className="skeleton-table__header">
         {Array.from({ length: cols }).map((_, i) => (
-          <SkeletonText key={i} width={`${60 + Math.random() * 30}%`} />
+          <SkeletonText key={i} width={`${headerWidths[i % headerWidths.length]}%`} />
         ))}
       </div>
       {Array.from({ length: rows }).map((_, r) => (
         <div key={r} className="skeleton-table__row">
           {Array.from({ length: cols }).map((_, c) => (
-            <SkeletonText key={c} width={`${40 + Math.random() * 40}%`} />
+            <SkeletonText key={c} width={`${rowWidths[(r * cols + c) % rowWidths.length]}%`} />
           ))}
         </div>
       ))}

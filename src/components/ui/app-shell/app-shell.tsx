@@ -14,12 +14,15 @@ interface AppShellProps {
 export function AppShell({ header, footer, children }: AppShellProps) {
   const [headerHidden, setHeaderHidden] = useState(false);
   const [peeking, setPeeking] = useState(false);
-  const [expanded, setExpanded] = useState(() => {
-    if (typeof window !== "undefined") return localStorage.getItem("optivo-expanded") === "true";
-    return false;
-  });
+  const [expanded, setExpanded] = useState(false);
   const lastScrollY = useRef(0);
   const mainRef = useRef<HTMLDivElement>(null);
+
+  // Restore expanded state from localStorage after mount (avoids hydration mismatch)
+  useEffect(() => {
+    const saved = localStorage.getItem("optivo-expanded");
+    if (saved === "true") setExpanded(true);
+  }, []);
 
   // Auto-hide header on scroll down, show on scroll up or at top
   useEffect(() => {

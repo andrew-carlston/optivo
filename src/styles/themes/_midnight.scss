@@ -28,6 +28,12 @@
     --info-fg: #FFFFFF;
 
     --ring: #7C3AED;
+
+    --shadow-xs: 0 1px 2px rgba(30, 27, 75, 0.05);
+    --shadow-sm: 0 1px 3px rgba(30, 27, 75, 0.07), 0 1px 2px rgba(30, 27, 75, 0.04);
+    --shadow-md: 0 4px 6px rgba(30, 27, 75, 0.08), 0 2px 4px rgba(30, 27, 75, 0.04);
+    --shadow-lg: 0 10px 15px rgba(30, 27, 75, 0.10), 0 4px 6px rgba(30, 27, 75, 0.04);
+    --shadow-inset: inset 0 2px 4px rgba(30, 27, 75, 0.07), inset 0 0 0 1px rgba(30, 27, 75, 0.03);
   }
 
   // Dark mode — deep indigo, not black
@@ -58,5 +64,11 @@
     --info-fg: #1A1635;
 
     --ring: #A78BFA;
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.35), 0 4px 6px rgba(0, 0, 0, 0.2);
+    --shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.25), inset 0 0 0 1px rgba(0, 0, 0, 0.1);
   }
 }
