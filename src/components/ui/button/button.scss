@@ -7,7 +7,7 @@
   gap: $space-sm;
   padding: $space-sm $space-lg;
   border: 1px solid var(--border);
-  border-radius: $radius-md;
+  border-radius: $radius-lg;
   font-size: $text-sm;
   font-weight: 500;
   font-family: inherit;
@@ -19,6 +19,7 @@
   background: var(--surface);
   color: var(--fg);
   transition: all 0.15s ease;
+  border-color: var(--border-strong);
 
   &:hover {
     border-color: var(--pop);
@@ -50,6 +51,7 @@
   // Outline
   &--outline {
     background: transparent;
+    border-color: var(--border-strong);
     &:hover { background: var(--pop-muted); border-color: var(--pop); color: var(--pop); }
   }
 
@@ -57,7 +59,7 @@
   &--ghost {
     background: transparent;
     border-color: transparent;
-    &:hover { background: var(--accent); color: var(--fg); border-color: transparent; }
+    &:hover { background: var(--surface-2); color: var(--fg); border-color: transparent; }
   }
 
   // Danger

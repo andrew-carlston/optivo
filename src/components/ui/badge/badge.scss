@@ -3,16 +3,75 @@
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px $space-sm;
+  gap: 4px;
+  padding: 3px $space-md;
   border-radius: $radius-full;
   font-size: $text-xs;
   font-weight: 600;
-  background: var(--accent);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  background: var(--surface-2);
   color: var(--fg);
+  border: 1px solid var(--border);
 
-  &--success { background: var(--success-muted); color: var(--success); }
-  &--warning { background: var(--warning); color: var(--warning-fg); }
-  &--danger { background: var(--danger); color: var(--danger-fg); }
-  &--info { background: var(--info); color: var(--info-fg); }
-  &--outline { background: transparent; border: 1px solid var(--border); color: var(--muted-fg); }
+  svg { width: 12px; height: 12px; }
+
+  &--success {
+    background: #DCFCE7;
+    color: #15803D;
+    border-color: #BBF7D0;
+  }
+
+  &--warning {
+    background: #FEF3C7;
+    color: #92400E;
+    border-color: #FDE68A;
+  }
+
+  &--danger {
+    background: #FEE2E2;
+    color: #991B1B;
+    border-color: #FECACA;
+  }
+
+  &--info {
+    background: #E0F2FE;
+    color: #075985;
+    border-color: #BAE6FD;
+  }
+
+  &--outline {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--muted-fg);
+  }
+}
+
+// Dark mode badge overrides
+[data-mode="dark"] {
+  .badge {
+    &--success {
+      background: rgba(22, 163, 74, 0.15);
+      color: #4ADE80;
+      border-color: rgba(22, 163, 74, 0.3);
+    }
+
+    &--warning {
+      background: rgba(245, 158, 11, 0.15);
+      color: #FBBF24;
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    &--danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: #FCA5A5;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    &--info {
+      background: rgba(14, 165, 233, 0.15);
+      color: #7DD3FC;
+      border-color: rgba(14, 165, 233, 0.3);
+    }
+  }
 }

@@ -1,30 +1,71 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card/card";
 import { Badge } from "@/components/ui/badge/badge";
-import { Search, Mail, Plus, Trash2, Settings, Bell, Check } from "lucide-react";
+import { Search, Mail, Plus, Trash2, Settings, Bell, Check, Sun, Moon } from "lucide-react";
 import "./ui-preview.scss";
+
+const THEMES = [
+  { id: "default", label: "Default", color: "#2563EB" },
+  { id: "midnight", label: "Midnight", color: "#7C3AED" },
+  { id: "ember", label: "Ember", color: "#EA580C" },
+];
 
 export default function UIPreviewPage() {
   const [mode, setMode] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState("default");
   const [inputVal, setInputVal] = useState("");
 
-  function toggleMode() {
-    const next = mode === "light" ? "dark" : "light";
-    setMode(next);
-    document.documentElement.setAttribute("data-mode", next);
+  // Restore from localStorage on mount
+  useEffect(() => {
+    const savedMode = localStorage.getItem("optivo-mode") as "light" | "dark" | null;
+    const savedTheme = localStorage.getItem("optivo-theme");
+    if (savedMode) { setMode(savedMode); document.documentElement.setAttribute("data-mode", savedMode); }
+    if (savedTheme) { setTheme(savedTheme); document.documentElement.setAttribute("data-theme", savedTheme); }
+  }, []);
+
+  function changeMode(m: "light" | "dark") {
+    setMode(m);
+    document.documentElement.setAttribute("data-mode", m);
+    localStorage.setItem("optivo-mode", m);
+  }
+
+  function changeTheme(t: string) {
+    setTheme(t);
+    document.documentElement.setAttribute("data-theme", t);
+    localStorage.setItem("optivo-theme", t);
   }
 
   return (
     <div className="ui-preview">
       <div className="ui-preview__header">
         <h1>Optivo UI Kit</h1>
-        <Button variant="outline" size="sm" onClick={toggleMode}>
-          {mode === "light" ? "🌙 Dark" : "☀️ Light"}
-        </Button>
+        <div className="ui-preview__controls">
+          {/* Mode toggle */}
+          <div className="ui-preview__mode-toggle">
+            <button className={`ui-preview__mode-btn ${mode === "light" ? "ui-preview__mode-btn--active" : ""}`} onClick={() => changeMode("light")}>
+              <Sun size={14} /> Light
+            </button>
+            <button className={`ui-preview__mode-btn ${mode === "dark" ? "ui-preview__mode-btn--active" : ""}`} onClick={() => changeMode("dark")}>
+              <Moon size={14} /> Dark
+            </button>
+          </div>
+          {/* Theme palette */}
+          <div className="ui-preview__theme-picker">
+            {THEMES.map((t) => (
+              <button
+                key={t.id}
+                className={`ui-preview__theme-dot ${theme === t.id ? "ui-preview__theme-dot--active" : ""}`}
+                style={{ "--dot-color": t.color } as React.CSSProperties}
+                onClick={() => changeTheme(t.id)}
+                title={t.label}
+              />
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* ── Colors ── */}

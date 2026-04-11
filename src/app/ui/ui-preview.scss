@@ -20,6 +20,66 @@
     }
   }
 
+  &__controls {
+    display: flex;
+    align-items: center;
+    gap: $space-lg;
+  }
+
+  &__mode-toggle {
+    display: flex;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: $radius-lg;
+    overflow: hidden;
+  }
+
+  &__mode-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: $space-xs $space-md;
+    border: none;
+    background: transparent;
+    color: var(--muted-fg);
+    font-size: $text-xs;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+
+    &:hover { color: var(--fg); }
+
+    &--active {
+      background: var(--surface);
+      color: var(--fg);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  &__theme-picker {
+    display: flex;
+    gap: $space-sm;
+  }
+
+  &__theme-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--dot-color);
+    cursor: pointer;
+    transition: all 0.15s;
+    padding: 0;
+
+    &:hover { transform: scale(1.15); }
+
+    &--active {
+      border-color: var(--fg);
+      box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--dot-color);
+    }
+  }
+
   &__section {
     display: flex;
     flex-direction: column;

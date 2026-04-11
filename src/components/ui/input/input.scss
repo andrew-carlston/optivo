@@ -4,17 +4,17 @@
   width: 100%;
   padding: $space-sm $space-md;
   border: 1px solid var(--border);
-  border-radius: $radius-md;
+  border-radius: $radius-lg;
   background: var(--input-bg);
   color: var(--fg);
   font-size: $text-sm;
   font-family: inherit;
-  min-height: $touch-min;
+  min-height: 40px;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
 
   &::placeholder { color: var(--muted-fg); }
-  &:focus { border-color: var(--pop); }
+  &:focus { border-color: var(--pop); box-shadow: 0 0 0 3px var(--pop-muted); }
   &:disabled { opacity: 0.5; }
 
   &--error { border-color: var(--danger); }
