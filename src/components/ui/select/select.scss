@@ -1,0 +1,188 @@
+@use "../../../styles/tokens" as *;
+
+.select {
+  position: relative;
+  width: 100%;
+}
+
+// ── Trigger ──
+
+.select__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-sm;
+  width: 100%;
+  min-height: 40px;
+  padding: $space-sm $space-md;
+  border: 1px solid var(--border);
+  border-radius: $radius-lg;
+  background: var(--input-bg);
+  color: var(--fg);
+  font-size: $text-sm;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:hover { border-color: var(--pop); }
+  &:focus-visible { border-color: var(--pop); box-shadow: 0 0 0 3px var(--pop-muted); }
+
+  svg { color: var(--muted-fg); flex-shrink: 0; }
+
+  &--disabled { opacity: 0.5; cursor: default; &:hover { border-color: var(--border); } }
+
+  &--multi {
+    flex-wrap: nowrap;
+    min-height: 40px;
+  }
+}
+
+.select__placeholder { color: var(--muted-fg); }
+
+// ── Chips (Multi Select) ──
+
+.select__chips {
+  display: flex;
+  flex: 1;
+  gap: $space-xs;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.select__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px $space-sm;
+  border-radius: $radius-full;
+  background: var(--pop-muted);
+  color: var(--pop);
+  font-size: $text-xs;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.select__chip-remove {
+  display: flex;
+  cursor: pointer;
+  color: var(--pop);
+  opacity: 0.6;
+  &:hover { opacity: 1; }
+}
+
+// ── Dropdown ──
+
+.select__dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  min-width: 200px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: $radius-lg;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
+  z-index: $z-dropdown;
+  overflow: hidden;
+}
+
+// ── Search ──
+
+.select__search {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  padding: $space-sm $space-md;
+  border-bottom: 1px solid var(--border);
+
+  svg { color: var(--muted-fg); flex-shrink: 0; }
+
+  input {
+    all: unset;
+    flex: 1;
+    font-size: $text-sm;
+    font-family: inherit;
+    color: var(--fg);
+    &::placeholder { color: var(--muted-fg); }
+  }
+}
+
+// ── Bulk Actions ──
+
+.select__bulk {
+  display: flex;
+  justify-content: space-between;
+  padding: $space-xs $space-md;
+  border-bottom: 1px solid var(--border);
+
+  button {
+    all: unset;
+    font-size: $text-xs;
+    font-weight: 600;
+    color: var(--pop);
+    cursor: pointer;
+    &:hover { text-decoration: underline; }
+  }
+}
+
+// ── Options ──
+
+.select__options {
+  max-height: 240px;
+  overflow-y: auto;
+  padding: $space-xs;
+}
+
+.select__option {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  width: 100%;
+  padding: $space-sm $space-md;
+  border: none;
+  border-radius: $radius-md;
+  background: transparent;
+  color: var(--fg);
+  font-size: $text-sm;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  min-height: 36px;
+  transition: background 0.12s;
+
+  &:hover { background: var(--pop-muted); color: var(--pop); }
+  &--active { background: var(--pop-muted); color: var(--pop); font-weight: 600; }
+
+  svg { margin-left: auto; flex-shrink: 0; }
+}
+
+.select__empty {
+  padding: $space-md;
+  text-align: center;
+  font-size: $text-sm;
+  color: var(--muted-fg);
+}
+
+// ── Checkbox (Multi Select) ──
+
+.select__check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  border: 1.5px solid var(--border-strong);
+  transition: all 0.12s;
+
+  &--checked {
+    background: var(--pop);
+    border-color: var(--pop);
+    color: var(--pop-fg);
+  }
+}

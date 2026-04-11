@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input/input";
+import { Select, MultiSelect, type SelectOption } from "@/components/ui/select/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card/card";
 import { Badge } from "@/components/ui/badge/badge";
 import { Skeleton, SkeletonText, SkeletonButton, SkeletonAvatar, SkeletonCard, SkeletonTable } from "@/components/ui/skeleton/skeleton";
@@ -20,6 +21,17 @@ export default function UIPreviewPage() {
   const [mode, setMode] = useState<"light" | "dark">("light");
   const [theme, setTheme] = useState("default");
   const [inputVal, setInputVal] = useState("");
+  const [selectVal, setSelectVal] = useState("");
+  const [multiVal, setMultiVal] = useState<string[]>([]);
+
+  const sampleOptions: SelectOption[] = [
+    { value: "sales", label: "Sales" },
+    { value: "ops", label: "Operations" },
+    { value: "hr", label: "Human Resources" },
+    { value: "wfm", label: "Workforce Management" },
+    { value: "finance", label: "Finance" },
+    { value: "engineering", label: "Engineering" },
+  ];
 
   // Restore from localStorage on mount
   useEffect(() => {
@@ -122,6 +134,31 @@ export default function UIPreviewPage() {
           <Input placeholder="Error state" error />
           <Input placeholder="Disabled" disabled />
           <Input type="password" placeholder="Password" />
+        </div>
+      </section>
+
+      {/* ── Selects ── */}
+      <section className="ui-preview__section">
+        <h2>Select & MultiSelect</h2>
+        <div className="ui-preview__grid">
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+            <label style={{ fontSize: "0.8125rem", fontWeight: 500 }}>Single Select</label>
+            <Select options={sampleOptions} value={selectVal} onChange={setSelectVal} placeholder="Choose department..." />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+            <label style={{ fontSize: "0.8125rem", fontWeight: 500 }}>Single Select (searchable)</label>
+            <Select options={sampleOptions} value={selectVal} onChange={setSelectVal} placeholder="Search departments..." searchable />
+          </div>
+        </div>
+        <div className="ui-preview__grid">
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+            <label style={{ fontSize: "0.8125rem", fontWeight: 500 }}>Multi Select</label>
+            <MultiSelect options={sampleOptions} selected={multiVal} onChange={setMultiVal} placeholder="Select departments..." />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+            <label style={{ fontSize: "0.8125rem", fontWeight: 500 }}>Multi Select (loading)</label>
+            <MultiSelect options={[]} selected={[]} onChange={() => {}} loading />
+          </div>
         </div>
       </section>
 
