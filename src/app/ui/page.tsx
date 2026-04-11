@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card/c
 import { Badge } from "@/components/ui/badge/badge";
 import { Skeleton, SkeletonText, SkeletonButton, SkeletonAvatar, SkeletonCard, SkeletonTable } from "@/components/ui/skeleton/skeleton";
 import { AccessGate } from "@/components/ui/access-gate/access-gate";
-import { Search, Mail, Plus, Trash2, Settings, Bell, Check, Sun, Moon, Lock, Palette } from "lucide-react";
+import { Search, Mail, Plus, Trash2, Settings, Bell, Check, Sun, Moon, Monitor, Lock, Palette } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import "./ui-preview.scss";
 
@@ -20,7 +20,7 @@ const THEMES = [
 ];
 
 export default function UIPreviewPage() {
-  const [mode, setMode] = useState<"light" | "dark">("light");
+  const [mode, setMode] = useState<"light" | "dark" | "system">("light");
   const [theme, setTheme] = useState("default");
   const [inputVal, setInputVal] = useState("");
   const [selectVal, setSelectVal] = useState("");
@@ -38,15 +38,18 @@ export default function UIPreviewPage() {
 
   // Restore from localStorage on mount
   useEffect(() => {
-    const savedMode = localStorage.getItem("optivo-mode") as "light" | "dark" | null;
+    const savedMode = localStorage.getItem("optivo-mode") as "light" | "dark" | "system" | null;
     const savedTheme = localStorage.getItem("optivo-theme");
     if (savedMode) { setMode(savedMode); document.documentElement.setAttribute("data-mode", savedMode); }
     if (savedTheme) { setTheme(savedTheme); document.documentElement.setAttribute("data-theme", savedTheme); }
   }, []);
 
-  function changeMode(m: "light" | "dark") {
+  function changeMode(m: "light" | "dark" | "system") {
     setMode(m);
-    document.documentElement.setAttribute("data-mode", m);
+    const resolved = m === "system"
+      ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+      : m;
+    document.documentElement.setAttribute("data-mode", resolved);
     localStorage.setItem("optivo-mode", m);
   }
 
@@ -69,28 +72,39 @@ export default function UIPreviewPage() {
           <DropdownMenu.Portal>
             <DropdownMenu.Content className="theme-menu" sideOffset={6} align="end">
               <DropdownMenu.Label className="theme-menu__label">Mode</DropdownMenu.Label>
-              <DropdownMenu.Item className={`theme-menu__item ${mode === "light" ? "theme-menu__item--active" : ""}`} onSelect={() => changeMode("light")}>
-                <Sun size={14} /> Light
-                {mode === "light" && <span className="theme-menu__check"><Check size={10} /></span>}
-              </DropdownMenu.Item>
-              <DropdownMenu.Item className={`theme-menu__item ${mode === "dark" ? "theme-menu__item--active" : ""}`} onSelect={() => changeMode("dark")}>
-                <Moon size={14} /> Dark
-                {mode === "dark" && <span className="theme-menu__check"><Check size={10} /></span>}
-              </DropdownMenu.Item>
+              {/* Segmented slider for mode */}
+              <div className="theme-menu__slider">
+                {([
+                  { id: "light" as const, icon: <Sun size={13} />, label: "Light" },
+                  { id: "system" as const, icon: <Monitor size={13} />, label: "System" },
+                  { id: "dark" as const, icon: <Moon size={13} />, label: "Dark" },
+                ]).map((m) => (
+                  <button
+                    key={m.id}
+                    className={`theme-menu__slider-btn ${mode === m.id ? "theme-menu__slider-btn--active" : ""}`}
+                    onClick={() => changeMode(m.id)}
+                  >
+                    {m.icon}
+                    {m.label}
+                  </button>
+                ))}
+              </div>
 
               <DropdownMenu.Separator className="theme-menu__separator" />
               <DropdownMenu.Label className="theme-menu__label">Theme</DropdownMenu.Label>
-              {THEMES.map((t) => (
-                <DropdownMenu.Item
-                  key={t.id}
-                  className={`theme-menu__item ${theme === t.id ? "theme-menu__item--active" : ""}`}
-                  onSelect={() => changeTheme(t.id)}
-                >
-                  <span className="theme-menu__dot" style={{ background: t.color }} />
-                  {t.label}
-                  {theme === t.id && <span className="theme-menu__check"><Check size={10} /></span>}
-                </DropdownMenu.Item>
-              ))}
+              <div className="theme-menu__themes">
+                {THEMES.map((t) => (
+                  <DropdownMenu.Item
+                    key={t.id}
+                    className={`theme-menu__item ${theme === t.id ? "theme-menu__item--active" : ""}`}
+                    onSelect={() => changeTheme(t.id)}
+                  >
+                    <span className="theme-menu__dot" style={{ background: t.color }} />
+                    {t.label}
+                    {theme === t.id && <span className="theme-menu__check"><Check size={10} /></span>}
+                  </DropdownMenu.Item>
+                ))}
+              </div>
             </DropdownMenu.Content>
           </DropdownMenu.Portal>
         </DropdownMenu.Root>
