@@ -57,28 +57,9 @@
     border-radius: $radius-md;
   }
 
+  // Google button — uses Button component, just needs full width
   &__google {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: $space-sm;
     width: 100%;
-    padding: $space-sm $space-lg;
-    border: 1px solid var(--border);
-    border-radius: $radius-full;
-    background: var(--surface);
-    color: var(--fg);
-    font-size: $text-sm;
-    font-weight: 500;
-    font-family: inherit;
-    cursor: pointer;
-    min-height: 42px;
-    transition: border-color 0.15s, background 0.15s;
-
-    &:hover { border-color: var(--border-strong); background: var(--surface-2); }
-    &:disabled { opacity: 0.5; cursor: default; }
-
-    svg { flex-shrink: 0; }
   }
 
   &__divider {
@@ -107,20 +88,10 @@
     font-size: $text-sm;
     color: var(--muted-fg);
     margin: 0;
-
-    button {
-      background: none;
-      border: none;
-      color: var(--pop);
-      font-weight: 600;
-      font-family: inherit;
-      font-size: inherit;
-      cursor: pointer;
-      text-decoration: underline;
-      text-underline-offset: 2px;
-
-      &:hover { opacity: 0.8; }
-    }
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-xs;
   }
 
   &__powered {
