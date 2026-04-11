@@ -1,9 +1,6 @@
 @use "../../../styles/tokens" as *;
 
-.select {
-  position: relative;
-  width: 100%;
-}
+.select { position: relative; width: 100%; }
 
 // ── Trigger ──
 
@@ -13,8 +10,8 @@
   justify-content: space-between;
   gap: $space-sm;
   width: 100%;
-  min-height: 40px;
-  padding: $space-sm $space-md;
+  height: 40px;
+  padding: 0 $space-md;
   border: 1px solid var(--border);
   border-radius: $radius-lg;
   background: var(--input-bg);
@@ -26,21 +23,21 @@
   transition: border-color 0.15s, box-shadow 0.15s;
 
   &:hover { border-color: var(--pop); }
-  &:focus-visible { border-color: var(--pop); box-shadow: 0 0 0 3px var(--pop-muted); }
+  &:focus, &[data-state="open"] { border-color: var(--pop); box-shadow: 0 0 0 3px var(--pop-muted); }
 
-  svg { color: var(--muted-fg); flex-shrink: 0; }
+  > svg, [data-radix-select-icon] { color: var(--muted-fg); flex-shrink: 0; }
 
   &--disabled { opacity: 0.5; cursor: default; &:hover { border-color: var(--border); } }
 
-  &--multi {
-    flex-wrap: nowrap;
-    min-height: 40px;
-  }
+  &--multi { flex-wrap: nowrap; }
+
+  // Radix injects a span for value
+  [data-placeholder] { color: var(--muted-fg); }
 }
 
 .select__placeholder { color: var(--muted-fg); }
 
-// ── Chips (Multi Select) ──
+// ── Chips (Multi) ──
 
 .select__chips {
   display: flex;
@@ -49,6 +46,7 @@
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
+  align-items: center;
   &::-webkit-scrollbar { display: none; }
 }
 
@@ -74,20 +72,29 @@
   &:hover { opacity: 1; }
 }
 
-// ── Dropdown ──
+.select__count {
+  font-size: $text-sm;
+  font-weight: 500;
+  color: var(--pop);
+}
+
+// ── Dropdown (shared by both Select and MultiSelect) ──
 
 .select__dropdown {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  width: 100%;
+  width: var(--radix-select-trigger-width, var(--radix-popover-trigger-width, 100%));
   min-width: 200px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: $radius-lg;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
   z-index: $z-dropdown;
   overflow: hidden;
+  animation: selectSlideDown 0.15s ease;
+}
+
+@keyframes selectSlideDown {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 // ── Search ──
@@ -111,7 +118,7 @@
   }
 }
 
-// ── Bulk Actions ──
+// ── Bulk ──
 
 .select__bulk {
   display: flex;
@@ -132,12 +139,12 @@
 // ── Options ──
 
 .select__options {
-  max-height: 260px;
+  max-height: 240px;
   overflow-y: auto;
-  padding: $space-sm;
+  padding: 4px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
 .select__option {
@@ -145,54 +152,35 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: $space-md $space-lg;
+  padding: $space-sm $space-md;
   border: none;
-  border-radius: $radius-md;
+  border-radius: $radius-sm;
   background: transparent;
   color: var(--fg);
   font-size: $text-sm;
   font-family: inherit;
   cursor: pointer;
   outline: none;
-  transition: background 0.12s;
+  transition: background 0.1s;
 
-  &:hover { background: var(--accent); }
+  &:hover, &[data-highlighted] { background: var(--accent); }
+  &--active, &[data-state="checked"] { background: var(--pop-muted); color: var(--pop); font-weight: 500; }
 
-  &--active {
-    background: var(--pop-muted);
-    color: var(--pop);
-    font-weight: 600;
-  }
-
-  // Multi select rows — add left border accent when selected
   &--multi.select__option--active {
-    border-left: 3px solid var(--pop);
-    padding-left: calc(#{$space-lg} - 3px);
+    border-left: 2px solid var(--pop);
+    padding-left: calc(#{$space-md} - 2px);
   }
 
-  svg { flex-shrink: 0; }
+  // Radix select item indicator
+  [data-radix-select-item-indicator] { display: flex; color: var(--pop); }
 }
 
-.select__option-label {
-  flex: 1;
-  text-align: left;
-}
-
-.select__option-check {
-  color: var(--pop);
-}
+.select__option-label { flex: 1; text-align: left; }
+.select__option-check { color: var(--pop); }
 
 .select__empty {
   padding: $space-lg;
   text-align: center;
   font-size: $text-sm;
   color: var(--muted-fg);
-}
-
-// ── Count badge (3+ selected) ──
-
-.select__count {
-  font-size: $text-sm;
-  font-weight: 500;
-  color: var(--pop);
 }

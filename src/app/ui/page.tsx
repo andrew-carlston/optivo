@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input/input";
 import { Select, MultiSelect, type SelectOption } from "@/components/ui/select/select";
+import { Switch } from "@/components/ui/switch/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card/card";
 import { Badge } from "@/components/ui/badge/badge";
 import { Skeleton, SkeletonText, SkeletonButton, SkeletonAvatar, SkeletonCard, SkeletonTable } from "@/components/ui/skeleton/skeleton";
@@ -23,6 +24,7 @@ export default function UIPreviewPage() {
   const [inputVal, setInputVal] = useState("");
   const [selectVal, setSelectVal] = useState("");
   const [multiVal, setMultiVal] = useState<string[]>([]);
+  const [switchVal, setSwitchVal] = useState(false);
 
   const sampleOptions: SelectOption[] = [
     { value: "sales", label: "Sales" },
@@ -146,8 +148,8 @@ export default function UIPreviewPage() {
             <Select options={sampleOptions} value={selectVal} onChange={setSelectVal} placeholder="Choose department..." />
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-            <label style={{ fontSize: "0.8125rem", fontWeight: 500 }}>Single Select (searchable)</label>
-            <Select options={sampleOptions} value={selectVal} onChange={setSelectVal} placeholder="Search departments..." searchable />
+            <label style={{ fontSize: "0.8125rem", fontWeight: 500 }}>Single Select (disabled)</label>
+            <Select options={sampleOptions} value="wfm" placeholder="Disabled..." disabled />
           </div>
         </div>
         <div className="ui-preview__grid">
@@ -158,6 +160,25 @@ export default function UIPreviewPage() {
           <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
             <label style={{ fontSize: "0.8125rem", fontWeight: 500 }}>Multi Select (loading)</label>
             <MultiSelect options={[]} selected={[]} onChange={() => {}} loading />
+          </div>
+        </div>
+      </section>
+
+      {/* ── Switch ── */}
+      <section className="ui-preview__section">
+        <h2>Switch</h2>
+        <div className="ui-preview__row">
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <Switch checked={switchVal} onCheckedChange={setSwitchVal} />
+            <span style={{ fontSize: "0.8125rem" }}>{switchVal ? "Enabled" : "Disabled"}</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <Switch checked disabled />
+            <span style={{ fontSize: "0.8125rem", color: "var(--muted-fg)" }}>Disabled on</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <Switch disabled />
+            <span style={{ fontSize: "0.8125rem", color: "var(--muted-fg)" }}>Disabled off</span>
           </div>
         </div>
       </section>

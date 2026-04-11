@@ -1,24 +1,27 @@
 "use client";
 
-import { useState, useEffect, useRef, ReactNode } from "react";
+import { useState, useRef, useEffect } from "react";
+import * as RadixSelect from "@radix-ui/react-select";
+import * as Popover from "@radix-ui/react-popover";
 import { ChevronDown, Check, Search, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import "./select.scss";
 
-// ── Single Select ──
+// ── Types ──
 
 export interface SelectOption {
   value: string;
   label: string;
 }
 
+// ── Single Select (Radix) ──
+
 export interface SelectProps {
   options: SelectOption[];
   value?: string;
   onChange?: (value: string) => void;
   placeholder?: string;
-  searchable?: boolean;
   loading?: boolean;
   disabled?: boolean;
   className?: string;
@@ -26,79 +29,38 @@ export interface SelectProps {
 
 export function Select({
   options, value, onChange, placeholder = "Select...",
-  searchable = false, loading, disabled, className,
+  loading, disabled, className,
 }: SelectProps) {
-  const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState("");
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  useEffect(() => { if (!open) setSearch(""); }, [open]);
-
   if (loading) return <Skeleton width="100%" height={40} radius="lg" />;
 
-  const filtered = options.filter((o) =>
-    o.label.toLowerCase().includes(search.toLowerCase())
-  );
-  const selected = options.find((o) => o.value === value);
-
   return (
-    <div ref={containerRef} className={cn("select", className)}>
-      <button
-        type="button"
-        className={cn("select__trigger", disabled && "select__trigger--disabled")}
-        onClick={() => !disabled && setOpen(!open)}
-      >
-        <span className={cn(!selected && "select__placeholder")}>
-          {selected?.label || placeholder}
-        </span>
-        <ChevronDown size={16} />
-      </button>
+    <RadixSelect.Root value={value} onValueChange={onChange} disabled={disabled}>
+      <RadixSelect.Trigger className={cn("select__trigger", className)}>
+        <RadixSelect.Value placeholder={placeholder} />
+        <RadixSelect.Icon>
+          <ChevronDown size={16} />
+        </RadixSelect.Icon>
+      </RadixSelect.Trigger>
 
-      {open && (
-        <div className="select__dropdown">
-          {searchable && (
-            <div className="select__search">
-              <Search size={14} />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search..."
-                autoFocus
-              />
-            </div>
-          )}
-          <div className="select__options">
-            {filtered.length === 0 && (
-              <div className="select__empty">No results</div>
-            )}
-            {filtered.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                className={cn("select__option", value === opt.value && "select__option--active")}
-                onClick={() => { onChange?.(opt.value); setOpen(false); }}
-              >
-                {opt.label}
-                {value === opt.value && <Check size={14} />}
-              </button>
+      <RadixSelect.Portal>
+        <RadixSelect.Content className="select__dropdown" position="popper" sideOffset={4}>
+          <RadixSelect.Viewport className="select__options">
+            {options.map((opt) => (
+              <RadixSelect.Item key={opt.value} value={opt.value} className="select__option">
+                <RadixSelect.ItemText>{opt.label}</RadixSelect.ItemText>
+                <RadixSelect.ItemIndicator>
+                  <Check size={14} />
+                </RadixSelect.ItemIndicator>
+              </RadixSelect.Item>
             ))}
-          </div>
-        </div>
-      )}
-    </div>
+          </RadixSelect.Viewport>
+        </RadixSelect.Content>
+      </RadixSelect.Portal>
+    </RadixSelect.Root>
   );
 }
 
-// ── Multi Select ──
+// ── Multi Select (Radix Popover + custom list) ──
 
 export interface MultiSelectProps {
   options: SelectOption[];
@@ -115,19 +77,8 @@ export function MultiSelect({
   options, selected, onChange, placeholder = "Select...",
   searchable = true, loading, disabled, className,
 }: MultiSelectProps) {
-  const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  useEffect(() => { if (!open) setSearch(""); }, [open]);
+  const searchRef = useRef<HTMLInputElement>(null);
 
   if (loading) return <Skeleton width="100%" height={40} radius="lg" />;
 
@@ -149,40 +100,39 @@ export function MultiSelect({
   };
 
   return (
-    <div ref={containerRef} className={cn("select", className)}>
-      <button
-        type="button"
-        className={cn("select__trigger select__trigger--multi", disabled && "select__trigger--disabled")}
-        onClick={() => !disabled && setOpen(!open)}
-      >
-        <div className="select__chips">
-          {selected.length === 0 && (
-            <span className="select__placeholder">{placeholder}</span>
-          )}
-          {selected.length > 0 && selected.length <= 2 && selected.map((val) => {
-            const opt = options.find((o) => o.value === val);
-            return (
-              <span key={val} className="select__chip">
-                {opt?.label ?? val}
-                <span className="select__chip-remove" onClick={(e) => remove(val, e)}>
-                  <X size={12} />
+    <Popover.Root onOpenChange={(open) => { if (!open) setSearch(""); }}>
+      <Popover.Trigger asChild disabled={disabled}>
+        <button type="button" className={cn("select__trigger select__trigger--multi", disabled && "select__trigger--disabled", className)}>
+          <div className="select__chips">
+            {selected.length === 0 && (
+              <span className="select__placeholder">{placeholder}</span>
+            )}
+            {selected.length > 0 && selected.length <= 2 && selected.map((val) => {
+              const opt = options.find((o) => o.value === val);
+              return (
+                <span key={val} className="select__chip">
+                  {opt?.label ?? val}
+                  <span className="select__chip-remove" onClick={(e) => remove(val, e)}>
+                    <X size={12} />
+                  </span>
                 </span>
-              </span>
-            );
-          })}
-          {selected.length > 2 && (
-            <span className="select__count">{selected.length} selected</span>
-          )}
-        </div>
-        <ChevronDown size={16} />
-      </button>
+              );
+            })}
+            {selected.length > 2 && (
+              <span className="select__count">{selected.length} selected</span>
+            )}
+          </div>
+          <ChevronDown size={16} />
+        </button>
+      </Popover.Trigger>
 
-      {open && (
-        <div className="select__dropdown">
+      <Popover.Portal>
+        <Popover.Content className="select__dropdown" sideOffset={4} align="start">
           {searchable && (
             <div className="select__search">
               <Search size={14} />
               <input
+                ref={searchRef}
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -214,8 +164,8 @@ export function MultiSelect({
               );
             })}
           </div>
-        </div>
-      )}
-    </div>
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   );
 }
