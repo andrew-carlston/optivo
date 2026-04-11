@@ -287,6 +287,59 @@ import { Footer } from "@/components/ui/footer/footer";
 
 Renders brand name + copyright year. Sticky to bottom of AppShell.
 
+### AuthCard
+
+```tsx
+import { AuthCard, AuthCardNotFound } from "@/components/ui/auth-card/auth-card";
+
+<AuthCard
+  companyName="LawnStarter"
+  logoUrl={null}
+  allowGoogle
+  allowPassword
+  allowSignup
+  loading={false}
+  error="Invalid credentials"
+  onGoogleSSO={handleGoogleSSO}
+  onEmailSignIn={handleEmailSignIn}
+  onEmailSignUp={handleEmailSignUp}
+  submitting={false}
+  footer="Powered by Optivo"
+/>
+
+<AuthCardNotFound onGoHome={() => router.push("/")} />
+```
+
+| Prop | Type | Default |
+|------|------|---------|
+| `companyName` | `string` | required |
+| `logoUrl` | `string \| null` | — |
+| `subtitle` | `string` | `"Sign in to continue"` |
+| `allowGoogle` | `boolean` | `true` |
+| `allowPassword` | `boolean` | `true` |
+| `allowSignup` | `boolean` | `true` |
+| `loading` | `boolean` | `false` (renders skeleton) |
+| `error` | `string` | — |
+| `onGoogleSSO` | `() => void` | — |
+| `onEmailSignIn` | `(email, password) => void` | — |
+| `onEmailSignUp` | `(email, password, name) => void` | — |
+| `submitting` | `boolean` | `false` |
+| `footer` | `string` | `"Powered by Optivo"` |
+
+### ThemeProvider
+
+```tsx
+import { ThemeProvider } from "@/components/ui/theme-provider/theme-provider";
+
+// In root layout:
+<body>
+  <ThemeProvider />
+  {children}
+</body>
+```
+
+Restores theme + mode from localStorage on mount. Handles system mode (prefers-color-scheme).
+
 ## File Patterns
 
 When creating a new component:
