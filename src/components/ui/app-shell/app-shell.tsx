@@ -93,17 +93,13 @@ export function AppShell({ header, footer, children }: AppShellProps) {
 
       {/* Main content */}
       <main ref={mainRef} className="app-shell__main">
-        <div className="app-shell__container">
-          {children}
-        </div>
+        {children}
       </main>
 
       {/* Footer */}
       {footer && (
         <footer className="app-shell__footer">
-          <div className="app-shell__container">
-            {footer}
-          </div>
+          {footer}
         </footer>
       )}
     </div>

@@ -1,61 +1,60 @@
 @use "../../../styles/tokens" as *;
 
+$container-max: 1200px;
+$shell-padding: $space-lg;
+$shell-padding-mobile: $space-md;
+
 .app-shell {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  padding: $space-sm $shell-padding;
 
-  // ── Container — responsive with expand toggle ──
-
-  &__container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 $space-lg;
-
-    @media (max-width: 768px) {
-      padding: 0 $space-md;
-    }
-  }
-
-  &--expanded &__container {
-    max-width: 100%;
+  @media (max-width: 768px) {
+    padding: $space-xs $shell-padding-mobile;
   }
 
   // ── Header ──
 
   &__header {
     position: sticky;
-    top: 0;
+    top: $space-sm;
     z-index: 50;
     background: var(--surface);
-    border-bottom: 1px solid var(--border);
+    border: 1px solid var(--border);
+    border-radius: $radius-xl;
+    max-width: $container-max;
+    width: 100%;
+    margin: 0 auto $space-sm;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
 
+    @media (max-width: 768px) {
+      top: $space-xs;
+      border-radius: $radius-lg;
+    }
+
     &--hidden {
-      transform: translateY(-100%);
+      transform: translateY(calc(-100% - #{$space-lg}));
       opacity: 0;
       pointer-events: none;
     }
+  }
+
+  &--expanded &__header {
+    max-width: 100%;
   }
 
   &__header-inner {
     display: flex;
     align-items: center;
     gap: $space-md;
-    max-width: 1200px;
-    margin: 0 auto;
     padding: $space-sm $space-lg;
-    min-height: 56px;
+    min-height: 52px;
 
     @media (max-width: 768px) {
       padding: $space-sm $space-md;
-      min-height: 48px;
+      min-height: 46px;
     }
-  }
-
-  &--expanded &__header-inner {
-    max-width: 100%;
   }
 
   // ── Expand button ──
@@ -73,7 +72,6 @@
     cursor: pointer;
     transition: all 0.15s;
     flex-shrink: 0;
-    margin-left: auto;
 
     &:hover { background: var(--accent); color: var(--fg); }
 
@@ -111,23 +109,48 @@
 
   &__main {
     flex: 1;
-    padding: $space-xl 0;
+    width: 100%;
+    max-width: $container-max;
+    margin: 0 auto;
+    padding: $space-lg 0;
 
     @media (max-width: 768px) {
-      padding: $space-lg 0;
+      padding: $space-md 0;
     }
+  }
+
+  &--expanded &__main {
+    max-width: 100%;
+  }
+
+  // ── Container (for child content) ──
+
+  &__container {
+    width: 100%;
   }
 
   // ── Footer ──
 
   &__footer {
-    border-top: 1px solid var(--border);
+    position: sticky;
+    bottom: 0;
+    z-index: 40;
     background: var(--surface);
-    padding: $space-md 0;
+    border: 1px solid var(--border);
+    border-radius: $radius-xl;
+    max-width: $container-max;
+    width: 100%;
+    margin: $space-sm auto 0;
+    padding: $space-md $space-lg;
 
     @media (max-width: 768px) {
-      padding: $space-sm 0;
+      border-radius: $radius-lg;
+      padding: $space-sm $space-md;
     }
+  }
+
+  &--expanded &__footer {
+    max-width: 100%;
   }
 }
 
