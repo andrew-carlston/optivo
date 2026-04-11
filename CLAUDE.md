@@ -174,7 +174,12 @@ npx drizzle-kit studio
 - SCSS only — no Tailwind, no CSS-in-JS
 - Theme variables: `--bg`, `--fg`, `--surface`, `--pop`, `--pop-fg`, etc.
 - `--pop` is the accent color per theme
+- Shadow tokens: `--shadow-xs`, `--shadow-sm`, `--shadow-md`, `--shadow-lg`, `--shadow-inset`
+  - Light modes: theme-tinted shadows (low opacity, uses theme `--fg` color)
+  - Dark modes: black shadows (higher opacity for punch on dark surfaces)
+  - Defined per theme per mode in `src/styles/themes/`
 - Component library: Button, Card, Dialog, Select, MultiSelect, DataTable, Switch, Input, Avatar
+- Card variants: `flat` (default — border, no shadow), `raised` (shadow-md, lifts on hover), `inset` (surface-2 bg, inner shadow)
 - All timestamps UTC in DB, displayed in user's timezone
 - `cn()` utility for conditional classnames
 

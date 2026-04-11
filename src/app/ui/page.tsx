@@ -230,23 +230,54 @@ export default function UIPreviewPage() {
       {/* ── Cards ── */}
       <section className="ui-preview__section">
         <h2>Cards</h2>
-        <div className="ui-preview__grid">
+        <div className="ui-preview__grid ui-preview__grid--3">
           <Card>
             <CardHeader>
-              <CardTitle>Card Title</CardTitle>
+              <CardTitle>Flat (default)</CardTitle>
               <Button variant="ghost" size="icon"><Settings size={16} /></Button>
             </CardHeader>
             <CardContent>
-              <p style={{ color: "var(--muted-fg)", fontSize: "0.8125rem" }}>This is a card with a header and content area. Cards use the surface background with a border.</p>
+              <p style={{ color: "var(--muted-fg)", fontSize: "0.8125rem" }}>Standard card with border, no shadow. The default look for content containers.</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card variant="raised">
+            <CardHeader>
+              <CardTitle>Raised</CardTitle>
+              <Button variant="ghost" size="icon"><Settings size={16} /></Button>
+            </CardHeader>
+            <CardContent>
+              <p style={{ color: "var(--muted-fg)", fontSize: "0.8125rem" }}>Elevated card with shadow. Lifts on hover. Great for interactive or primary content.</p>
+            </CardContent>
+          </Card>
+          <Card variant="inset">
+            <CardHeader>
+              <CardTitle>Inset</CardTitle>
+              <Button variant="ghost" size="icon"><Settings size={16} /></Button>
+            </CardHeader>
+            <CardContent>
+              <p style={{ color: "var(--muted-fg)", fontSize: "0.8125rem" }}>Recessed card with inner shadow. Good for nested content or secondary panels.</p>
+            </CardContent>
+          </Card>
+        </div>
+        <div className="ui-preview__grid">
+          <Card variant="raised">
             <CardContent>
               <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
                 <div style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--pop)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--pop-fg)", fontWeight: 600, fontSize: "0.875rem" }}>AC</div>
                 <div>
                   <div style={{ fontWeight: 600, fontSize: "0.875rem" }}>Andrew Carlston</div>
                   <div style={{ color: "var(--muted-fg)", fontSize: "0.75rem" }}>Senior Manager, WFM</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card variant="inset">
+            <CardContent>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                <div style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--success)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--success-fg)", fontWeight: 600, fontSize: "0.875rem" }}>JD</div>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: "0.875rem" }}>Jane Doe</div>
+                  <div style={{ color: "var(--muted-fg)", fontSize: "0.75rem" }}>Agent, Sales</div>
                 </div>
               </div>
             </CardContent>
