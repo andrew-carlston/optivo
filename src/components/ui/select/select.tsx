@@ -48,8 +48,8 @@ export function Select({
             {options.map((opt) => (
               <RadixSelect.Item key={opt.value} value={opt.value} className="select__option">
                 <RadixSelect.ItemText>{opt.label}</RadixSelect.ItemText>
-                <RadixSelect.ItemIndicator>
-                  <Check size={14} />
+                <RadixSelect.ItemIndicator className="select__option-check">
+                  <Check size={10} />
                 </RadixSelect.ItemIndicator>
               </RadixSelect.Item>
             ))}
