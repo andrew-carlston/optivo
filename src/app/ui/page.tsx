@@ -9,7 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card/c
 import { Badge } from "@/components/ui/badge/badge";
 import { Skeleton, SkeletonText, SkeletonButton, SkeletonAvatar, SkeletonCard, SkeletonTable } from "@/components/ui/skeleton/skeleton";
 import { AccessGate } from "@/components/ui/access-gate/access-gate";
-import { Search, Mail, Plus, Trash2, Settings, Bell, Check, Sun, Moon, Lock } from "lucide-react";
+import { Search, Mail, Plus, Trash2, Settings, Bell, Check, Sun, Moon, Lock, Palette } from "lucide-react";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import "./ui-preview.scss";
 
 const THEMES = [
@@ -59,29 +60,40 @@ export default function UIPreviewPage() {
     <div className="ui-preview">
       <div className="ui-preview__header">
         <h1>Optivo UI Kit</h1>
-        <div className="ui-preview__controls">
-          {/* Mode toggle */}
-          <div className="ui-preview__mode-toggle">
-            <button className={`ui-preview__mode-btn ${mode === "light" ? "ui-preview__mode-btn--active" : ""}`} onClick={() => changeMode("light")}>
-              <Sun size={14} /> Light
-            </button>
-            <button className={`ui-preview__mode-btn ${mode === "dark" ? "ui-preview__mode-btn--active" : ""}`} onClick={() => changeMode("dark")}>
-              <Moon size={14} /> Dark
-            </button>
-          </div>
-          {/* Theme palette */}
-          <div className="ui-preview__theme-picker">
-            {THEMES.map((t) => (
-              <button
-                key={t.id}
-                className={`ui-preview__theme-dot ${theme === t.id ? "ui-preview__theme-dot--active" : ""}`}
-                style={{ "--dot-color": t.color } as React.CSSProperties}
-                onClick={() => changeTheme(t.id)}
-                title={t.label}
-              />
-            ))}
-          </div>
-        </div>
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger asChild>
+            <Button variant="outline" size="sm">
+              <Palette size={14} /> Theme
+            </Button>
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Portal>
+            <DropdownMenu.Content className="theme-menu" sideOffset={6} align="end">
+              <DropdownMenu.Label className="theme-menu__label">Mode</DropdownMenu.Label>
+              <DropdownMenu.Item className={`theme-menu__item ${mode === "light" ? "theme-menu__item--active" : ""}`} onSelect={() => changeMode("light")}>
+                <Sun size={14} /> Light
+                {mode === "light" && <span className="theme-menu__check"><Check size={10} /></span>}
+              </DropdownMenu.Item>
+              <DropdownMenu.Item className={`theme-menu__item ${mode === "dark" ? "theme-menu__item--active" : ""}`} onSelect={() => changeMode("dark")}>
+                <Moon size={14} /> Dark
+                {mode === "dark" && <span className="theme-menu__check"><Check size={10} /></span>}
+              </DropdownMenu.Item>
+
+              <DropdownMenu.Separator className="theme-menu__separator" />
+              <DropdownMenu.Label className="theme-menu__label">Theme</DropdownMenu.Label>
+              {THEMES.map((t) => (
+                <DropdownMenu.Item
+                  key={t.id}
+                  className={`theme-menu__item ${theme === t.id ? "theme-menu__item--active" : ""}`}
+                  onSelect={() => changeTheme(t.id)}
+                >
+                  <span className="theme-menu__dot" style={{ background: t.color }} />
+                  {t.label}
+                  {theme === t.id && <span className="theme-menu__check"><Check size={10} /></span>}
+                </DropdownMenu.Item>
+              ))}
+            </DropdownMenu.Content>
+          </DropdownMenu.Portal>
+        </DropdownMenu.Root>
       </div>
 
       {/* ── Colors ── */}

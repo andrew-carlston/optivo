@@ -1,19 +1,21 @@
 @use "../../../styles/tokens" as *;
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .skeleton {
   background: linear-gradient(
     90deg,
-    var(--surface-2) 25%,
-    var(--accent) 50%,
-    var(--surface-2) 75%
+    var(--border) 0%,
+    var(--surface-2) 20%,
+    var(--surface) 40%,
+    var(--surface-2) 60%,
+    var(--border) 100%
   );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
+  background-size: 300% 100%;
+  animation: shimmer 2.5s ease-in-out infinite;
   flex-shrink: 0;
 
   &--sm { border-radius: $radius-sm; }

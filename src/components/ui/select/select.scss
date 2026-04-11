@@ -166,6 +166,7 @@
 
   &:hover, &[data-highlighted] {
     background: var(--surface-2);
+    border-color: var(--border-strong);
   }
 
   // Selected — pop tint background + border
