@@ -48,7 +48,8 @@ React frontend (feature-based modules)
 **Main (production):**
 - `core.companies` — slug → branch routing for all companies (includes `branch_host` column)
 - `core.users` — super users only (platform admins), `auth_user_id` is text (not uuid)
-- `core.access_templates` + `core.template_access` — platform-level ReBAC
+- `core.access_templates` + `core.template_access` + `core.access_resources` — platform-level ReBAC
+- `core.field_sensitivity` + `core.template_field_overrides` — field-level sensitivity control
 - All other tables present as schema template (empty)
 
 **Company branches (e.g., lawnstarter):**
@@ -74,6 +75,8 @@ React frontend (feature-based modules)
 /ui                             UI Kit preview (design system playground)
 /admin/login                    Super user login (email/password)
 /admin                          Company switcher (super users only)
+/admin/templates                Platform template list (ReBAC)
+/admin/templates/[id]           Platform template editor
 /api/auth/[...all]              Better Auth API handler
 /api/company/[slug]             Company lookup (queries main branch)
 /[company]/login                Company-scoped login page
@@ -87,17 +90,23 @@ React frontend (feature-based modules)
 /[company]/cost
 /[company]/analytics
 /[company]/hr
-/[company]/settings
+/[company]/settings              Settings hub (sidebar layout)
+/[company]/settings/org          Organization settings (stub)
+/[company]/settings/points       Points & Attendance settings (stub)
+/[company]/settings/integrations Integrations settings (stub)
+/[company]/settings/templates    Company template list (ReBAC)
+/[company]/settings/templates/[id] Company template editor
 /[company]/profile
 ```
 
 ## Database Schemas (Postgres namespaces)
 
-36 tables across 8 namespaces + neon_auth:
+38 tables across 8 namespaces + neon_auth:
 
 ```
 core.*          companies, users, config, audit_log, notifications,
-                access_templates, template_access, access_resources (ReBAC)
+                access_templates, template_access, access_resources,
+                field_sensitivity, template_field_overrides (ReBAC)
 hr.*            employees, departments, divisions, lobs, positions
 attendance.*    config, log, points, point_history, first_seen, disputes
 realtime.*      agent_states, queue_metrics, queue_groups, queue_members, status_mappings
@@ -135,10 +144,14 @@ src/
       login/
         page.tsx                Super user login (AuthCard, no signup)
         login.scss
+      templates/
+        page.tsx                Platform template list
+        [id]/
+          page.tsx              Platform template editor
       sign-out-button.tsx       Client sign-out component
       admin.scss
     [company]/                  Company-scoped routes (slug from URL)
-      layout.tsx                Auth + CompanyProvider (session → company → user)
+      layout.tsx                Auth + CompanyProvider (session → company → user → permissions via loadPermissions)
       login/                    Login page (uses AuthCard component)
         page.tsx
         login.scss
@@ -163,7 +176,19 @@ src/
       analytics/
         page.tsx                Stub page
       settings/
-        page.tsx                Stub page
+        layout.tsx              Settings sidebar (General, Organization,
+                                Points & Attendance, Integrations, Access Templates)
+        page.tsx                General settings (stub)
+        org/
+          page.tsx              Organization settings (stub)
+        points/
+          page.tsx              Points & Attendance settings (stub)
+        integrations/
+          page.tsx              Integrations settings (stub)
+        templates/
+          page.tsx              Company template list
+          [id]/
+            page.tsx            Company template editor
       profile/
         page.tsx                Stub page
 
@@ -173,15 +198,38 @@ src/
         session.ts              Server-side: getServerSession, requireSession,
                                 getCompanyBySlug, getOrCreateBranchUser,
                                 getSuperUser, getAllCompanies
+        access/                 ReBAC engine
+          types.ts              RESOURCES (15), ACTIONS (4), SCOPE_TYPES (7),
+                                SENSITIVITY_LEVELS (1-10), canSeeLevel(), permKey()
+          seed.ts               52 access_resources entries, MODULE_GROUPS,
+                                seedAccessResources()
+          load-permissions.ts   loadPermissions(db, templateId) → PermissionMap,
+                                serializePermissions/deserializePermissions (RSC boundary)
+          check-access.ts       checkAccess(db, user, resource, action) → {allowed, scopeType}
+          filter-by-scope.ts    filterByScope(db, scopeType, userId, ScopeColumns) → SQL WHERE,
+                                handles all 7 scopes incl. recursive CTE for reports
+          action-context.ts     getActionContext(companySlug) → {user, company, branchDb, isSuper}
+          index.ts              Barrel export
       providers/
-        company-provider.tsx    CompanyProvider context + hooks:
+        company-provider.tsx    CompanyProvider context + hooks (includes permissions: PermissionMap):
                                 useCompanyContext, useCurrentUser, useCurrentCompany
       hooks/
         use-company.ts          Client hook: fetches company from /api/company/[slug]
+        use-access.ts           useAccess() → {canAccess, getScope, isSuper}
       components/
-        company-shell.tsx       Company page wrapper (AppShell + Header + Footer + nav)
+        company-shell.tsx       Company page wrapper (AppShell + Header + Footer + nav),
+                                nav filtered by canAccess(href, "view")
         company-shell.scss
+        template-list/          Template card list with CRUD, create/delete dialogs
+        template-editor/        Permission grid editor:
+                                3-level cascade (Master → Group → Resource),
+                                Full Access toggle, column-level action toggles,
+                                per-resource scope & sensitivity overrides,
+                                mixed state detection, disabled inheritance display
       actions/
+        template-actions.ts     getTemplates, getTemplate, createTemplate, updateTemplate,
+                                savePermissions, archiveTemplate, setDefaultTemplate,
+                                assignTemplateToUser
     auth/
     hr/
     directory/
@@ -224,7 +272,7 @@ src/
     skeleton/                   Shimmer loading placeholders
     switch/                     Toggle switch (Radix)
     theme-switcher/             Mode slider + theme picker (Radix DropdownMenu, localStorage)
-    access-gate/                Permission wrapper (ReBAC placeholder)
+    access-gate/                Permission wrapper (wired to useAccess, graceful outside CompanyProvider)
 
   styles/
     _tokens.scss                Spacing, typography, radius, z-index
@@ -236,7 +284,8 @@ src/
 
   db/
     schema/                     Drizzle schema files (one per namespace)
-      core.ts                   Companies, users, ReBAC tables
+      core.ts                   Companies, users, ReBAC tables (access_templates w/ sensitivity_levels,
+                                template_access, access_resources, field_sensitivity, template_field_overrides)
       hr.ts
       attendance.ts
       realtime.ts
@@ -313,6 +362,7 @@ A **blocking inline script** in `src/app/layout.tsx` reads `theme`, `mode`, and 
 `src/features/core/components/company-shell.tsx` wraps all company-scoped pages with AppShell + Header + Footer.
 
 - **Nav groups** (Radix DropdownMenu): Dashboard (direct link) | Workforce (Realtime, Attendance, Schedule, Forecast) | People (Directory, HR, Staffing) | Business (Cost Planning, Analytics) | Settings (direct link)
+- **Nav filtering**: items hidden when `canAccess(href, "view")` returns false (ReBAC-driven)
 - **Mobile/tablet**: hamburger menu replaces nav, company name hidden (logo avatar only)
 - **Header actions**: ThemeSwitcher | NotificationBell | Expand toggle | User Avatar dropdown (Profile, Admin Panel for super users, Sign Out)
 - Expand button is a header action (not internal to AppShell)
@@ -331,6 +381,59 @@ A **blocking inline script** in `src/app/layout.tsx` reads `theme`, `mode`, and 
 10. **Namespaced schemas** — each module gets its own Postgres schema with grant/revoke support
 11. **Shared components** — all UI from component library, no raw HTML buttons/inputs in pages
 12. **ReBAC from day one** — access templates on both platform (main) and company (branch) levels
+
+## ReBAC (Relationship-Based Access Control)
+
+Template-based permission system on both platform (main) and company (branch) levels.
+
+### Model
+
+- **15 resources** across 5 module groups (Dashboard, Workforce, People, Business, Settings)
+- **4 actions**: view, create, edit, archive
+- **7 scope types**: all, division, department, lob, team, reports (recursive CTE), self
+- **Sensitivity levels** 1–10 per resource (controls field visibility)
+- **Permission key** format: `resource:action` (e.g., `attendance:edit`)
+
+### Data Flow
+
+```
+access_templates (name, is_default, sensitivity_levels[])
+    ↓
+template_access (template_id, resource, action, scope_type, sensitivity_level)
+    ↓
+loadPermissions(db, templateId) → PermissionMap
+    ↓ serialized across RSC boundary
+CompanyProvider (permissions prop)
+    ↓
+useAccess() → { canAccess(resource, action), getScope(resource, action), isSuper }
+```
+
+### Server-Side Checks
+
+- `checkAccess(db, user, resource, action)` → `{allowed, scopeType}` — for server actions
+- `filterByScope(db, scopeType, userId, columns)` → SQL WHERE clause — for queries
+- `getActionContext(companySlug)` → `{user, company, branchDb, isSuper}` — for action setup
+
+### Template Editor
+
+3-level cascade UI: **Master → Group → Resource**
+
+- Master level: Full Access toggle (scope + sensitivity for all resources)
+- Group level: Full Access toggle (scope + sensitivity for group resources)
+- Resource level: column-level action toggles (View/Create/Edit/Archive), per-resource scope override (single select, "Default" inherits parent), per-resource sensitivity override (multi-select levels 1–10, "Default" inherits parent)
+- Mixed state: parent shows "Mixed" when any child overrides the inherited value
+- Disabled resources: show inherited values grayed out
+
+### Default Template Assignment
+
+`getOrCreateBranchUser()` assigns the company's default template (`is_default: true`) to new users automatically.
+
+### Field Sensitivity
+
+- `field_sensitivity` table: maps (resource, field_name) → level 1–10 + label
+- `template_field_overrides` table: per-template (resource, field_name) → visible boolean
+- `access_templates.sensitivity_levels`: jsonb array of allowed levels 1–10
+- `canSeeLevel(allowedLevels, fieldLevel)`: returns true if the field should be visible
 
 ## Skills (Claude)
 
