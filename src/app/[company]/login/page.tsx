@@ -1,14 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { signIn, signUp, useSession } from "@/lib/auth-client";
+import { useCompany } from "@/features/core/hooks/use-company";
+import { Button } from "@/components/ui/button/button";
+import { Input } from "@/components/ui/input/input";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import "./login.scss";
 
 export default function LoginPage() {
-  const params = useParams();
   const router = useRouter();
-  const company = params.company as string;
+  const { company, slug, loading: companyLoading, error: companyError } = useCompany();
   const { data: session, isPending } = useSession();
 
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -18,38 +21,29 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // TODO: Fetch company config (logo, auth_methods, force_sso) from DB
-  // For now, allow all methods
-  const companyConfig = {
-    name: company.charAt(0).toUpperCase() + company.slice(1),
-    logo_url: null as string | null,
-    auth_methods: ["google", "password"] as string[],
-    force_sso: false,
-  };
-
-  const allowGoogle = companyConfig.auth_methods.includes("google");
-  const allowPassword = companyConfig.auth_methods.includes("password");
+  const allowGoogle = company?.auth_methods?.includes("google") ?? true;
+  const allowPassword = company?.auth_methods?.includes("password") ?? true;
 
   // Redirect if already logged in
   useEffect(() => {
-    if (session?.user) {
-      router.push(`/${company}/dashboard`);
+    if (session?.user && slug) {
+      router.push(`/${slug}/dashboard`);
     }
-  }, [session, company, router]);
+  }, [session, slug, router]);
 
   // Force SSO redirect
   useEffect(() => {
-    if (companyConfig.force_sso && allowGoogle && !session?.user) {
+    if (company?.force_sso && allowGoogle && !session?.user) {
       handleGoogleSSO();
     }
-  }, [companyConfig.force_sso]); // eslint-disable-line
+  }, [company?.force_sso]); // eslint-disable-line
 
   async function handleGoogleSSO() {
     setError("");
     setLoading(true);
     const result = await signIn.social({
       provider: "google",
-      callbackURL: `/${company}/dashboard`,
+      callbackURL: `/${slug}/dashboard`,
     });
     if (result.error) {
       setError(result.error.message || "Google sign-in failed");
@@ -68,32 +62,50 @@ export default function LoginPage() {
           email,
           password,
           name,
-          callbackURL: `/${company}/dashboard`,
+          callbackURL: `/${slug}/dashboard`,
         });
-        if (result.error) {
-          setError(result.error.message || "Sign up failed");
-        }
+        if (result.error) setError(result.error.message || "Sign up failed");
       } else {
         const result = await signIn.email({
           email,
           password,
-          callbackURL: `/${company}/dashboard`,
+          callbackURL: `/${slug}/dashboard`,
         });
-        if (result.error) {
-          setError(result.error.message || "Sign in failed");
-        }
+        if (result.error) setError(result.error.message || "Sign in failed");
       }
-    } catch (err) {
+    } catch {
       setError("An unexpected error occurred");
     }
     setLoading(false);
   }
 
-  if (isPending) {
+  // Loading states
+  if (isPending || companyLoading) {
     return (
       <div className="login">
         <div className="login__card">
-          <p className="login__loading">Loading...</p>
+          <div className="login__branding">
+            <Skeleton width={200} height={28} radius="md" />
+            <Skeleton width={160} height={16} radius="sm" />
+          </div>
+          <Skeleton width="100%" height={44} radius="full" />
+          <Skeleton width="100%" height={44} radius="full" />
+          <Skeleton width="100%" height={44} radius="full" />
+        </div>
+      </div>
+    );
+  }
+
+  // Company not found
+  if (companyError || !company) {
+    return (
+      <div className="login">
+        <div className="login__card">
+          <div className="login__branding">
+            <h1 className="login__company-name">Company Not Found</h1>
+            <p className="login__subtitle">The URL you entered doesn&apos;t match any organization.</p>
+          </div>
+          <Button variant="outline" onClick={() => router.push("/")}>Go Home</Button>
         </div>
       </div>
     );
@@ -104,23 +116,19 @@ export default function LoginPage() {
       <div className="login__card">
         {/* Company branding */}
         <div className="login__branding">
-          {companyConfig.logo_url ? (
-            <img src={companyConfig.logo_url} alt={companyConfig.name} className="login__logo" />
+          {company.logo_url ? (
+            <img src={company.logo_url} alt={company.name} className="login__logo" referrerPolicy="no-referrer" />
           ) : (
-            <h1 className="login__company-name">{companyConfig.name}</h1>
+            <h1 className="login__company-name">{company.name}</h1>
           )}
-          <p className="login__subtitle">Workforce Management</p>
+          <p className="login__subtitle">Sign in to continue</p>
         </div>
 
         {error && <div className="login__error">{error}</div>}
 
         {/* Google SSO */}
         {allowGoogle && (
-          <button
-            className="login__google"
-            onClick={handleGoogleSSO}
-            disabled={loading}
-          >
+          <button className="login__google" onClick={handleGoogleSSO} disabled={loading}>
             <svg viewBox="0 0 24 24" width="18" height="18">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
@@ -133,48 +141,24 @@ export default function LoginPage() {
 
         {/* Divider */}
         {allowGoogle && allowPassword && (
-          <div className="login__divider">
-            <span>or</span>
-          </div>
+          <div className="login__divider"><span>or</span></div>
         )}
 
         {/* Email/Password form */}
         {allowPassword && (
           <form onSubmit={handleEmailAuth} className="login__form">
             {mode === "signup" && (
-              <input
-                type="text"
-                placeholder="Full name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="login__input"
-                required
-              />
+              <Input placeholder="Full name" value={name} onChange={(e) => setName(e.target.value)} required />
             )}
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="login__input"
-              required
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="login__input"
-              required
-              minLength={8}
-            />
-            <button type="submit" className="login__submit" disabled={loading}>
+            <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <Input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
+            <Button variant="primary" type="submit" disabled={loading} style={{ width: "100%" }}>
               {loading ? "..." : mode === "signup" ? "Create account" : "Sign in"}
-            </button>
+            </Button>
           </form>
         )}
 
-        {/* Toggle sign in / sign up */}
+        {/* Toggle */}
         {allowPassword && (
           <p className="login__toggle">
             {mode === "signin" ? (
