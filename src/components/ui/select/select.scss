@@ -132,17 +132,20 @@
 // ── Options ──
 
 .select__options {
-  max-height: 240px;
+  max-height: 260px;
   overflow-y: auto;
-  padding: $space-xs;
+  padding: $space-sm;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .select__option {
   display: flex;
   align-items: center;
-  gap: $space-sm;
+  justify-content: space-between;
   width: 100%;
-  padding: $space-sm $space-md;
+  padding: $space-md $space-lg;
   border: none;
   border-radius: $radius-md;
   background: transparent;
@@ -151,38 +154,45 @@
   font-family: inherit;
   cursor: pointer;
   outline: none;
-  min-height: 36px;
   transition: background 0.12s;
 
-  &:hover { background: var(--pop-muted); color: var(--pop); }
-  &--active { background: var(--pop-muted); color: var(--pop); font-weight: 600; }
+  &:hover { background: var(--accent); }
 
-  svg { margin-left: auto; flex-shrink: 0; }
+  &--active {
+    background: var(--pop-muted);
+    color: var(--pop);
+    font-weight: 600;
+  }
+
+  // Multi select rows — add left border accent when selected
+  &--multi.select__option--active {
+    border-left: 3px solid var(--pop);
+    padding-left: calc(#{$space-lg} - 3px);
+  }
+
+  svg { flex-shrink: 0; }
+}
+
+.select__option-label {
+  flex: 1;
+  text-align: left;
+}
+
+.select__option-check {
+  color: var(--pop);
 }
 
 .select__empty {
-  padding: $space-md;
+  padding: $space-lg;
   text-align: center;
   font-size: $text-sm;
   color: var(--muted-fg);
 }
 
-// ── Checkbox (Multi Select) ──
+// ── Count badge (3+ selected) ──
 
-.select__check {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
-  flex-shrink: 0;
-  border: 1.5px solid var(--border-strong);
-  transition: all 0.12s;
-
-  &--checked {
-    background: var(--pop);
-    border-color: var(--pop);
-    color: var(--pop-fg);
-  }
+.select__count {
+  font-size: $text-sm;
+  font-weight: 500;
+  color: var(--pop);
 }

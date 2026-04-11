@@ -159,7 +159,7 @@ export function MultiSelect({
           {selected.length === 0 && (
             <span className="select__placeholder">{placeholder}</span>
           )}
-          {selected.map((val) => {
+          {selected.length > 0 && selected.length <= 2 && selected.map((val) => {
             const opt = options.find((o) => o.value === val);
             return (
               <span key={val} className="select__chip">
@@ -170,6 +170,9 @@ export function MultiSelect({
               </span>
             );
           })}
+          {selected.length > 2 && (
+            <span className="select__count">{selected.length} selected</span>
+          )}
         </div>
         <ChevronDown size={16} />
       </button>
@@ -202,13 +205,11 @@ export function MultiSelect({
                 <button
                   key={opt.value}
                   type="button"
-                  className={cn("select__option", isSelected && "select__option--active")}
+                  className={cn("select__option select__option--multi", isSelected && "select__option--active")}
                   onClick={() => toggle(opt.value)}
                 >
-                  <div className={cn("select__check", isSelected && "select__check--checked")}>
-                    {isSelected && <Check size={12} />}
-                  </div>
-                  {opt.label}
+                  <span className="select__option-label">{opt.label}</span>
+                  {isSelected && <Check size={14} className="select__option-check" />}
                 </button>
               );
             })}
