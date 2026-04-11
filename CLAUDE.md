@@ -8,10 +8,11 @@ WFM/HR SaaS platform — realtime monitoring, scheduling, forecasting, attendanc
 
 - **Database**: Neon Postgres 17 (serverless, per-company branching)
 - **ORM**: Drizzle (typed schema, migrations via drizzle-kit generate + migrate)
+- **UI Primitives**: Radix UI (select, popover, dropdown-menu, switch, dialog, tooltip, tabs, checkbox)
 - **Framework**: Next.js 16.2.3 (App Router, server actions, TypeScript strict)
-- **Auth**: Neon Auth (Google/Microsoft SSO, users stored in your DB)
+- **Auth**: Neon Auth / Better Auth (Google SSO, email/password, users in your DB)
 - **Language**: TypeScript everywhere (frontend + backend + workers)
-- **Styling**: SCSS with CSS variable theming
+- **Styling**: SCSS with CSS variable theming (3 themes × 3 modes)
 - **Deploy**: TBD (EC2 or Railway)
 
 ## Architecture
@@ -23,7 +24,7 @@ Drizzle ORM (typed schema + migrations)
     ↑
 Next.js 16 App Router (server actions + API routes)
     ↑
-Neon Auth (SSO, sessions — users in your DB)
+Neon Auth / Better Auth (SSO, sessions — users in your DB)
     ↑
 React frontend (feature-based modules)
 ```
@@ -33,16 +34,47 @@ React frontend (feature-based modules)
 - **Project**: optivo
 - **Region**: AWS US East 1 (N. Virginia)
 - **Postgres**: 17
-- **Neon Auth**: enabled (neon_auth schema)
-- **Connection**: `DATABASE_URL` in `.env.local`
-- **Branching**: main (schema only) → per-company branches
+- **Neon Auth**: enabled (neon_auth schema, powered by Better Auth)
+
+### Branches
+
+| Branch | ID | Purpose |
+|--------|----|---------|
+| production (main) | `br-frosty-recipe-amuoewi8` | Schema template + company routing + super users |
+| lawnstarter | `br-small-sea-amxcpb3n` | LawnStarter company data (forked from main) |
+
+### Branch Architecture
+
+**Main (production):**
+- `core.companies` — slug → branch routing for all companies
+- `core.users` — super users only (platform admins)
+- `core.access_templates` + `core.template_access` — platform-level ReBAC
+- All other tables present as schema template (empty)
+
+**Company branches (e.g., lawnstarter):**
+- `core.users` — that company's users
+- All feature tables with company data
+- `core.access_templates` — company-level ReBAC templates
+
+**Routing flow:**
+1. `/lawnstarter/login` → query `core.companies` on main → get `branch_id`
+2. Connect to that Neon branch
+3. All queries run on the branch
+
+### Seeded Data
+
+**Main:**
+- Super user: `andrew.carlston@gmail.com` (is_super: true)
+- Company: LawnStarter (slug: `lawnstarter`, branch_id: `br-small-sea-amxcpb3n`)
 
 ## URL Structure
 
 ```
 /                               Landing page
-/(auth)/login                   Auth (no company context)
-/(auth)/callback                OAuth callback
+/ui                             UI Kit preview (design system playground)
+/api/auth/[...all]              Better Auth API handler
+/api/company/[slug]             Company lookup (queries main branch)
+/[company]/login                Company-scoped login page
 /[company]/dashboard            Company-scoped pages
 /[company]/directory
 /[company]/realtime
@@ -59,10 +91,11 @@ React frontend (feature-based modules)
 
 ## Database Schemas (Postgres namespaces)
 
-32 tables across 7 namespaces + neon_auth:
+36 tables across 8 namespaces + neon_auth:
 
 ```
-core.*          companies, users, config, audit_log, notifications
+core.*          companies, users, config, audit_log, notifications,
+                access_templates, template_access, access_resources (ReBAC)
 hr.*            employees, departments, divisions, lobs, positions
 attendance.*    config, log, points, point_history, first_seen, disputes
 realtime.*      agent_states, queue_metrics, queue_groups, queue_members, status_mappings
@@ -86,27 +119,26 @@ directory.*     Agent profiles, columns, custom fields, system connections
 src/
   app/
     page.tsx                    Landing page
-    layout.tsx                  Root layout (Geist font)
-    (auth)/                     Auth pages (no company context)
-      login/
-      callback/
+    layout.tsx                  Root layout (Geist font, ThemeProvider)
+    globals.scss                Reset, scrollbar, selection styles
+    ui/                         UI Kit preview page (design system playground)
+      page.tsx
+      ui-preview.scss
+    api/
+      auth/[...all]/route.ts    Better Auth API handler
+      company/[slug]/route.ts   Company lookup (Drizzle query on main)
     [company]/                  Company-scoped routes (slug from URL)
-      layout.tsx                Company context provider + auth check
+      layout.tsx                Company context provider
+      login/                    Login page (uses AuthCard component)
+        page.tsx
+        login.scss
       dashboard/
-      directory/
-      realtime/
-      attendance/
-      schedule/
-      forecast/
-      staffing/
-      cost/
-      analytics/
-      hr/
-      settings/
-      profile/
+        page.tsx
+
   features/                     Feature modules (fully self-contained)
     core/
       hooks/
+        use-company.ts          Fetches company config from /api/company/[slug]
       components/
       actions/
     auth/
@@ -135,9 +167,33 @@ src/
     staffing/
     cost/
     analytics/
+
+  components/ui/                Shared component library
+    app-shell/                  Auto-hide header, expand toggle, sticky footer
+    auth-card/                  Login/signup card (company-branded)
+    badge/                      Status badges (6 variants)
+    button/                     Buttons (6 variants × 4 sizes + loading)
+    card/                       Cards (flat, raised, inset)
+    footer/                     App footer (brand + copyright)
+    header/                     App header (logo, nav, actions)
+    input/                      Text inputs (icon, error, loading)
+    select/                     Single select (Radix) + MultiSelect (Radix Popover)
+    skeleton/                   Shimmer loading placeholders
+    switch/                     Toggle switch (Radix)
+    access-gate/                Permission wrapper (ReBAC placeholder)
+    theme-provider/             Global theme/mode restore from localStorage
+
+  styles/
+    _tokens.scss                Spacing, typography, radius, z-index
+    themes/
+      index.scss                Theme imports
+      _default.scss             Blue accent, slate tones
+      _midnight.scss            Purple accent, indigo tones
+      _ember.scss               Orange accent, warm tones
+
   db/
     schema/                     Drizzle schema files (one per namespace)
-      core.ts
+      core.ts                   Companies, users, ReBAC tables
       hr.ts
       attendance.ts
       realtime.ts
@@ -147,11 +203,17 @@ src/
       index.ts                  Namespaced exports (core.*, hr.*, etc.)
     migrations/                 Generated by drizzle-kit
     client.ts                   Neon serverless connection + Drizzle instance
-  components/ui/                Shared component library
-  styles/themes/                Theme CSS variables
+
   lib/
     cn.ts                       Classname utility
+    auth-client.ts              Better Auth React client (signIn, signUp, useSession)
+    auth-server.ts              Better Auth server instance
+
+  middleware.ts                 Route protection skeleton
+
 docs/
+  PHASE-PLAN.md                 10 phases in build order
+  DESIGN_SYSTEM.md              Full token/variable/component reference
   ARCHITECTURE.md               System design, data flows, v1 vs v2 comparison
 ```
 
@@ -161,9 +223,18 @@ docs/
 # Generate migration from schema changes
 npx drizzle-kit generate
 
-# Apply migrations to Neon
-# (use node script — drizzle-kit migrate has issues with Neon serverless driver)
-node -e 'const {neon}=require("@neondatabase/serverless"); ...'
+# Apply migrations to Neon (use node script — drizzle-kit migrate has issues with serverless driver)
+DATABASE_URL=... node -e '
+const {neon}=require("@neondatabase/serverless");
+const fs=require("fs");
+const sql=neon(process.env.DATABASE_URL);
+(async()=>{
+  const migration=fs.readFileSync("src/db/migrations/XXXX_name.sql","utf8");
+  const stmts=migration.split("--> statement-breakpoint").map(s=>s.trim()).filter(Boolean);
+  for(const s of stmts) await sql.query(s);
+  console.log("Done");
+})();
+'
 
 # View current schema
 npx drizzle-kit studio
@@ -178,7 +249,9 @@ npx drizzle-kit studio
 - `--pop` is the accent color per theme
 - Shadow tokens: `--shadow-xs`, `--shadow-sm`, `--shadow-md`, `--shadow-lg`, `--shadow-inset`
 - Card variants: `flat` (default), `raised` (elevated), `inset` (recessed)
-- Component library: Button, Card, Select, MultiSelect, Switch, Input, Badge, Skeleton, AccessGate, AppShell, Header, Footer, AuthCard, ThemeProvider
+- Components (14): Button, Card, Select, MultiSelect, Switch, Input, Badge, Skeleton, AccessGate, AppShell, Header, Footer, AuthCard, ThemeProvider
+- Dropdown style: pill-shaped rows, filled circle check icons, hover border
+- Skeletons: left-to-right shimmer, 2.5s cycle, deterministic widths
 - All timestamps UTC in DB, displayed in user's timezone
 - `cn()` utility for conditional classnames
 - Preview page: `/ui`
@@ -195,6 +268,8 @@ npx drizzle-kit studio
 8. **One language** — TypeScript for frontend, backend, and workers
 9. **Transactions for mutations** — all multi-step operations use `db.transaction()`
 10. **Namespaced schemas** — each module gets its own Postgres schema with grant/revoke support
+11. **Shared components** — all UI from component library, no raw HTML buttons/inputs in pages
+12. **ReBAC from day one** — access templates on both platform (main) and company (branch) levels
 
 ## Skills (Claude)
 
