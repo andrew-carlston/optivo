@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card/card";
 import { Badge } from "@/components/ui/badge/badge";
-import { Search, Mail, Plus, Trash2, Settings, Bell, Check, Sun, Moon } from "lucide-react";
+import { Skeleton, SkeletonText, SkeletonButton, SkeletonAvatar, SkeletonCard, SkeletonTable } from "@/components/ui/skeleton/skeleton";
+import { AccessGate } from "@/components/ui/access-gate/access-gate";
+import { Search, Mail, Plus, Trash2, Settings, Bell, Check, Sun, Moon, Lock } from "lucide-react";
 import "./ui-preview.scss";
 
 const THEMES = [
@@ -167,6 +169,51 @@ export default function UIPreviewPage() {
           <Badge variant="danger">No Show</Badge>
           <Badge variant="outline">Verbal Warning</Badge>
         </div>
+      </section>
+
+      {/* ── Skeletons ── */}
+      <section className="ui-preview__section">
+        <h2>Loading Skeletons</h2>
+        <div className="ui-preview__row">
+          <Skeleton width={120} height={20} radius="sm" />
+          <SkeletonText width={200} />
+          <SkeletonButton />
+          <SkeletonAvatar />
+          <SkeletonAvatar size={32} />
+        </div>
+        <div className="ui-preview__row" style={{ alignItems: "flex-start" }}>
+          <Button loading>Loading</Button>
+          <Button loading size="sm">Small</Button>
+          <Button loading size="icon">X</Button>
+          <Input loading placeholder="Loading..." />
+        </div>
+        <div className="ui-preview__grid">
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+        <SkeletonTable rows={3} cols={5} />
+      </section>
+
+      {/* ── Access Gate ── */}
+      <section className="ui-preview__section">
+        <h2>Access Gate (ReBAC)</h2>
+        <div className="ui-preview__row">
+          <AccessGate access="admin:edit">
+            <Button variant="primary"><Lock size={14} /> Admin Only (visible — no auth yet)</Button>
+          </AccessGate>
+          <AccessGate access="billing:view" fallback={<Badge variant="outline">No Access</Badge>}>
+            <Button>Billing (with fallback)</Button>
+          </AccessGate>
+        </div>
+        <Card>
+          <CardContent>
+            <p style={{ fontSize: "0.8125rem", color: "var(--muted-fg)" }}>
+              <code>&lt;AccessGate access=&quot;resource:action&quot;&gt;</code> wraps any component.
+              Hidden when denied, shows fallback if provided. When ReBAC is wired up,
+              these will gate automatically based on the user&apos;s template permissions.
+            </p>
+          </CardContent>
+        </Card>
       </section>
 
       {/* ── Typography ── */}

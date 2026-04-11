@@ -1,17 +1,17 @@
-// Ember theme — warm orange/amber accent
+// Ember theme — warm orange/amber
 [data-theme="ember"] {
-  // Light mode
+  // Light mode — warm cream tint
   &[data-mode="light"] {
-    --bg: #FFFBF5;
-    --fg: #1C1917;
+    --bg: #FFF8F1;
+    --fg: #431407;
     --surface: #FFFFFF;
-    --surface-2: #FFF7ED;
-    --border: #E7DDD0;
+    --surface-2: #FFF1E6;
+    --border: #FED7AA;
     --border-strong: #FDBA74;
     --input-bg: #FFFFFF;
-    --accent: #FFF3E0;
-    --muted: #FEF3C7;
-    --muted-fg: #78716C;
+    --accent: #FFF1E6;
+    --muted: #FED7AA;
+    --muted-fg: #9A6E4C;
 
     --pop: #EA580C;
     --pop-fg: #FFFFFF;
@@ -30,32 +30,32 @@
     --ring: #EA580C;
   }
 
-  // Dark mode
+  // Dark mode — warm brown, not black
   &[data-mode="dark"] {
-    --bg: #0F0A07;
-    --fg: #FFF7ED;
-    --surface: #1A1210;
-    --surface-2: #231A14;
-    --border: #3D2E22;
-    --border-strong: #78533A;
-    --input-bg: #231A14;
-    --accent: #2A1E15;
-    --muted: #1E150F;
-    --muted-fg: #B8A08A;
+    --bg: #271A10;
+    --fg: #FEF3E2;
+    --surface: #33231A;
+    --surface-2: #3D2C20;
+    --border: #5C412E;
+    --border-strong: #7C5A3E;
+    --input-bg: #33231A;
+    --accent: #3D2C20;
+    --muted: #2E2018;
+    --muted-fg: #C4A882;
 
     --pop: #FB923C;
-    --pop-fg: #0F0A07;
-    --pop-muted: #3D1F0A;
+    --pop-fg: #271A10;
+    --pop-muted: #4A2810;
 
-    --success: #34D399;
-    --success-fg: #000000;
-    --success-muted: #052E16;
+    --success: #4ADE80;
+    --success-fg: #271A10;
+    --success-muted: #14532D;
     --warning: #FBBF24;
-    --warning-fg: #000000;
+    --warning-fg: #271A10;
     --danger: #F87171;
-    --danger-fg: #000000;
+    --danger-fg: #271A10;
     --info: #38BDF8;
-    --info-fg: #000000;
+    --info-fg: #271A10;
 
     --ring: #FB923C;
   }

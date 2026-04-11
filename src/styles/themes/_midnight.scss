@@ -1,21 +1,21 @@
-// Midnight theme — deep purple/violet accent
+// Midnight theme — refined purple/violet
 [data-theme="midnight"] {
-  // Light mode
+  // Light mode — soft lavender tint
   &[data-mode="light"] {
-    --bg: #FAFAF9;
-    --fg: #1C1917;
+    --bg: #F5F3FF;
+    --fg: #1E1B4B;
     --surface: #FFFFFF;
-    --surface-2: #F5F3FF;
-    --border: #E4E2EC;
+    --surface-2: #EDE9FE;
+    --border: #DDD6FE;
     --border-strong: #C4B5FD;
     --input-bg: #FFFFFF;
-    --accent: #F3F0FF;
-    --muted: #EDE9FE;
-    --muted-fg: #6B7280;
+    --accent: #EDE9FE;
+    --muted: #DDD6FE;
+    --muted-fg: #6D6C80;
 
     --pop: #7C3AED;
     --pop-fg: #FFFFFF;
-    --pop-muted: #EDE9FE;
+    --pop-muted: #F5F3FF;
 
     --success: #059669;
     --success-fg: #FFFFFF;
@@ -30,32 +30,32 @@
     --ring: #7C3AED;
   }
 
-  // Dark mode
+  // Dark mode — deep indigo, not black
   &[data-mode="dark"] {
-    --bg: #0C0A1A;
-    --fg: #F5F3FF;
-    --surface: #16132A;
-    --surface-2: #1E1A36;
-    --border: #2D2754;
-    --border-strong: #4C3D99;
-    --input-bg: #1E1A36;
-    --accent: #221E3D;
-    --muted: #181430;
+    --bg: #1A1635;
+    --fg: #E8E5F5;
+    --surface: #241F47;
+    --surface-2: #2C2654;
+    --border: #3D356B;
+    --border-strong: #554B8D;
+    --input-bg: #241F47;
+    --accent: #2C2654;
+    --muted: #211C40;
     --muted-fg: #A8A0C8;
 
     --pop: #A78BFA;
-    --pop-fg: #0C0A1A;
-    --pop-muted: #1E1548;
+    --pop-fg: #1A1635;
+    --pop-muted: #2E2460;
 
-    --success: #34D399;
-    --success-fg: #000000;
-    --success-muted: #052E16;
+    --success: #4ADE80;
+    --success-fg: #1A1635;
+    --success-muted: #14532D;
     --warning: #FBBF24;
-    --warning-fg: #000000;
+    --warning-fg: #1A1635;
     --danger: #F87171;
-    --danger-fg: #000000;
+    --danger-fg: #1A1635;
     --info: #60A5FA;
-    --info-fg: #000000;
+    --info-fg: #1A1635;
 
     --ring: #A78BFA;
   }

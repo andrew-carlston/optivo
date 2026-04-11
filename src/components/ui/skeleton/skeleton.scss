@@ -1,0 +1,68 @@
+@use "../../../styles/tokens" as *;
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-2) 25%,
+    var(--accent) 50%,
+    var(--surface-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  flex-shrink: 0;
+
+  &--sm { border-radius: $radius-sm; }
+  &--md { border-radius: $radius-md; }
+  &--lg { border-radius: $radius-lg; }
+  &--full { border-radius: $radius-full; }
+}
+
+.skeleton-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: $radius-xl;
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $space-lg;
+    border-bottom: 1px solid var(--border);
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: $space-md;
+    padding: $space-lg;
+  }
+}
+
+.skeleton-table {
+  display: flex;
+  flex-direction: column;
+
+  &__header {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    gap: $space-md;
+    padding: $space-sm $space-md;
+    border-bottom: 2px solid var(--border);
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    gap: $space-md;
+    padding: $space-md;
+    border-bottom: 1px solid var(--border);
+
+    &:last-child { border-bottom: none; }
+  }
+}
