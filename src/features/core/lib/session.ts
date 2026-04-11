@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth-server";
 import { db, createBranchDb } from "@/db/client";
 import { core } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 type AuthSession = {
   user: { id: string; email: string; name: string; image?: string | null };
@@ -120,6 +120,13 @@ export async function getOrCreateBranchUser(
   }
 
   // Auto-provision user on first login (SSO flow)
+  // Assign company's default template if one exists
+  const defaultTemplate = await branchDb
+    .select({ id: core.accessTemplates.id })
+    .from(core.accessTemplates)
+    .where(and(eq(core.accessTemplates.company_id, companyId), eq(core.accessTemplates.is_default, true)))
+    .limit(1);
+
   const inserted = await branchDb
     .insert(core.users)
     .values({
@@ -128,6 +135,7 @@ export async function getOrCreateBranchUser(
       email: authSession.user.email,
       full_name: authSession.user.name || authSession.user.email.split("@")[0],
       avatar_url: authSession.user.image ?? null,
+      access_template_id: defaultTemplate[0]?.id ?? null,
     })
     .returning();
 

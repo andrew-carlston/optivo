@@ -1,41 +1,35 @@
 "use client";
 
 import { ReactNode } from "react";
-
-// TODO: Replace with real access hook when ReBAC is built
-// import { useAccess } from "@/features/core/hooks/use-access";
+import { useCompanyContextSafe } from "@/features/core/providers/company-provider";
+import { permKey } from "@/features/core/lib/access/types";
 
 interface AccessGateProps {
   /** Permission string — "resource:action" (e.g., "attendance:edit") */
   access: string;
   /** What to render when denied. Defaults to null (hidden). */
   fallback?: ReactNode;
-  /** What to render while loading. Defaults to null. */
-  loading?: ReactNode;
   children: ReactNode;
 }
 
 /**
  * Conditionally renders children based on ReBAC permissions.
  * Hidden (or shows fallback) when the user lacks the specified access.
- *
- * Usage:
- *   <AccessGate access="attendance:edit">
- *     <Button>Adjust Points</Button>
- *   </AccessGate>
- *
- *   <AccessGate access="settings:view" fallback={<p>No access</p>}>
- *     <SettingsPanel />
- *   </AccessGate>
+ * Allows everything when outside CompanyProvider (e.g., /ui preview page).
  */
-export function AccessGate({ access, fallback = null, loading: loadingState = null, children }: AccessGateProps) {
-  // TODO: Wire to real useAccess() hook
-  // const { canAccess, loading } = useAccess();
-  // if (loading) return <>{loadingState}</>;
-  // const [resource, action] = access.split(":");
-  // if (!canAccess(resource, action || "view")) return <>{fallback}</>;
+export function AccessGate({ access, fallback = null, children }: AccessGateProps) {
+  const ctx = useCompanyContextSafe();
 
-  // For now: allow everything (no auth yet)
+  // Outside CompanyProvider — allow everything (public pages like /ui)
+  if (!ctx) return <>{children}</>;
+
+  // Super users bypass all checks
+  if (ctx.isSuper) return <>{children}</>;
+
+  const [resource, action] = access.split(":");
+  if (!ctx.permissions.has(permKey(resource, action || "view"))) {
+    return <>{fallback}</>;
+  }
   return <>{children}</>;
 }
 

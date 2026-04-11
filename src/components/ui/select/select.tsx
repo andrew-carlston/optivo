@@ -70,12 +70,13 @@ export interface MultiSelectProps {
   searchable?: boolean;
   loading?: boolean;
   disabled?: boolean;
+  mixed?: boolean;
   className?: string;
 }
 
 export function MultiSelect({
   options, selected, onChange, placeholder = "Select...",
-  searchable = true, loading, disabled, className,
+  searchable = true, loading, disabled, mixed, className,
 }: MultiSelectProps) {
   const [search, setSearch] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
@@ -104,10 +105,10 @@ export function MultiSelect({
       <Popover.Trigger asChild disabled={disabled}>
         <button type="button" className={cn("select__trigger select__trigger--multi", disabled && "select__trigger--disabled", className)}>
           <div className="select__chips">
-            {selected.length === 0 && (
+            {(selected.length === 0 || mixed) && (
               <span className="select__placeholder">{placeholder}</span>
             )}
-            {selected.length > 0 && selected.length <= 2 && selected.map((val) => {
+            {!mixed && selected.length > 0 && selected.length <= 2 && selected.map((val) => {
               const opt = options.find((o) => o.value === val);
               return (
                 <span key={val} className="select__chip">
@@ -118,7 +119,7 @@ export function MultiSelect({
                 </span>
               );
             })}
-            {selected.length > 2 && (
+            {!mixed && selected.length > 2 && (
               <span className="select__count">{selected.length} selected</span>
             )}
           </div>

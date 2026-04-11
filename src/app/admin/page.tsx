@@ -23,6 +23,12 @@ export default async function AdminPage() {
         <SignOutButton />
       </div>
 
+      <div className="admin__nav">
+        <Link href="/admin/templates" className="admin__nav-link">
+          Platform Templates
+        </Link>
+      </div>
+
       <h2 className="admin__section-title">Companies</h2>
 
       <div className="admin__grid">

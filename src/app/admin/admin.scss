@@ -27,6 +27,29 @@
     margin: $space-xs 0 0;
   }
 
+  &__nav {
+    display: flex;
+    gap: $space-sm;
+    margin-bottom: $space-xl;
+  }
+
+  &__nav-link {
+    padding: $space-sm $space-lg;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: $radius-lg;
+    font-size: $text-sm;
+    font-weight: 500;
+    color: var(--fg);
+    text-decoration: none;
+    transition: border-color 0.15s;
+
+    &:hover {
+      border-color: var(--pop);
+      color: var(--pop);
+    }
+  }
+
   &__section-title {
     font-size: $text-lg;
     font-weight: 600;

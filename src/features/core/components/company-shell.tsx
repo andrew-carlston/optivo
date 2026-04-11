@@ -32,6 +32,7 @@ import { NotificationBell } from "@/components/ui/notification-bell/notification
 import { cn } from "@/lib/cn";
 import { signOut } from "@/lib/auth-client";
 import { useCompanyContext } from "@/features/core/providers/company-provider";
+import { useAccess } from "@/features/core/hooks/use-access";
 import "./company-shell.scss";
 
 type NavLink = { href: string; label: string; icon: React.ElementType };
@@ -67,6 +68,7 @@ export function CompanyShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { company, user, isSuper } = useCompanyContext();
+  const { canAccess } = useAccess();
   const slug = company.slug;
 
   const segments = pathname.split("/").filter(Boolean);
@@ -95,14 +97,22 @@ export function CompanyShell({ children }: { children: React.ReactNode }) {
   const isGroupActive = (items: NavLink[]) =>
     items.some((i) => i.href === activeSegment);
 
+  // Filter nav by permissions
+  const visibleGroups = NAV_GROUPS.map((group) => ({
+    ...group,
+    items: group.items.filter((item) => canAccess(item.href, "view")),
+  })).filter((group) => group.items.length > 0);
+
   const headerNav = (
     <>
-      <NavItem href={`/${slug}/dashboard`} active={activeSegment === "dashboard"}>
-        <LayoutDashboard size={15} />
-        Dashboard
-      </NavItem>
+      {canAccess("dashboard", "view") && (
+        <NavItem href={`/${slug}/dashboard`} active={activeSegment === "dashboard"}>
+          <LayoutDashboard size={15} />
+          Dashboard
+        </NavItem>
+      )}
 
-      {NAV_GROUPS.map((group) => (
+      {visibleGroups.map((group) => (
         <DropdownMenu.Root key={group.label}>
           <DropdownMenu.Trigger asChild>
             <button
@@ -135,19 +145,14 @@ export function CompanyShell({ children }: { children: React.ReactNode }) {
         </DropdownMenu.Root>
       ))}
 
-      <NavItem href={`/${slug}/settings`} active={activeSegment === "settings"}>
-        <Settings size={15} />
-        Settings
-      </NavItem>
+      {canAccess("settings.general", "view") && (
+        <NavItem href={`/${slug}/settings`} active={activeSegment === "settings"}>
+          <Settings size={15} />
+          Settings
+        </NavItem>
+      )}
     </>
   );
-
-  // All nav items flattened for mobile menu
-  const allNavItems: NavLink[] = [
-    { href: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    ...NAV_GROUPS.flatMap((g) => g.items),
-    { href: "settings", label: "Settings", icon: Settings },
-  ];
 
   const mobileNav = (
     <DropdownMenu.Root>
@@ -158,15 +163,17 @@ export function CompanyShell({ children }: { children: React.ReactNode }) {
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <DropdownMenu.Content className="mobile-menu__content" sideOffset={6} align="start">
-          <DropdownMenu.Item
-            className={cn("nav-dropdown__item", activeSegment === "dashboard" && "nav-dropdown__item--active")}
-            onSelect={() => router.push(`/${slug}/dashboard`)}
-          >
-            <LayoutDashboard size={15} />
-            Dashboard
-          </DropdownMenu.Item>
+          {canAccess("dashboard", "view") && (
+            <DropdownMenu.Item
+              className={cn("nav-dropdown__item", activeSegment === "dashboard" && "nav-dropdown__item--active")}
+              onSelect={() => router.push(`/${slug}/dashboard`)}
+            >
+              <LayoutDashboard size={15} />
+              Dashboard
+            </DropdownMenu.Item>
+          )}
 
-          {NAV_GROUPS.map((group) => (
+          {visibleGroups.map((group) => (
             <DropdownMenu.Group key={group.label}>
               <DropdownMenu.Label className="mobile-menu__label">
                 {group.label}
@@ -184,14 +191,18 @@ export function CompanyShell({ children }: { children: React.ReactNode }) {
             </DropdownMenu.Group>
           ))}
 
-          <DropdownMenu.Separator className="user-menu__separator" />
-          <DropdownMenu.Item
-            className={cn("nav-dropdown__item", activeSegment === "settings" && "nav-dropdown__item--active")}
-            onSelect={() => router.push(`/${slug}/settings`)}
-          >
-            <Settings size={15} />
-            Settings
-          </DropdownMenu.Item>
+          {canAccess("settings.general", "view") && (
+            <>
+              <DropdownMenu.Separator className="user-menu__separator" />
+              <DropdownMenu.Item
+                className={cn("nav-dropdown__item", activeSegment === "settings" && "nav-dropdown__item--active")}
+                onSelect={() => router.push(`/${slug}/settings`)}
+              >
+                <Settings size={15} />
+                Settings
+              </DropdownMenu.Item>
+            </>
+          )}
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
     </DropdownMenu.Root>

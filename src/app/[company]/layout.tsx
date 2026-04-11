@@ -5,6 +5,8 @@ import {
   getOrCreateBranchUser,
   getSuperUser,
 } from "@/features/core/lib/session";
+import { loadPermissions, serializePermissions } from "@/features/core/lib/access/load-permissions";
+import { createBranchDb } from "@/db/client";
 import { CompanyProvider } from "@/features/core/providers/company-provider";
 import { CompanyShell } from "@/features/core/components/company-shell";
 
@@ -52,8 +54,17 @@ export default async function CompanyLayout({
     redirect(`/${slug}/login`);
   }
 
+  // Load permissions (super users bypass — empty map is fine)
+  let permissions: import("@/features/core/lib/access/types").PermissionMap = new Map();
+  if (!isSuper && user.accessTemplateId) {
+    const branchDb = company.branchHost ? createBranchDb(company.branchHost) : null;
+    if (branchDb) {
+      permissions = await loadPermissions(branchDb, user.accessTemplateId);
+    }
+  }
+
   return (
-    <CompanyProvider company={company} user={user} isSuper={isSuper}>
+    <CompanyProvider company={company} user={user} isSuper={isSuper} permissions={serializePermissions(permissions)}>
       <CompanyShell>{children}</CompanyShell>
     </CompanyProvider>
   );

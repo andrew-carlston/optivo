@@ -1,0 +1,213 @@
+@use "../../../../styles/tokens" as *;
+
+.template-editor {
+  display: flex;
+  flex-direction: column;
+  gap: $space-lg;
+
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__info-card {
+    display: flex;
+    flex-direction: column;
+    gap: $space-md;
+    padding: $space-lg;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: $radius-lg;
+  }
+
+  &__info-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    h3 {
+      font-size: $text-base;
+      font-weight: 600;
+      color: var(--fg);
+      margin: 0;
+    }
+  }
+
+
+
+
+  &__label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted-fg);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  // ── Group header ──
+
+  &__group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  &__group-name {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    margin-bottom: 2px;
+  }
+
+  &__group-master {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+
+    span {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--muted-fg);
+      text-transform: none;
+      letter-spacing: 0;
+    }
+  }
+
+  // ── Column header controls ──
+
+  &__col-header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $space-xs;
+
+    span {
+      font-size: 10px;
+    }
+  }
+
+  // ── Table ──
+
+  &__table-wrap {
+    overflow-x: auto;
+    margin: 0 (-$space-lg);
+    padding: 0 $space-lg;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+
+    // Fixed column widths so nothing shifts
+    $col-name: 140px;
+    $col-toggle: 60px;
+    $col-select: 120px;
+
+    col:nth-child(1) { width: $col-name; }   // Resource name
+    col:nth-child(2) { width: $col-toggle; }  // View
+    col:nth-child(3) { width: $col-toggle; }  // Create
+    col:nth-child(4) { width: $col-toggle; }  // Edit
+    col:nth-child(5) { width: $col-toggle; }  // Archive
+    col:nth-child(6) { width: $col-select; }  // Scope
+    col:nth-child(7) { width: $col-select; }  // Sensitivity
+
+    // All select triggers inside the table get compact sizing
+    .select__trigger {
+      width: 100%;
+      height: 26px;
+      font-size: 11px;
+      padding: 0 $space-xs;
+      border-radius: $radius-sm;
+    }
+
+    // Chips inside compact triggers
+    .select__chip {
+      font-size: 10px;
+      padding: 1px 6px;
+    }
+
+    .select__count {
+      font-size: 10px;
+    }
+
+    th, td {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    th {
+      text-align: left;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted-fg);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: $space-sm $space-xs;
+      white-space: nowrap;
+      background: var(--pop-muted);
+      border-bottom: 2px solid var(--pop);
+      vertical-align: bottom;
+
+      &:first-child {
+        color: var(--pop);
+        font-size: $text-sm;
+        font-weight: 700;
+        vertical-align: top;
+        padding: $space-sm $space-sm;
+      }
+    }
+  }
+}
+
+// ── Permission row (child resources) ──
+
+.perm-row {
+  &__label {
+    padding: $space-sm $space-xs $space-sm ($space-md + $space-lg);
+    font-size: $text-sm;
+    font-weight: 500;
+    color: var(--fg);
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: $space-lg;
+      top: 50%;
+      width: 8px;
+      height: 1px;
+      background: var(--border-strong);
+    }
+  }
+
+  &__cell {
+    padding: $space-xs;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+
+    &--disabled {
+      opacity: 0.3;
+    }
+
+    &--muted {
+      opacity: 0.4;
+    }
+
+  }
+
+  &__na {
+    color: var(--muted-fg);
+    font-size: $text-xs;
+  }
+
+  &:last-child &__label,
+  &:last-child &__cell {
+    border-bottom: none;
+  }
+}

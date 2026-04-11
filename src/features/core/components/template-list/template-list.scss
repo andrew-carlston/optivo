@@ -1,0 +1,135 @@
+@use "../../../../styles/tokens" as *;
+
+.template-list {
+  display: flex;
+  flex-direction: column;
+  gap: $space-lg;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    h2 {
+      font-size: $text-lg;
+      font-weight: 600;
+      color: var(--fg);
+    }
+  }
+
+  &__empty {
+    text-align: center;
+    color: var(--muted-fg);
+    padding: $space-2xl;
+    font-size: $text-sm;
+  }
+
+  &__grid {
+    display: flex;
+    flex-direction: column;
+    gap: $space-sm;
+  }
+
+  &__card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-lg;
+  }
+
+  &__card-info {
+    display: flex;
+    flex-direction: column;
+    gap: $space-xs;
+    min-width: 0;
+  }
+
+  &__card-title {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    font-weight: 600;
+    font-size: $text-base;
+  }
+
+  &__card-desc {
+    font-size: $text-sm;
+    color: var(--muted-fg);
+    margin: 0;
+  }
+
+  &__card-meta {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+    font-size: $text-xs;
+    color: var(--muted-fg);
+  }
+
+  &__card-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+}
+
+// ── Dialog ──
+
+.template-dialog {
+  &__overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: $z-modal;
+    animation: fade-in 0.15s ease;
+  }
+
+  &__content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(440px, 90vw);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: $radius-lg;
+    box-shadow: var(--shadow-lg);
+    padding: $space-xl;
+    z-index: $z-modal;
+    animation: fade-in 0.15s ease;
+
+    &:focus { outline: none; }
+  }
+
+  &__title {
+    font-size: $text-lg;
+    font-weight: 600;
+    color: var(--fg);
+    margin: 0 0 $space-lg;
+  }
+
+  &__body {
+    font-size: $text-sm;
+    color: var(--muted-fg);
+    margin: 0 0 $space-lg;
+  }
+
+  &__fields {
+    display: flex;
+    flex-direction: column;
+    gap: $space-md;
+    margin-bottom: $space-lg;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $space-sm;
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

@@ -47,6 +47,7 @@ export const accessTemplates = core.table("access_templates", {
   name: text("name").notNull(),
   description: text("description"),
   is_default: boolean("is_default").default(false),
+  sensitivity_levels: jsonb("sensitivity_levels").default([1]), // array of allowed levels (1-10)
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
@@ -69,6 +70,26 @@ export const accessResources = core.table("access_resources", {
   label: text("label").notNull(),
   parent_resource: text("parent_resource"),   // for grouping in UI (e.g., "settings.wfm")
   sort_order: integer("sort_order").default(0),
+});
+
+// ── Field Sensitivity Registry ──
+
+export const fieldSensitivity = core.table("field_sensitivity", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  resource: text("resource").notNull(),
+  field_name: text("field_name").notNull(),
+  level: integer("level").notNull().default(1), // 1-10
+  label: text("label").notNull(),
+});
+
+// ── Template Field Overrides (per-template visibility overrides beyond tier) ──
+
+export const templateFieldOverrides = core.table("template_field_overrides", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  template_id: uuid("template_id").references(() => accessTemplates.id, { onDelete: "cascade" }).notNull(),
+  resource: text("resource").notNull(),
+  field_name: text("field_name").notNull(),
+  visible: boolean("visible").notNull(), // true = grant despite tier, false = hide despite tier
 });
 
 // ── Config (key-value per company) ──
