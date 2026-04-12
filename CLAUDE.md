@@ -48,8 +48,10 @@ React frontend (feature-based modules)
 **Main (production):**
 - `core.companies` — slug → branch routing for all companies (includes `branch_host` column)
 - `core.users` — super users only (platform admins), `auth_user_id` is text (not uuid)
-- `core.access_templates` + `core.template_access` + `core.access_resources` — platform-level ReBAC
+- `core.access_templates` + `core.template_access` + `core.access_resources` + `core.template_companies` — platform-level ReBAC
 - `core.field_sensitivity` + `core.template_field_overrides` — field-level sensitivity control
+- `core.user_company_access` — user_id, company_id, override_template_id (super user per-company access)
+- `core.tags` + `core.tag_assignments` — platform tags/groups for template organization
 - All other tables present as schema template (empty)
 
 **Company branches (e.g., lawnstarter):**
@@ -75,8 +77,13 @@ React frontend (feature-based modules)
 /ui                             UI Kit preview (design system playground)
 /admin/login                    Super user login (email/password)
 /admin                          Company switcher (super users only)
-/admin/templates                Platform template list (ReBAC)
-/admin/templates/[id]           Platform template editor
+/admin/users                    Platform user list (avatar, template badge, company count)
+/admin/billing                  Billing (stub)
+/admin/analytics                Analytics (stub)
+/admin/settings                 Admin settings hub (sidebar: General, Access Templates, Tags & Groups, Integrations, Platform)
+/admin/settings/templates       Platform template list (ReBAC) — moved from /admin/templates
+/admin/settings/templates/[id]  Platform template editor
+/admin/settings/tags            Tag & group management
 /api/auth/[...all]              Better Auth API handler
 /api/company/[slug]             Company lookup (queries main branch)
 /[company]/login                Company-scoped login page
@@ -101,12 +108,13 @@ React frontend (feature-based modules)
 
 ## Database Schemas (Postgres namespaces)
 
-38 tables across 8 namespaces + neon_auth:
+42 tables across 8 namespaces + neon_auth:
 
 ```
-core.*          companies, users, config, audit_log, notifications,
-                access_templates, template_access, access_resources,
-                field_sensitivity, template_field_overrides (ReBAC)
+core.*          companies, users, user_company_access, config, audit_log, notifications,
+                access_templates, template_access, access_resources, template_companies,
+                field_sensitivity, template_field_overrides (ReBAC),
+                tags, tag_assignments
 hr.*            employees, departments, divisions, lobs, positions
 attendance.*    config, log, points, point_history, first_seen, disputes
 realtime.*      agent_states, queue_metrics, queue_groups, queue_members, status_mappings
@@ -138,16 +146,30 @@ src/
     api/
       auth/[...all]/route.ts    Better Auth API handler
       company/[slug]/route.ts   Company lookup (Drizzle query on main)
-    admin/                        Super user routes
-      layout.tsx                Validates super user access
+    admin/                        Super user routes (AdminShell layout)
+      layout.tsx                Validates super user access, wraps with AdminShell
       page.tsx                  Company switcher
       login/
         page.tsx                Super user login (AuthCard, no signup)
         login.scss
-      templates/
-        page.tsx                Platform template list
-        [id]/
-          page.tsx              Platform template editor
+      users/
+        page.tsx                Platform user list (avatar, template badge, company count)
+                                Click user → dialog: template selector, super toggle, company access
+                                Add User → create Better Auth account + core.users record
+                                Draft model: changes only persist on Save
+      billing/
+        page.tsx                Billing (stub)
+      analytics/
+        page.tsx                Analytics (stub)
+      settings/
+        layout.tsx              Settings sidebar (General, Access Templates, Tags & Groups, Integrations, Platform)
+        page.tsx                General settings (stub)
+        templates/
+          page.tsx              Platform template list (moved from /admin/templates)
+          [id]/
+            page.tsx            Platform template editor
+        tags/
+          page.tsx              Tag & group management
       sign-out-button.tsx       Client sign-out component
       admin.scss
     [company]/                  Company-scoped routes (slug from URL)
@@ -197,7 +219,8 @@ src/
       lib/
         session.ts              Server-side: getServerSession, requireSession,
                                 getCompanyBySlug, getOrCreateBranchUser,
-                                getSuperUser, getAllCompanies
+                                getSuperUser, getAllCompanies,
+                                getSuperUserCompanyAccess (resolves template per company)
         access/                 ReBAC engine
           types.ts              RESOURCES (15), ACTIONS (4), SCOPE_TYPES (7),
                                 SENSITIVITY_LEVELS (1-10), canSeeLevel(), permKey()
@@ -217,6 +240,8 @@ src/
         use-company.ts          Client hook: fetches company from /api/company/[slug]
         use-access.ts           useAccess() → {canAccess, getScope, isSuper}
       components/
+        admin-shell.tsx         Admin page wrapper (AppShell + Header + Footer + admin nav),
+                                nav: Companies | Users | Billing | Analytics | Settings
         company-shell.tsx       Company page wrapper (AppShell + Header + Footer + nav),
                                 nav filtered by canAccess(href, "view")
         company-shell.scss
@@ -284,8 +309,10 @@ src/
 
   db/
     schema/                     Drizzle schema files (one per namespace)
-      core.ts                   Companies, users, ReBAC tables (access_templates w/ sensitivity_levels,
-                                template_access, access_resources, field_sensitivity, template_field_overrides)
+      core.ts                   Companies, users, user_company_access, ReBAC tables (access_templates w/ sensitivity_levels,
+                                template_access, access_resources, template_companies,
+                                field_sensitivity, template_field_overrides),
+                                tags, tag_assignments
       hr.ts
       attendance.ts
       realtime.ts
@@ -341,7 +368,7 @@ npx drizzle-kit studio
 - `--pop` is the accent color per theme
 - Shadow tokens: `--shadow-xs`, `--shadow-sm`, `--shadow-md`, `--shadow-lg`, `--shadow-inset`
 - Card variants: `flat` (default), `raised` (elevated), `inset` (recessed)
-- Components (17): Button, Card, Select, MultiSelect, Switch, Input, Badge, Skeleton, AccessGate, AppShell, Header, Footer, AuthCard, Avatar, ThemeSwitcher, NotificationBell, CompanyShell
+- Components (18): Button, Card, Select, MultiSelect, Switch, Input, Badge, Skeleton, AccessGate, AppShell, Header, Footer, AuthCard, Avatar, ThemeSwitcher, NotificationBell, CompanyShell, AdminShell
 - Dropdown style: pill-shaped rows, filled circle check icons, hover border
 - Skeletons: left-to-right shimmer, 2.5s cycle, deterministic widths
 - All timestamps UTC in DB, displayed in user's timezone
@@ -352,10 +379,18 @@ npx drizzle-kit studio
 
 A **blocking inline script** in `src/app/layout.tsx` reads `theme`, `mode`, and `expanded` from localStorage and sets `data-theme`, `data-mode`, and `.expanded` class on `<html>` **before** React hydrates. This eliminates the flash-of-wrong-theme problem entirely.
 
+- **`<body>` has `suppressHydrationWarning`** — prevents Grammarly extension hydration mismatch
 - **No ThemeProvider component** — the blocking script replaces it
 - **AppShell** no longer manages expanded state — CSS reads `html.expanded` directly
 - **CompanyShell** syncs expanded state via `useEffect` (only for the toggle button icon)
 - Theme/mode persistence still uses localStorage; the ThemeSwitcher component writes to it and updates DOM attributes
+
+## Admin Shell
+
+`src/features/core/components/admin-shell.tsx` wraps all admin pages with AppShell + Header + Footer (same pattern as CompanyShell).
+
+- **Admin nav**: Companies | Users | Billing | Analytics | Settings
+- **Admin settings sidebar**: General, Access Templates, Tags & Groups, Integrations, Platform
 
 ## Company Shell
 
@@ -381,6 +416,9 @@ A **blocking inline script** in `src/app/layout.tsx` reads `theme`, `mode`, and 
 10. **Namespaced schemas** — each module gets its own Postgres schema with grant/revoke support
 11. **Shared components** — all UI from component library, no raw HTML buttons/inputs in pages
 12. **ReBAC from day one** — access templates on both platform (main) and company (branch) levels
+13. **CSS variables for colors** — all badges use `--pop`, `--info`, `--muted-fg` (never inline hex)
+14. **Select z-index above modals** — dropdowns render above dialog overlays
+15. **Graceful error handling** — company layout uses try/catch for resilient loading
 
 ## ReBAC (Relationship-Based Access Control)
 
@@ -423,6 +461,7 @@ useAccess() → { canAccess(resource, action), getScope(resource, action), isSup
 - Resource level: column-level action toggles (View/Create/Edit/Archive), per-resource scope override (single select, "Default" inherits parent), per-resource sensitivity override (multi-select levels 1–10, "Default" inherits parent)
 - Mixed state: parent shows "Mixed" when any child overrides the inherited value
 - Disabled resources: show inherited values grayed out
+- Metadata: assign groups, tags, and companies via MultiSelect dropdowns
 
 ### Default Template Assignment
 
@@ -434,6 +473,24 @@ useAccess() → { canAccess(resource, action), getScope(resource, action), isSup
 - `template_field_overrides` table: per-template (resource, field_name) → visible boolean
 - `access_templates.sensitivity_levels`: jsonb array of allowed levels 1–10
 - `canSeeLevel(allowedLevels, fieldLevel)`: returns true if the field should be visible
+
+## Super User Company Access
+
+- `core.user_company_access` table: user_id, company_id, override_template_id
+- `getSuperUserCompanyAccess()` resolves which template applies per company
+- Company layout: super users with a template get permissions loaded (not full bypass)
+- `is_super=true` without template = full bypass (legacy behavior)
+
+## Tags & Groups
+
+- `core.tags` table: company_id (null = platform-level), name, color, type (tag/group), is_global
+- `core.tag_assignments` table: tag_id, entity_type, entity_id
+- `core.template_companies` table: template_id, company_id (direct FK, not via tags)
+- Tag management page at `/admin/settings/tags`
+- Template editor: tags, groups, and companies assignable via MultiSelect dropdowns
+- Template list: filter by groups, tags, companies (all MultiSelect with search)
+- Template list: Group By dropdown (none/group/tag/company) with collapsible sections
+- Template cards: collapsible badge sections showing groups, tags, companies
 
 ## Skills (Claude)
 
