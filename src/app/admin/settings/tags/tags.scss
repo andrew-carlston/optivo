@@ -1,0 +1,169 @@
+@use "../../../../styles/tokens" as *;
+
+.tags-page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2xl;
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: $space-md;
+  }
+
+  &__section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    h3 {
+      display: flex;
+      align-items: center;
+      gap: $space-sm;
+      font-size: $text-base;
+      font-weight: 600;
+      margin: 0;
+    }
+  }
+
+  &__empty {
+    font-size: $text-sm;
+    color: var(--muted-fg);
+    padding: $space-md 0;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: $space-xs;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    padding: $space-sm $space-md;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: $radius-md;
+    transition: border-color 0.12s;
+
+    &:hover {
+      border-color: var(--border-strong);
+    }
+  }
+
+  &__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+  }
+
+  &__name {
+    font-size: $text-sm;
+    font-weight: 500;
+    flex: 1;
+  }
+
+  &__count {
+    font-size: $text-xs;
+    color: var(--muted-fg);
+  }
+}
+
+// ── Dialog ──
+
+.tags-dialog {
+  &__overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: $z-modal;
+  }
+
+  &__content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(420px, 90vw);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: $radius-lg;
+    box-shadow: var(--shadow-lg);
+    padding: $space-xl;
+    z-index: $z-modal;
+
+    &:focus { outline: none; }
+  }
+
+  &__title {
+    font-size: $text-lg;
+    font-weight: 600;
+    margin: 0 0 $space-lg;
+    text-transform: capitalize;
+  }
+
+  &__fields {
+    display: flex;
+    flex-direction: column;
+    gap: $space-lg;
+    margin-bottom: $space-lg;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: $space-xs;
+
+    > label {
+      font-size: $text-sm;
+      font-weight: 600;
+    }
+  }
+
+  &__colors {
+    display: flex;
+    gap: $space-xs;
+    flex-wrap: wrap;
+  }
+
+  &__color {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    cursor: pointer;
+    transition: all 0.12s;
+
+    &:hover {
+      transform: scale(1.15);
+      border-color: var(--border-strong);
+    }
+
+    &--active {
+      border-color: var(--fg);
+      transform: scale(1.15);
+      box-shadow: 0 0 0 2px var(--pop-muted);
+    }
+  }
+
+  &__toggle-row {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+
+    span {
+      font-size: $text-xs;
+      color: var(--muted-fg);
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $space-sm;
+  }
+}

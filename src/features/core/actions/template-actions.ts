@@ -11,6 +11,8 @@ export type TemplateRow = {
   id: string;
   name: string;
   description: string | null;
+  groupName: string | null;
+  tags: string[];
   isDefault: boolean;
   createdAt: Date;
   userCount: number;
@@ -20,6 +22,8 @@ export type TemplateDetail = {
   id: string;
   name: string;
   description: string | null;
+  groupName: string | null;
+  tags: string[];
   isDefault: boolean;
   sensitivityLevels: number[];
   permissions: { resource: string; action: string; scopeType: string }[];
@@ -67,6 +71,8 @@ export async function getTemplates(companySlug: string | null): Promise<Template
       id: core.accessTemplates.id,
       name: core.accessTemplates.name,
       description: core.accessTemplates.description,
+      groupName: core.accessTemplates.group_name,
+      tags: core.accessTemplates.tags,
       isDefault: core.accessTemplates.is_default,
       createdAt: core.accessTemplates.created_at,
     })
@@ -94,6 +100,8 @@ export async function getTemplates(companySlug: string | null): Promise<Template
     id: t.id,
     name: t.name,
     description: t.description,
+    groupName: t.groupName ?? null,
+    tags: (t.tags as string[]) ?? [],
     isDefault: t.isDefault ?? false,
     createdAt: t.createdAt,
     userCount: countMap.get(t.id) ?? 0,
@@ -122,6 +130,8 @@ export async function getTemplate(
       id: core.accessTemplates.id,
       name: core.accessTemplates.name,
       description: core.accessTemplates.description,
+      groupName: core.accessTemplates.group_name,
+      tags: core.accessTemplates.tags,
       isDefault: core.accessTemplates.is_default,
       sensitivityLevels: core.accessTemplates.sensitivity_levels,
     })
@@ -145,6 +155,8 @@ export async function getTemplate(
     id: t.id,
     name: t.name,
     description: t.description,
+    groupName: t.groupName ?? null,
+    tags: (t.tags as string[]) ?? [],
     isDefault: t.isDefault ?? false,
     sensitivityLevels: (t.sensitivityLevels as number[]) ?? [1],
     permissions: permissions.map((p: any) => ({
@@ -192,7 +204,7 @@ export async function createTemplate(
 export async function updateTemplate(
   companySlug: string | null,
   templateId: string,
-  data: { name?: string; description?: string; sensitivityLevels?: number[] },
+  data: { name?: string; description?: string; groupName?: string | null; tags?: string[]; sensitivityLevels?: number[] },
 ): Promise<void> {
   let dbInstance: any;
 
@@ -209,6 +221,8 @@ export async function updateTemplate(
     .set({
       ...(data.name !== undefined && { name: data.name }),
       ...(data.description !== undefined && { description: data.description }),
+      ...(data.groupName !== undefined && { group_name: data.groupName }),
+      ...(data.tags !== undefined && { tags: data.tags }),
       ...(data.sensitivityLevels !== undefined && { sensitivity_levels: data.sensitivityLevels }),
     })
     .where(eq(core.accessTemplates.id, templateId));

@@ -178,7 +178,60 @@ export async function getSuperUser(authUserId: string): Promise<AppUser | null> 
 }
 
 /**
- * Get all companies (for super user company switcher).
+ * Get a super user's company access record (which template to use in a specific company).
+ * Returns the override template ID if set, otherwise the user's platform template ID.
+ */
+export async function getSuperUserCompanyAccess(
+  userId: string,
+  companyId: string,
+): Promise<{ hasAccess: boolean; templateId: string | null }> {
+  // Check user_company_access for this user + company
+  const rows = await db
+    .select({
+      overrideTemplateId: core.userCompanyAccess.override_template_id,
+    })
+    .from(core.userCompanyAccess)
+    .where(
+      and(
+        eq(core.userCompanyAccess.user_id, userId),
+        eq(core.userCompanyAccess.company_id, companyId),
+      ),
+    )
+    .limit(1);
+
+  if (!rows.length) {
+    // No company access row — check if user has is_super (full access to all companies)
+    const user = await db
+      .select({ isSuper: core.users.is_super, templateId: core.users.access_template_id })
+      .from(core.users)
+      .where(eq(core.users.id, userId))
+      .limit(1);
+
+    if (user[0]?.isSuper) {
+      // is_super = true means full access (no restrictions)
+      return { hasAccess: true, templateId: null };
+    }
+    return { hasAccess: false, templateId: null };
+  }
+
+  // Has company access — use override template or fall back to platform template
+  if (rows[0].overrideTemplateId) {
+    return { hasAccess: true, templateId: rows[0].overrideTemplateId };
+  }
+
+  // No override — use platform template
+  const user = await db
+    .select({ templateId: core.users.access_template_id })
+    .from(core.users)
+    .where(eq(core.users.id, userId))
+    .limit(1);
+
+  return { hasAccess: true, templateId: user[0]?.templateId ?? null };
+}
+
+/**
+ * Get companies a super user has access to (for company switcher).
+ * is_super = true sees all. Non-super platform users see only assigned companies.
  */
 export async function getAllCompanies(): Promise<CompanyData[]> {
   const rows = await db

@@ -21,6 +21,17 @@
     border-radius: $radius-lg;
   }
 
+  &__fields-row {
+    display: flex;
+    gap: $space-sm;
+    flex-wrap: wrap;
+
+    > * {
+      flex: 1;
+      min-width: 140px;
+    }
+  }
+
   &__info-header {
     display: flex;
     align-items: center;

@@ -1,12 +1,13 @@
 import { redirect } from "next/navigation";
+import { db, createBranchDb } from "@/db/client";
 import {
   getServerSession,
   getCompanyBySlug,
   getOrCreateBranchUser,
   getSuperUser,
+  getSuperUserCompanyAccess,
 } from "@/features/core/lib/session";
 import { loadPermissions, serializePermissions } from "@/features/core/lib/access/load-permissions";
-import { createBranchDb } from "@/db/client";
 import { CompanyProvider } from "@/features/core/providers/company-provider";
 import { CompanyShell } from "@/features/core/components/company-shell";
 
@@ -19,48 +20,71 @@ export default async function CompanyLayout({
 }) {
   const { company: slug } = await params;
 
-  // No session → render children directly (login page, etc.)
-  // Middleware gates all non-login routes, so this only applies to /login
-  const session = await getServerSession();
+  let session;
+  try {
+    session = await getServerSession();
+  } catch {
+    // Session check failed (expired, DB error, etc.)
+    return <>{children}</>;
+  }
   if (!session) {
     return <>{children}</>;
   }
 
-  // Look up company on main branch
-  const company = await getCompanyBySlug(slug);
+  let company;
+  try {
+    company = await getCompanyBySlug(slug);
+  } catch {
+    redirect("/");
+  }
   if (!company) {
     redirect("/");
   }
 
-  // Resolve user: check company branch first, then super user on main
   let user;
   let isSuper = false;
 
-  if (company.branchHost) {
-    user = await getOrCreateBranchUser(company.branchHost, session, company.id);
-  }
-
-  // If no branch user (or no branch host yet), check if super user
-  if (!user) {
-    const superUser = await getSuperUser(session.user.id);
-    if (superUser) {
-      user = superUser;
-      isSuper = true;
+  try {
+    if (company.branchHost) {
+      user = await getOrCreateBranchUser(company.branchHost, session, company.id);
     }
+
+    if (!user) {
+      const superUser = await getSuperUser(session.user.id);
+      if (superUser) {
+        user = superUser;
+        isSuper = true;
+      }
+    }
+  } catch {
+    // User resolution failed
   }
 
-  // No user found anywhere — not authorized for this company
   if (!user) {
     redirect(`/${slug}/login`);
   }
 
-  // Load permissions (super users bypass — empty map is fine)
+  // Load permissions
   let permissions: import("@/features/core/lib/access/types").PermissionMap = new Map();
-  if (!isSuper && user.accessTemplateId) {
-    const branchDb = company.branchHost ? createBranchDb(company.branchHost) : null;
-    if (branchDb) {
-      permissions = await loadPermissions(branchDb, user.accessTemplateId);
+
+  try {
+    if (isSuper) {
+      const access = await getSuperUserCompanyAccess(user.id, company.id);
+      if (!access.hasAccess) {
+        redirect("/admin");
+      }
+      if (access.templateId) {
+        permissions = await loadPermissions(db, access.templateId);
+        isSuper = false;
+      }
+    } else if (user.accessTemplateId) {
+      const branchDb = company.branchHost ? createBranchDb(company.branchHost) : null;
+      if (branchDb) {
+        permissions = await loadPermissions(branchDb, user.accessTemplateId);
+      }
     }
+  } catch {
+    // Permission loading failed — proceed with empty permissions
   }
 
   return (

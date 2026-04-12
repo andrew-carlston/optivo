@@ -1,0 +1,224 @@
+@use "../../../styles/tokens" as *;
+
+.admin-users {
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $space-lg;
+
+    h2 {
+      font-size: $text-lg;
+      font-weight: 600;
+      margin: 0;
+    }
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: $space-sm;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: $space-lg;
+    cursor: pointer;
+    padding: $space-xs 0;
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__name {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    font-weight: 600;
+    font-size: $text-base;
+  }
+
+  &__email {
+    font-size: $text-sm;
+    color: var(--muted-fg);
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    flex-shrink: 0;
+  }
+
+  &__companies {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+    font-size: $text-xs;
+    color: var(--muted-fg);
+  }
+
+  // ── Dialog ──
+
+  &__overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: $z-modal;
+  }
+
+  &__dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(520px, 92vw);
+    max-height: 85vh;
+    overflow-y: auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: $radius-lg;
+    box-shadow: var(--shadow-lg);
+    padding: $space-xl;
+    z-index: $z-modal;
+
+    &:focus { outline: none; }
+  }
+
+  &__dialog-header {
+    padding-bottom: $space-md;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: $space-lg;
+  }
+
+  &__dialog-title {
+    display: flex;
+    align-items: center;
+    gap: $space-md;
+    margin: 0;
+
+    h3 {
+      font-size: $text-lg;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    p {
+      font-size: $text-sm;
+      color: var(--muted-fg);
+      margin: 2px 0 0;
+    }
+  }
+
+  &__dialog-body {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-bottom: $space-md;
+  }
+
+  &__dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: $space-sm;
+    padding-top: $space-md;
+    border-top: 1px solid var(--border);
+  }
+
+  &__section {
+    margin-bottom: $space-xl;
+
+    > label {
+      display: flex;
+      align-items: center;
+      gap: $space-xs;
+      font-size: $text-sm;
+      font-weight: 600;
+      margin-bottom: $space-sm;
+    }
+  }
+
+  &__access-row--new {
+    border-style: dashed;
+    border-color: var(--pop);
+    background: var(--pop-muted);
+  }
+
+  &__access-badge {
+    font-size: $text-xs;
+    font-weight: 600;
+    color: var(--pop);
+    flex: 1;
+    text-align: right;
+  }
+
+  &__hint {
+    font-size: $text-xs;
+    color: var(--muted-fg);
+    margin: 0 0 $space-sm;
+  }
+
+  &__access-list {
+    display: flex;
+    flex-direction: column;
+    gap: $space-sm;
+    margin-bottom: $space-md;
+  }
+
+  &__access-row {
+    display: flex;
+    align-items: center;
+    gap: $space-md;
+    padding: $space-sm $space-md;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: $radius-md;
+  }
+
+  &__access-company {
+    font-size: $text-sm;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  &__empty {
+    font-size: $text-sm;
+    color: var(--muted-fg);
+    text-align: center;
+    padding: $space-md;
+  }
+
+  &__add-company {
+    width: 100%;
+  }
+
+  &__dialog-create-title {
+    font-size: $text-lg;
+    font-weight: 600;
+    margin: 0 0 $space-lg;
+  }
+
+  &__create-form {
+    display: flex;
+    flex-direction: column;
+    gap: $space-md;
+  }
+
+  &__create-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $space-sm;
+    margin-top: $space-sm;
+  }
+
+  &__error {
+    font-size: $text-sm;
+    color: var(--danger);
+    margin: 0;
+  }
+}

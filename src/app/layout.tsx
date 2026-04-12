@@ -38,7 +38,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: RESTORE_SCRIPT }} />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         {children}
       </body>
     </html>

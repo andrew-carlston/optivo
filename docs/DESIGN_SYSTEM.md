@@ -251,7 +251,7 @@ const ProtectedButton = withAccess(Button, "attendance:edit");
 | `fallback` | `ReactNode` | `null` (hidden) |
 | `loading` | `ReactNode` | `null` |
 
-> Note: Currently allows everything — wired to real ReBAC hook when auth is built.
+> Wired to `useAccess()` from CompanyProvider. Gracefully allows everything when rendered outside CompanyProvider (e.g., admin pages). Access checks are driven by the user's assigned template permissions loaded server-side via `loadPermissions()`.
 
 ### AppShell
 

@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getServerSession, getSuperUser } from "@/features/core/lib/session";
+import { AdminShell } from "@/features/core/components/admin-shell";
 
 export default async function AdminLayout({
   children,
@@ -20,5 +21,9 @@ export default async function AdminLayout({
     redirect("/");
   }
 
-  return <>{children}</>;
+  return (
+    <AdminShell user={{ fullName: superUser.fullName, email: superUser.email, avatarUrl: superUser.avatarUrl }}>
+      {children}
+    </AdminShell>
+  );
 }

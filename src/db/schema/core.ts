@@ -46,8 +46,10 @@ export const accessTemplates = core.table("access_templates", {
   company_id: uuid("company_id").references(() => companies.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   description: text("description"),
+  group_name: text("group_name"),           // e.g., "Customer Support", "WFM Team", "Sales"
+  tags: jsonb("tags").default([]),           // e.g., ["wfm", "support", "tier-1"]
   is_default: boolean("is_default").default(false),
-  sensitivity_levels: jsonb("sensitivity_levels").default([1]), // array of allowed levels (1-10)
+  sensitivity_levels: jsonb("sensitivity_levels").default([1]),
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
@@ -70,6 +72,45 @@ export const accessResources = core.table("access_resources", {
   label: text("label").notNull(),
   parent_resource: text("parent_resource"),   // for grouping in UI (e.g., "settings.wfm")
   sort_order: integer("sort_order").default(0),
+});
+
+// ── Super User → Company Access (which companies a platform user can enter) ──
+
+export const userCompanyAccess = core.table("user_company_access", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  user_id: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  company_id: uuid("company_id").references(() => companies.id, { onDelete: "cascade" }).notNull(),
+  override_template_id: uuid("override_template_id").references(() => accessTemplates.id, { onDelete: "set null" }),
+  created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
+// ── Tags & Groups ──
+
+export const tags = core.table("tags", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  company_id: uuid("company_id").references(() => companies.id, { onDelete: "cascade" }),  // null = platform tag
+  name: text("name").notNull(),
+  color: text("color").default("#6366f1"),  // hex color for display
+  type: text("type").notNull().default("tag"),  // "tag" or "group"
+  is_global: boolean("is_global").default(false),  // platform tags: visible to all companies
+  created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
+export const tagAssignments = core.table("tag_assignments", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tag_id: uuid("tag_id").references(() => tags.id, { onDelete: "cascade" }).notNull(),
+  entity_type: text("entity_type").notNull(),  // "template", "user", "company"
+  entity_id: uuid("entity_id").notNull(),
+  created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
+// ── Template → Company Assignments (which companies a template applies to) ──
+
+export const templateCompanies = core.table("template_companies", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  template_id: uuid("template_id").references(() => accessTemplates.id, { onDelete: "cascade" }).notNull(),
+  company_id: uuid("company_id").references(() => companies.id, { onDelete: "cascade" }).notNull(),
+  created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
 // ── Field Sensitivity Registry ──

@@ -58,16 +58,48 @@ type ResourceScopeMap = Map<string, string>; // resource → "default" | ScopeTy
 /** Per-resource sensitivity override ("default" = inherit group/global, or specific levels) */
 type ResourceSensMap = Map<string, string | string[]>; // resource → "default" | string[]
 
+export type TagOption = { id: string; name: string; color: string; type: "tag" | "group" };
+export type CompanyOption = { id: string; name: string };
+
 interface TemplateEditorProps {
   template: TemplateDetail;
   backHref: string;
-  onSave: (name: string, description: string, sensitivityLevels: number[], permissions: PermissionInput[]) => Promise<void>;
+  /** Available tags/groups to assign */
+  availableTags?: TagOption[];
+  /** Currently assigned tag IDs */
+  assignedTagIds?: string[];
+  /** Available companies (admin only) */
+  availableCompanies?: CompanyOption[];
+  /** Currently assigned company IDs */
+  assignedCompanyIds?: string[];
+  onSave: (data: {
+    name: string;
+    description: string;
+    groupName: string;
+    tags: string[];
+    sensitivityLevels: number[];
+    permissions: PermissionInput[];
+    assignedTagIds: string[];
+    assignedCompanyIds: string[];
+  }) => Promise<void>;
 }
 
-export function TemplateEditor({ template, backHref, onSave }: TemplateEditorProps) {
+export function TemplateEditor({
+  template,
+  backHref,
+  availableTags = [],
+  assignedTagIds: initialTagIds = [],
+  availableCompanies = [],
+  assignedCompanyIds: initialCompanyIds = [],
+  onSave,
+}: TemplateEditorProps) {
   const router = useRouter();
   const [name, setName] = useState(template.name);
   const [description, setDescription] = useState(template.description ?? "");
+  const [groupName] = useState(template.groupName ?? "");
+  const [tags] = useState<string[]>(template.tags ?? []);
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(initialTagIds);
+  const [selectedCompanyIds, setSelectedCompanyIds] = useState<string[]>(initialCompanyIds);
   const [sensitivityLevels, setSensitivityLevels] = useState<string[]>(
     (template.sensitivityLevels ?? [1]).map(String)
   );
@@ -336,7 +368,7 @@ export function TemplateEditor({ template, backHref, onSave }: TemplateEditorPro
       }
     }
 
-    await onSave(name, description, sensitivityLevels.map(Number), permissions);
+    await onSave({ name, description, groupName, tags, sensitivityLevels: sensitivityLevels.map(Number), permissions, assignedTagIds: selectedTagIds, assignedCompanyIds: selectedCompanyIds });
     setSaving(false);
   }
 
@@ -367,6 +399,43 @@ export function TemplateEditor({ template, backHref, onSave }: TemplateEditorPro
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
+        <div className="template-editor__fields-row">
+          {(() => {
+            const groups = availableTags.filter((t) => t.type === "group");
+            const tagsList = availableTags.filter((t) => t.type === "tag");
+            return (
+              <>
+                <MultiSelect
+                  options={groups.map((g) => ({ value: g.id, label: g.name }))}
+                  selected={selectedTagIds.filter((id) => groups.some((g) => g.id === id))}
+                  onChange={(vals) => {
+                    const tagOnlyIds = selectedTagIds.filter((id) => !groups.some((g) => g.id === id));
+                    setSelectedTagIds([...tagOnlyIds, ...vals]);
+                  }}
+                  placeholder="Groups"
+                  searchable={false}
+                />
+                <MultiSelect
+                  options={tagsList.map((t) => ({ value: t.id, label: t.name }))}
+                  selected={selectedTagIds.filter((id) => tagsList.some((t) => t.id === id))}
+                  onChange={(vals) => {
+                    const groupOnlyIds = selectedTagIds.filter((id) => !tagsList.some((t) => t.id === id));
+                    setSelectedTagIds([...groupOnlyIds, ...vals]);
+                  }}
+                  placeholder="Tags"
+                  searchable={false}
+                />
+              </>
+            );
+          })()}
+          <MultiSelect
+            options={availableCompanies.map((c) => ({ value: c.id, label: c.name }))}
+            selected={selectedCompanyIds}
+            onChange={setSelectedCompanyIds}
+            placeholder="Companies"
+            searchable
+          />
+        </div>
       </div>
 
       {/* Master Defaults */}

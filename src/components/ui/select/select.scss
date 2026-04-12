@@ -87,7 +87,7 @@
   border: 1px solid var(--border);
   border-radius: $radius-xl;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
-  z-index: $z-dropdown;
+  z-index: $z-modal + 10;
   overflow: hidden;
   animation: selectAppear 0.15s ease;
 }

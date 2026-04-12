@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { requireSession, getSuperUser, getAllCompanies } from "@/features/core/lib/session";
 import { redirect } from "next/navigation";
-import { SignOutButton } from "./sign-out-button";
 import "./admin.scss";
 
 export default async function AdminPage() {
@@ -13,25 +12,9 @@ export default async function AdminPage() {
 
   return (
     <div className="admin">
-      <div className="admin__header">
-        <div>
-          <h1 className="admin__title">Optivo Platform</h1>
-          <p className="admin__subtitle">
-            Signed in as {superUser.fullName} ({superUser.email})
-          </p>
-        </div>
-        <SignOutButton />
-      </div>
-
-      <div className="admin__nav">
-        <Link href="/admin/templates" className="admin__nav-link">
-          Platform Templates
-        </Link>
-      </div>
-
       <h2 className="admin__section-title">Companies</h2>
 
-      <div className="admin__grid">
+      <div className="admin__grid">¡¡
         {companies.map((company) => (
           <Link
             key={company.id}

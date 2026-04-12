@@ -1,54 +1,7 @@
 @use "../../styles/tokens" as *;
 
 .admin {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: $space-2xl $space-lg;
-  min-height: 100vh;
-  background: var(--bg);
   color: var(--fg);
-
-  &__header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: $space-2xl;
-  }
-
-  &__title {
-    font-size: $text-2xl;
-    font-weight: 700;
-    margin: 0;
-  }
-
-  &__subtitle {
-    font-size: $text-sm;
-    color: var(--muted-fg);
-    margin: $space-xs 0 0;
-  }
-
-  &__nav {
-    display: flex;
-    gap: $space-sm;
-    margin-bottom: $space-xl;
-  }
-
-  &__nav-link {
-    padding: $space-sm $space-lg;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: $radius-lg;
-    font-size: $text-sm;
-    font-weight: 500;
-    color: var(--fg);
-    text-decoration: none;
-    transition: border-color 0.15s;
-
-    &:hover {
-      border-color: var(--pop);
-      color: var(--pop);
-    }
-  }
 
   &__section-title {
     font-size: $text-lg;
