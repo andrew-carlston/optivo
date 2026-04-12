@@ -9,7 +9,7 @@ export function SignOutButton() {
 
   async function handleSignOut() {
     await signOut();
-    router.push("/admin/login");
+    window.location.href = "/admin/login";
   }
 
   return (

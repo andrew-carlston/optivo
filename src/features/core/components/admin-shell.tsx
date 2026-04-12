@@ -69,7 +69,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
 
   async function handleSignOut() {
     await signOut();
-    router.push("/admin/login");
+    window.location.href = "/admin/login";
   }
 
   function isActive(href: string) {

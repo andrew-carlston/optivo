@@ -91,7 +91,7 @@ export function CompanyShell({ children }: { children: React.ReactNode }) {
 
   async function handleSignOut() {
     await signOut();
-    router.push(`/${slug}/login`);
+    window.location.href = `/${slug}/login`;
   }
 
   const isGroupActive = (items: NavLink[]) =>

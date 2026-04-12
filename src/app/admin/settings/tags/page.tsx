@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input/input";
 import { Switch } from "@/components/ui/switch/switch";
 import { Badge } from "@/components/ui/badge/badge";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { Plus, Trash2, Pencil, Tag, FolderOpen } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
@@ -78,13 +79,41 @@ export default function AdminTagsPage() {
   const groupTags = tags.filter((t) => t.type === "group");
   const regularTags = tags.filter((t) => t.type === "tag");
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return (
+      <div className="tags-page">
+        {[0, 1].map((s) => (
+          <div key={s} className="tags-page__section">
+            <div className="tags-page__section-header">
+              <Skeleton width="100%" height={38} radius="md" />
+              <Skeleton width={110} height={34} radius="lg" />
+            </div>
+            <div className="tags-page__list">
+              {[1, 2].map((i) => (
+                <div key={i} className="tags-page__item">
+                  <Skeleton width={12} height={12} radius="full" />
+                  <Skeleton width={120} height={14} radius="md" style={{ flex: 1 }} />
+                  <Skeleton width={60} height={14} radius="sm" />
+                  <Skeleton width={28} height={28} radius="md" />
+                  <Skeleton width={28} height={28} radius="md" />
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="tags-page">
       <div className="tags-page__section">
         <div className="tags-page__section-header">
-          <h3><FolderOpen size={16} /> Groups</h3>
+          <div className="tags-page__section-title">
+            <FolderOpen size={14} />
+            <span>Groups</span>
+            <span className="tags-page__section-count">{groupTags.length}</span>
+          </div>
           <Button variant="outline" size="sm" onClick={() => openCreate("group")}>
             <Plus size={14} /> New Group
           </Button>
@@ -110,7 +139,11 @@ export default function AdminTagsPage() {
 
       <div className="tags-page__section">
         <div className="tags-page__section-header">
-          <h3><Tag size={16} /> Tags</h3>
+          <div className="tags-page__section-title">
+            <Tag size={14} />
+            <span>Tags</span>
+            <span className="tags-page__section-count">{regularTags.length}</span>
+          </div>
           <Button variant="outline" size="sm" onClick={() => openCreate("tag")}>
             <Plus size={14} /> New Tag
           </Button>

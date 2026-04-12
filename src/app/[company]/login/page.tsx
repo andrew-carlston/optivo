@@ -13,10 +13,12 @@ export default function LoginPage() {
   const { data: session, isPending } = useSession();
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
 
   // Redirect if already logged in
   useEffect(() => {
     if (session?.user && slug) {
+      setAuthenticated(true);
       router.push(`/${slug}/dashboard`);
     }
   }, [session, slug, router]);
@@ -45,16 +47,20 @@ export default function LoginPage() {
     setError("");
     setSubmitting(true);
     const result = await signIn.email({ email, password, callbackURL: `/${slug}/dashboard` });
-    if (result.error) setError(result.error.message || "Sign in failed");
-    setSubmitting(false);
+    if (result.error) {
+      setError(result.error.message || "Sign in failed");
+      setSubmitting(false);
+    }
   }
 
   async function handleEmailSignUp(email: string, password: string, name: string) {
     setError("");
     setSubmitting(true);
     const result = await signUp.email({ email, password, name, callbackURL: `/${slug}/dashboard` });
-    if (result.error) setError(result.error.message || "Sign up failed");
-    setSubmitting(false);
+    if (result.error) {
+      setError(result.error.message || "Sign up failed");
+      setSubmitting(false);
+    }
   }
 
   // Company not found
@@ -62,6 +68,15 @@ export default function LoginPage() {
     return (
       <div className="login">
         <AuthCardNotFound onGoHome={() => router.push("/")} />
+      </div>
+    );
+  }
+
+  // Authenticated — show card skeleton while redirecting
+  if (authenticated || (session?.user && slug)) {
+    return (
+      <div className="login">
+        <AuthCard companyName="" loading />
       </div>
     );
   }

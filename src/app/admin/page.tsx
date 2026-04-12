@@ -11,10 +11,10 @@ export default async function AdminPage() {
   const companies = await getAllCompanies();
 
   return (
-    <div className="admin">
+    <div>
       <h2 className="admin__section-title">Companies</h2>
 
-      <div className="admin__grid">¡¡
+      <div className="admin__grid">
         {companies.map((company) => (
           <Link
             key={company.id}

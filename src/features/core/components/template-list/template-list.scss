@@ -50,16 +50,15 @@
 
   &__card {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: $space-lg;
-  }
-
-  &__card-info {
-    display: flex;
     flex-direction: column;
     gap: $space-xs;
-    min-width: 0;
+  }
+
+  &__card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-sm;
   }
 
   &__card-title {
@@ -68,6 +67,7 @@
     gap: $space-sm;
     font-weight: 600;
     font-size: $text-base;
+    min-width: 0;
   }
 
   &__card-desc {
@@ -111,6 +111,19 @@
     padding: 2px 0;
 
     &:hover { color: var(--pop); }
+
+    svg { flex-shrink: 0; }
+  }
+
+  &__card-section-empty {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--muted-fg);
+    opacity: 0.5;
+    padding: 2px 0;
 
     svg { flex-shrink: 0; }
   }
@@ -167,25 +180,40 @@
     align-items: center;
     gap: $space-sm;
     padding: $space-sm $space-md;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
+    background: var(--pop-muted);
+    border: 1px solid var(--pop);
     border-radius: $radius-md;
     cursor: pointer;
     font-size: $text-sm;
     font-weight: 600;
-    color: var(--fg);
-    transition: border-color 0.12s;
+    color: var(--pop);
+    transition: opacity 0.12s;
 
     &:hover {
-      border-color: var(--border-strong);
+      opacity: 0.85;
     }
 
     svg {
-      color: var(--muted-fg);
+      color: var(--pop);
       flex-shrink: 0;
     }
 
     span { flex: 1; }
+  }
+
+  &__section-count {
+    flex: 0 0 auto !important;
+    background: var(--pop);
+    color: var(--pop-fg);
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-full;
+    padding: 0 $space-xs;
   }
 
   &__card-actions {

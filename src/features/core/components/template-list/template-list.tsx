@@ -169,64 +169,77 @@ export function TemplateList({
     const [showTags, setShowTags] = useState(false);
     const [showCompanies, setShowCompanies] = useState(false);
 
-    if (groups.length === 0 && tags.length === 0 && companies.length === 0) return null;
-
     return (
       <div className="template-list__card-sections">
-        {groups.length > 0 && (
-          <div className="template-list__card-section">
+        <div className="template-list__card-section">
+          {groups.length > 0 ? (
             <button className="template-list__card-section-toggle" onClick={(e) => { e.stopPropagation(); setShowGroups(!showGroups); }}>
               {showGroups ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
               <FolderOpen size={11} />
               <span>{groups.length} group{groups.length !== 1 ? "s" : ""}</span>
             </button>
-            {showGroups && (
-              <div className="template-list__card-section-items">
-                {groups.map((g) => (
-                  <span key={g.id} className="template-list__badge template-list__badge--group">
-                    {g.name}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-        {tags.length > 0 && (
-          <div className="template-list__card-section">
+          ) : (
+            <span className="template-list__card-section-empty">
+              <FolderOpen size={11} />
+              <span>0 groups</span>
+            </span>
+          )}
+          {showGroups && groups.length > 0 && (
+            <div className="template-list__card-section-items">
+              {groups.map((g) => (
+                <span key={g.id} className="template-list__badge template-list__badge--group">
+                  {g.name}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="template-list__card-section">
+          {tags.length > 0 ? (
             <button className="template-list__card-section-toggle" onClick={(e) => { e.stopPropagation(); setShowTags(!showTags); }}>
               {showTags ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
               <Tag size={11} />
               <span>{tags.length} tag{tags.length !== 1 ? "s" : ""}</span>
             </button>
-            {showTags && (
-              <div className="template-list__card-section-items">
-                {tags.map((tag) => (
-                  <span key={tag.id} className="template-list__badge template-list__badge--tag">
-                    {tag.name}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-        {companies.length > 0 && (
-          <div className="template-list__card-section">
+          ) : (
+            <span className="template-list__card-section-empty">
+              <Tag size={11} />
+              <span>0 tags</span>
+            </span>
+          )}
+          {showTags && tags.length > 0 && (
+            <div className="template-list__card-section-items">
+              {tags.map((tag) => (
+                <span key={tag.id} className="template-list__badge template-list__badge--tag">
+                  {tag.name}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="template-list__card-section">
+          {companies.length > 0 ? (
             <button className="template-list__card-section-toggle" onClick={(e) => { e.stopPropagation(); setShowCompanies(!showCompanies); }}>
               {showCompanies ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
               <Building2 size={11} />
               <span>{companies.length} compan{companies.length !== 1 ? "ies" : "y"}</span>
             </button>
-            {showCompanies && (
-              <div className="template-list__card-section-items">
-                {companies.map((c) => (
-                  <span key={c.id} className="template-list__badge template-list__badge--company">
-                    {c.name}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+          ) : (
+            <span className="template-list__card-section-empty">
+              <Building2 size={11} />
+              <span>0 companies</span>
+            </span>
+          )}
+          {showCompanies && companies.length > 0 && (
+            <div className="template-list__card-section-items">
+              {companies.map((c) => (
+                <span key={c.id} className="template-list__badge template-list__badge--company">
+                  {c.name}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     );
   }
@@ -243,31 +256,31 @@ export function TemplateList({
       <Card key={t.id} variant="flat">
         <CardContent>
           <div className="template-list__card">
-            <div className="template-list__card-info">
+            <div className="template-list__card-header">
               <div className="template-list__card-title">
                 <span>{t.name}</span>
                 {t.isDefault && <Badge variant="info">Default</Badge>}
               </div>
-              {t.description && <p className="template-list__card-desc">{t.description}</p>}
-              <div className="template-list__card-meta">
-                <Users size={13} />
-                <span>{t.userCount} user{t.userCount !== 1 ? "s" : ""}</span>
-              </div>
-              <CardSections groups={cardGroups} tags={cardTags} companies={cardCompanies} />
-            </div>
-            <div className="template-list__card-actions">
-              {!t.isDefault && (
-                <Button variant="ghost" size="icon" title="Set as default" onClick={() => onSetDefault(t.id)}>
-                  <Star size={15} />
+              <div className="template-list__card-actions">
+                {!t.isDefault && (
+                  <Button variant="ghost" size="icon" title="Set as default" onClick={() => onSetDefault(t.id)}>
+                    <Star size={15} />
+                  </Button>
+                )}
+                <Button variant="ghost" size="icon" title="Edit" onClick={() => onEdit(t.id)}>
+                  <Pencil size={15} />
                 </Button>
-              )}
-              <Button variant="ghost" size="icon" title="Edit" onClick={() => onEdit(t.id)}>
-                <Pencil size={15} />
-              </Button>
-              <Button variant="ghost" size="icon" title="Delete" onClick={() => setDeleteId(t.id)}>
-                <Trash2 size={15} />
-              </Button>
+                <Button variant="ghost" size="icon" title="Delete" onClick={() => setDeleteId(t.id)}>
+                  <Trash2 size={15} />
+                </Button>
+              </div>
             </div>
+            {t.description && <p className="template-list__card-desc">{t.description}</p>}
+            <div className="template-list__card-meta">
+              <Users size={13} />
+              <span>{t.userCount} user{t.userCount !== 1 ? "s" : ""}</span>
+            </div>
+            <CardSections groups={cardGroups} tags={cardTags} companies={cardCompanies} />
           </div>
         </CardContent>
       </Card>
@@ -316,7 +329,7 @@ export function TemplateList({
               {section.icon === "tag" && <Tag size={14} />}
               {section.icon === "company" && <Building2 size={14} />}
               <span>{section.label}</span>
-              <Badge variant="default">{section.templates.length}</Badge>
+              <span className="template-list__section-count">{section.templates.length}</span>
             </button>
             {!collapsed.has(key) && (
               <div className="template-list__grid">

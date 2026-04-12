@@ -149,6 +149,43 @@ export async function getEntityTags(
   }));
 }
 
+/** Get all tag assignments for an entity type (batch). */
+export async function getAllEntityTags(
+  entityType: string,
+): Promise<Record<string, string[]>> {
+  const rows = await db
+    .select({
+      entityId: core.tagAssignments.entity_id,
+      tagId: core.tagAssignments.tag_id,
+    })
+    .from(core.tagAssignments)
+    .where(eq(core.tagAssignments.entity_type, entityType));
+
+  const map: Record<string, string[]> = {};
+  for (const r of rows) {
+    if (!map[r.entityId]) map[r.entityId] = [];
+    map[r.entityId].push(r.tagId);
+  }
+  return map;
+}
+
+/** Get all template → company assignments (batch). */
+export async function getAllTemplateCompanies(): Promise<Record<string, string[]>> {
+  const rows = await db
+    .select({
+      templateId: core.templateCompanies.template_id,
+      companyId: core.templateCompanies.company_id,
+    })
+    .from(core.templateCompanies);
+
+  const map: Record<string, string[]> = {};
+  for (const r of rows) {
+    if (!map[r.templateId]) map[r.templateId] = [];
+    map[r.templateId].push(r.companyId);
+  }
+  return map;
+}
+
 /** Assign a tag to an entity. */
 export async function assignTag(
   tagId: string,

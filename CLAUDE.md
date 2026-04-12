@@ -245,7 +245,10 @@ src/
         company-shell.tsx       Company page wrapper (AppShell + Header + Footer + nav),
                                 nav filtered by canAccess(href, "view")
         company-shell.scss
-        template-list/          Template card list with CRUD, create/delete dialogs
+        template-list/          Template card list with CRUD, create/delete dialogs,
+                                card layout: header (title + actions) top, info below,
+                                always-show groups/tags/companies sections (empty state),
+                                collapsible badge sections, group-by with accent section headers
         template-editor/        Permission grid editor:
                                 3-level cascade (Master → Group → Resource),
                                 Full Access toggle, column-level action toggles,
@@ -419,6 +422,9 @@ A **blocking inline script** in `src/app/layout.tsx` reads `theme`, `mode`, and 
 13. **CSS variables for colors** — all badges use `--pop`, `--info`, `--muted-fg` (never inline hex)
 14. **Select z-index above modals** — dropdowns render above dialog overlays
 15. **Graceful error handling** — company layout uses try/catch for resilient loading
+16. **Hard redirects on sign-out** — `window.location.href` (not `router.push`) to clear client state
+17. **Skeleton loading states** — all list pages show skeleton shimmer while loading (never "Loading..." text)
+18. **Login redirect skeleton** — login pages show AuthCard skeleton while redirecting after authentication
 
 ## ReBAC (Relationship-Based Access Control)
 
@@ -486,11 +492,12 @@ useAccess() → { canAccess(resource, action), getScope(resource, action), isSup
 - `core.tags` table: company_id (null = platform-level), name, color, type (tag/group), is_global
 - `core.tag_assignments` table: tag_id, entity_type, entity_id
 - `core.template_companies` table: template_id, company_id (direct FK, not via tags)
-- Tag management page at `/admin/settings/tags`
+- Tag management page at `/admin/settings/tags` (skeleton loading, accent section headers with count badges)
 - Template editor: tags, groups, and companies assignable via MultiSelect dropdowns
 - Template list: filter by groups, tags, companies (all MultiSelect with search)
-- Template list: Group By dropdown (none/group/tag/company) with collapsible sections
-- Template cards: collapsible badge sections showing groups, tags, companies
+- Template list: Group By dropdown (none/group/tag/company) with collapsible sections, accent headers with count badges
+- Template cards: always-show groups/tags/companies sections (empty state when none assigned)
+- Batch loading: `getAllEntityTags(entityType)` and `getAllTemplateCompanies()` eliminate N+1 queries
 
 ## Skills (Claude)
 

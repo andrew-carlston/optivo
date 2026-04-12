@@ -15,15 +15,45 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: $space-sm;
+  }
 
-    h3 {
-      display: flex;
-      align-items: center;
-      gap: $space-sm;
-      font-size: $text-base;
-      font-weight: 600;
-      margin: 0;
+  &__section-title {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    padding: $space-sm $space-md;
+    background: var(--pop-muted);
+    border: 1px solid var(--pop);
+    border-radius: $radius-md;
+    font-size: $text-sm;
+    font-weight: 600;
+    color: var(--pop);
+    flex: 1;
+
+    svg {
+      color: var(--pop);
+      flex-shrink: 0;
     }
+
+    > span:first-of-type {
+      flex: 1;
+    }
+  }
+
+  &__section-count {
+    flex: 0 0 auto;
+    background: var(--pop);
+    color: var(--pop-fg);
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-full;
+    padding: 0 $space-xs;
   }
 
   &__empty {
