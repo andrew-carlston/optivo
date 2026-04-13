@@ -4,7 +4,7 @@
 
 Each module unlocks the next. No skipping.
 
-### Phase 1: Core + Auth
+### Phase 1: Core + Auth ✅
 > Everything depends on this.
 
 - Company creation + slug routing
@@ -15,7 +15,6 @@ Each module unlocks the next. No skipping.
 - Theme + mode persistence per user
 
 **Tables:** `core.companies`, `core.users`, `core.config`, `core.audit_log`, `core.notifications`
-**Doc:** `docs/PHASE-1-CORE-AUTH.md`
 
 ---
 
@@ -29,7 +28,6 @@ Each module unlocks the next. No skipping.
 - Employee CRUD + bulk import
 
 **Tables:** `hr.employees`, `hr.departments`, `hr.divisions`, `hr.lobs`, `hr.positions`
-**Doc:** `docs/PHASE-2-HR.md`
 
 ---
 
@@ -43,7 +41,6 @@ Each module unlocks the next. No skipping.
 - Inline editing, upload, export
 
 **Tables:** `directory.agents`, `directory.columns`, `directory.column_access`, `directory.custom_fields`, `directory.system_connections`
-**Doc:** `docs/PHASE-3-DIRECTORY.md`
 
 ---
 
@@ -58,7 +55,6 @@ Each module unlocks the next. No skipping.
 - Thread watchdog + stale cleanup
 
 **Tables:** `realtime.agent_states`, `realtime.queue_metrics`, `realtime.queue_groups`, `realtime.queue_members`, `realtime.status_mappings`
-**Doc:** `docs/PHASE-4-REALTIME.md`
 
 ---
 
@@ -73,7 +69,6 @@ Each module unlocks the next. No skipping.
 - Worker: schedule sync
 
 **Tables:** `schedule.shifts`, `schedule.templates`, `schedule.calendar_tokens`
-**Doc:** `docs/PHASE-5-SCHEDULE.md`
 
 ---
 
@@ -88,7 +83,6 @@ Each module unlocks the next. No skipping.
 - Settings UI for all rules
 
 **Tables:** `attendance.config`, `attendance.log`, `attendance.points`, `attendance.point_history`, `attendance.first_seen`, `attendance.disputes`
-**Doc:** `docs/PHASE-6-ATTENDANCE.md`
 
 ---
 
@@ -102,7 +96,6 @@ Each module unlocks the next. No skipping.
 - Dashboard widgets
 
 **Tables:** `analytics.agent_metrics`, `analytics.reports`, `analytics.saved_filters`
-**Doc:** `docs/PHASE-7-ANALYTICS.md`
 
 ---
 
@@ -116,7 +109,6 @@ Each module unlocks the next. No skipping.
 - Worker: model runner
 
 **Tables:** `forecast.models`, `forecast.predictions`, `forecast.actuals`, `forecast.scenarios`
-**Doc:** `docs/PHASE-8-FORECAST.md`
 
 ---
 
@@ -129,7 +121,6 @@ Each module unlocks the next. No skipping.
 - Hiring pipeline integration
 
 **Tables:** `staffing.plans`, `staffing.headcount`, `staffing.skill_groups`, `staffing.capacity`
-**Doc:** `docs/PHASE-9-STAFFING.md`
 
 ---
 
@@ -143,4 +134,3 @@ Each module unlocks the next. No skipping.
 - Cost per contact modeling
 
 **Tables:** `cost.budgets`, `cost.rates`, `cost.actuals`, `cost.labor_models`, `cost.overtime_rules`
-**Doc:** `docs/PHASE-10-COST.md`

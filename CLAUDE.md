@@ -108,7 +108,7 @@ React frontend (feature-based modules)
 
 ## Database Schemas (Postgres namespaces)
 
-42 tables across 8 namespaces + neon_auth:
+41 tables across 8 namespaces + neon_auth:
 
 ```
 core.*          companies, users, user_company_access, config, audit_log, notifications,
@@ -170,10 +170,14 @@ src/
             page.tsx            Platform template editor
         tags/
           page.tsx              Tag & group management
+        integrations/
+          page.tsx              Integrations settings (stub)
+        platform/
+          page.tsx              Platform configuration (stub)
       sign-out-button.tsx       Client sign-out component
       admin.scss
     [company]/                  Company-scoped routes (slug from URL)
-      layout.tsx                Auth + CompanyProvider (session → company → user → permissions via loadPermissions)
+      layout.tsx                Auth + resolveCompanyAccess → CompanyProvider
       login/                    Login page (uses AuthCard component)
         page.tsx
         login.scss
@@ -373,7 +377,8 @@ npx drizzle-kit studio
 - `--pop` is the accent color per theme
 - Shadow tokens: `--shadow-xs`, `--shadow-sm`, `--shadow-md`, `--shadow-lg`, `--shadow-inset`
 - Card variants: `flat` (default), `raised` (elevated), `inset` (recessed)
-- Components (18): Button, Card, Select, MultiSelect, Switch, Input, Badge, Skeleton, AccessGate, AppShell, Header, Footer, AuthCard, Avatar, ThemeSwitcher, NotificationBell, CompanyShell, AdminShell
+- UI primitives (15): Button, Card, Select (+ MultiSelect), Switch, Input, Badge, Skeleton, AccessGate, AppShell, Header, Footer, AuthCard, Avatar, ThemeSwitcher, NotificationBell
+- Feature shells: CompanyShell, AdminShell (in `features/core/components/`, not the UI library)
 - Dropdown style: pill-shaped rows, filled circle check icons, hover border
 - Skeletons: left-to-right shimmer, 2.5s cycle, deterministic widths
 - All timestamps UTC in DB, displayed in user's timezone

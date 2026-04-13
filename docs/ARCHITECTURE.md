@@ -180,5 +180,5 @@ All workers use the same Drizzle client and schema — one language, one codebas
 | Folder structure | Page-based (Next.js default) | Feature-module based (hooks/components/actions/worker) |
 | Type safety | Runtime errors, misspelled columns | Drizzle schema → TypeScript types end-to-end |
 | Dev environment | None — all changes hit production | Neon branching (instant dev/staging databases) |
-| Framework | Next.js 16 | Next.js 16.2.3 (latest) |
+| Framework | Next.js 14 | Next.js 16.2.3 (App Router) |
 | External services | Supabase (auth + DB + storage + realtime) | Neon only (auth + DB), S3/R2 for storage |
