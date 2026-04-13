@@ -1,10 +1,9 @@
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth-server";
-import { db, createBranchDb } from "@/db/client";
+import { createBranchDb, db } from "@/db/client";
 import {
   getCompanyBySlug,
-  getOrCreateBranchUser,
-  getSuperUser,
+  resolveCompanyAccess,
 } from "@/features/core/lib/session";
 import type { AppUser, CompanyData } from "@/features/core/lib/session";
 
@@ -17,7 +16,8 @@ type ActionContext = {
 
 /**
  * Resolve session, company, branch DB, and user for server actions.
- * Throws if not authenticated or company not found.
+ * Uses resolveCompanyAccess for consistent permission resolution.
+ * Throws if not authenticated, company not found, or access denied.
  */
 export async function getActionContext(companySlug: string): Promise<ActionContext> {
   // Validate session
@@ -34,27 +34,13 @@ export async function getActionContext(companySlug: string): Promise<ActionConte
     throw new Error("Company not found");
   }
 
-  // Resolve user
-  let user: AppUser | undefined;
-  let isSuper = false;
-
-  if (company.branchHost) {
-    user = await getOrCreateBranchUser(company.branchHost, session as any, company.id);
-  }
-
-  if (!user) {
-    const superUser = await getSuperUser(session.user.id);
-    if (superUser) {
-      user = superUser;
-      isSuper = true;
-    }
-  }
-
-  if (!user) {
+  // Resolve user + permissions via the same logic as the layout
+  const access = await resolveCompanyAccess(session as any, company);
+  if (!access) {
     throw new Error("Access denied");
   }
 
   const branchDb = company.branchHost ? createBranchDb(company.branchHost) : db;
 
-  return { user, company, branchDb, isSuper };
+  return { user: access.user, company, branchDb, isSuper: access.isSuper };
 }

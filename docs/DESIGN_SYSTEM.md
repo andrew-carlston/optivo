@@ -387,6 +387,14 @@ Bell icon with unread count badge. Clicking opens a dropdown list of notificatio
 
 Badge shows unread count; hidden when all are read.
 
+### Admin Banner
+
+Built into `CompanyShell` (not a standalone component). Renders a thin accent-colored (`--pop`) bar above the header when `isPlatformUser` is true.
+
+Content: `[Shield icon] Admin session | Back to Admin`
+
+Styled via `.admin-banner` in `company-shell.scss`. Uses `--pop` background and `--pop-fg` text.
+
 ## File Patterns
 
 When creating a new component:

@@ -1,14 +1,16 @@
 import Link from "next/link";
-import { requireSession, getSuperUser, getAllCompanies } from "@/features/core/lib/session";
+import { requireSession, getPlatformUser, getAllCompanies, getUserCompanies } from "@/features/core/lib/session";
 import { redirect } from "next/navigation";
 import "./admin.scss";
 
 export default async function AdminPage() {
   const session = await requireSession();
-  const superUser = await getSuperUser(session.user.id);
-  if (!superUser) redirect("/");
+  const user = await getPlatformUser(session.user.id);
+  if (!user) redirect("/");
 
-  const companies = await getAllCompanies();
+  const companies = user.isSuper
+    ? await getAllCompanies()
+    : await getUserCompanies(user.id);
 
   return (
     <div>
@@ -38,7 +40,7 @@ export default async function AdminPage() {
       </div>
 
       {companies.length === 0 && (
-        <p className="admin__empty">No companies yet.</p>
+        <p className="admin__empty">No companies assigned yet.</p>
       )}
     </div>
   );

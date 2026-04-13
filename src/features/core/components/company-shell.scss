@@ -1,5 +1,45 @@
 @use "../../../styles/tokens" as *;
 
+// ── Admin banner ──
+
+.admin-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-sm;
+  padding: 4px $space-lg;
+  background: var(--pop);
+  color: var(--pop-fg);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  z-index: $z-toast;
+  position: relative;
+
+  svg { flex-shrink: 0; }
+
+  &__sep {
+    width: 1px;
+    height: 12px;
+    background: var(--pop-fg);
+    opacity: 0.35;
+  }
+
+  &__link {
+    background: none;
+    border: none;
+    color: var(--pop-fg);
+    font: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    opacity: 0.85;
+    padding: 0;
+
+    &:hover { opacity: 1; }
+  }
+}
+
 // ── Company logo ──
 
 .company-logo__name {

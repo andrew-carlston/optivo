@@ -9,6 +9,7 @@ interface CompanyContextValue {
   company: CompanyData;
   user: AppUser;
   isSuper: boolean;
+  isPlatformUser: boolean;
   permissions: PermissionMap;
 }
 
@@ -18,15 +19,16 @@ interface CompanyProviderProps {
   company: CompanyData;
   user: AppUser;
   isSuper: boolean;
+  isPlatformUser: boolean;
   permissions: SerializedPermissions;
   children: ReactNode;
 }
 
-export function CompanyProvider({ company, user, isSuper, permissions: serialized, children }: CompanyProviderProps) {
+export function CompanyProvider({ company, user, isSuper, isPlatformUser, permissions: serialized, children }: CompanyProviderProps) {
   const permissions = useMemo(() => deserializePermissions(serialized), [serialized]);
 
   return (
-    <CompanyContext.Provider value={{ company, user, isSuper, permissions }}>
+    <CompanyContext.Provider value={{ company, user, isSuper, isPlatformUser, permissions }}>
       {children}
     </CompanyContext.Provider>
   );

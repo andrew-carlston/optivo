@@ -67,7 +67,7 @@ const NAV_GROUPS: { label: string; items: NavLink[] }[] = [
 export function CompanyShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { company, user, isSuper } = useCompanyContext();
+  const { company, user, isSuper, isPlatformUser } = useCompanyContext();
   const { canAccess } = useAccess();
   const slug = company.slug;
 
@@ -246,7 +246,7 @@ export function CompanyShell({ children }: { children: React.ReactNode }) {
               <User size={15} />
               Profile
             </DropdownMenu.Item>
-            {isSuper && (
+            {isPlatformUser && (
               <DropdownMenu.Item
                 className="user-menu__item"
                 onSelect={() => router.push("/admin")}
@@ -270,18 +270,30 @@ export function CompanyShell({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <AppShell
-      header={
-        <Header
-          logo={companyLogo}
-          nav={headerNav}
-          mobileNav={mobileNav}
-          actions={headerActions}
-        />
-      }
-      footer={<Footer />}
-    >
-      {children}
-    </AppShell>
+    <>
+      {isPlatformUser && (
+        <div className="admin-banner">
+          <Shield size={13} />
+          <span>Admin session</span>
+          <span className="admin-banner__sep" />
+          <button className="admin-banner__link" onClick={() => router.push("/admin")}>
+            Back to Admin
+          </button>
+        </div>
+      )}
+      <AppShell
+        header={
+          <Header
+            logo={companyLogo}
+            nav={headerNav}
+            mobileNav={mobileNav}
+            actions={headerActions}
+          />
+        }
+        footer={<Footer />}
+      >
+        {children}
+      </AppShell>
+    </>
   );
 }

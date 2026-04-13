@@ -40,14 +40,24 @@ const ADMIN_NAV: NavLink[] = [
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
+const SUPER_ONLY_PATHS = ["/admin/users", "/admin/billing", "/admin/analytics", "/admin/settings"];
+
 interface AdminShellProps {
   user: { fullName: string; email: string; avatarUrl: string | null };
+  isSuper: boolean;
   children: React.ReactNode;
 }
 
-export function AdminShell({ user, children }: AdminShellProps) {
+export function AdminShell({ user, isSuper, children }: AdminShellProps) {
   const pathname = usePathname();
   const router = useRouter();
+
+  // Redirect non-super users away from super-only routes
+  useEffect(() => {
+    if (!isSuper && SUPER_ONLY_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
+      router.replace("/admin");
+    }
+  }, [isSuper, pathname, router]);
 
   // Active segment
   const segments = pathname.split("/").filter(Boolean);
@@ -77,10 +87,13 @@ export function AdminShell({ user, children }: AdminShellProps) {
     return pathname.startsWith(href);
   }
 
+  // Filter nav: non-super users only see Companies
+  const visibleNav = isSuper ? ADMIN_NAV : ADMIN_NAV.filter((n) => !SUPER_ONLY_PATHS.includes(n.href));
+
   // Desktop nav
   const headerNav = (
     <>
-      {ADMIN_NAV.map(({ href, label, icon: Icon }) => (
+      {visibleNav.map(({ href, label, icon: Icon }) => (
         <NavItem key={href} href={href} active={isActive(href)}>
           <Icon size={15} />
           {label}
@@ -99,7 +112,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <DropdownMenu.Content className="mobile-menu__content" sideOffset={6} align="start">
-          {ADMIN_NAV.map(({ href, label, icon: Icon }) => (
+          {visibleNav.map(({ href, label, icon: Icon }) => (
             <DropdownMenu.Item
               key={href}
               className={cn("nav-dropdown__item", isActive(href) && "nav-dropdown__item--active")}

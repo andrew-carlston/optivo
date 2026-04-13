@@ -1,13 +1,10 @@
 import { redirect } from "next/navigation";
-import { db, createBranchDb } from "@/db/client";
 import {
   getServerSession,
   getCompanyBySlug,
-  getOrCreateBranchUser,
-  getSuperUser,
-  getSuperUserCompanyAccess,
+  resolveCompanyAccess,
 } from "@/features/core/lib/session";
-import { loadPermissions, serializePermissions } from "@/features/core/lib/access/load-permissions";
+import { serializePermissions } from "@/features/core/lib/access/load-permissions";
 import { CompanyProvider } from "@/features/core/providers/company-provider";
 import { CompanyShell } from "@/features/core/components/company-shell";
 
@@ -24,7 +21,6 @@ export default async function CompanyLayout({
   try {
     session = await getServerSession();
   } catch {
-    // Session check failed (expired, DB error, etc.)
     return <>{children}</>;
   }
   if (!session) {
@@ -41,54 +37,20 @@ export default async function CompanyLayout({
     redirect("/");
   }
 
-  let user;
-  let isSuper = false;
-
-  try {
-    if (company.branchHost) {
-      user = await getOrCreateBranchUser(company.branchHost, session, company.id);
-    }
-
-    if (!user) {
-      const superUser = await getSuperUser(session.user.id);
-      if (superUser) {
-        user = superUser;
-        isSuper = true;
-      }
-    }
-  } catch {
-    // User resolution failed
-  }
-
-  if (!user) {
-    redirect(`/${slug}/login`);
-  }
-
-  // Load permissions
-  let permissions: import("@/features/core/lib/access/types").PermissionMap = new Map();
-
-  try {
-    if (isSuper) {
-      const access = await getSuperUserCompanyAccess(user.id, company.id);
-      if (!access.hasAccess) {
-        redirect("/admin");
-      }
-      if (access.templateId) {
-        permissions = await loadPermissions(db, access.templateId);
-        isSuper = false;
-      }
-    } else if (user.accessTemplateId) {
-      const branchDb = company.branchHost ? createBranchDb(company.branchHost) : null;
-      if (branchDb) {
-        permissions = await loadPermissions(branchDb, user.accessTemplateId);
-      }
-    }
-  } catch {
-    // Permission loading failed — proceed with empty permissions
+  const access = await resolveCompanyAccess(session, company);
+  if (!access) {
+    // Authenticated but no access — send to admin, not login (avoids redirect loop)
+    redirect("/admin");
   }
 
   return (
-    <CompanyProvider company={company} user={user} isSuper={isSuper} permissions={serializePermissions(permissions)}>
+    <CompanyProvider
+      company={company}
+      user={access.user}
+      isSuper={access.isSuper}
+      isPlatformUser={access.isPlatformUser}
+      permissions={serializePermissions(access.permissions)}
+    >
       <CompanyShell>{children}</CompanyShell>
     </CompanyProvider>
   );

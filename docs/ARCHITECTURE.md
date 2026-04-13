@@ -111,13 +111,23 @@ const hasForecasting = await db.query.featureFlags.findFirst({
 ## Authentication Flow
 
 ```
-1. User visits /{slug}/login
-2. Google/Microsoft SSO via Neon Auth (Stack Auth)
-3. Callback → session created, user stored in neon_auth schema
-4. Middleware validates session + resolves slug → Neon branch
-5. All subsequent requests scoped to that branch
-6. User data lives in YOUR database (queryable via Drizzle)
+1. User visits /{slug}/login or /admin/login
+2. Email/password or Google SSO via Better Auth (Neon Auth)
+3. Session created, cookie set (better-auth.session_token)
+4. Middleware validates cookie exists (fast gate)
+5. Company layout calls resolveCompanyAccess(session, company):
+   a. Auto-provisions branch user (first visit)
+   b. Resolves platform user on main
+   c. Template precedence: platform override → platform default → branch default → super bypass
+   d. Loads permissions from the right DB
+6. CompanyProvider passes user + permissions to all child components
 ```
+
+### User Types
+
+- **Platform users**: created in admin panel, `core.users` on main, access companies via `user_company_access`
+- **Company users**: auto-provisioned on branch on first visit, get branch's default template
+- **Super users**: platform users with `is_super=true`, see all companies, full admin access
 
 ### Neon Auth Advantages
 - Users stored in neon_auth.* schema — same database, no sync needed

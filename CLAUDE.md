@@ -218,9 +218,9 @@ src/
     core/
       lib/
         session.ts              Server-side: getServerSession, requireSession,
-                                getCompanyBySlug, getOrCreateBranchUser,
-                                getSuperUser, getAllCompanies,
-                                getSuperUserCompanyAccess (resolves template per company)
+                                getCompanyBySlug, getPlatformUser,
+                                resolveCompanyAccess (single entry point for company pages),
+                                getAllCompanies, getUserCompanies
         access/                 ReBAC engine
           types.ts              RESOURCES (15), ACTIONS (4), SCOPE_TYPES (7),
                                 SENSITIVITY_LEVELS (1-10), canSeeLevel(), permKey()
@@ -234,16 +234,18 @@ src/
           action-context.ts     getActionContext(companySlug) → {user, company, branchDb, isSuper}
           index.ts              Barrel export
       providers/
-        company-provider.tsx    CompanyProvider context + hooks (includes permissions: PermissionMap):
+        company-provider.tsx    CompanyProvider context + hooks (permissions, isSuper, isPlatformUser):
                                 useCompanyContext, useCurrentUser, useCurrentCompany
       hooks/
         use-company.ts          Client hook: fetches company from /api/company/[slug]
         use-access.ts           useAccess() → {canAccess, getScope, isSuper}
       components/
         admin-shell.tsx         Admin page wrapper (AppShell + Header + Footer + admin nav),
-                                nav: Companies | Users | Billing | Analytics | Settings
+                                nav: Companies (all users) | Users | Billing | Analytics | Settings (super only),
+                                isSuper prop filters nav + redirects away from super-only routes
         company-shell.tsx       Company page wrapper (AppShell + Header + Footer + nav),
-                                nav filtered by canAccess(href, "view")
+                                nav filtered by canAccess(href, "view"),
+                                admin banner (accent bar) for platform users with "Back to Admin" link
         company-shell.scss
         template-list/          Template card list with CRUD, create/delete dialogs,
                                 card layout: header (title + actions) top, info below,
@@ -392,17 +394,20 @@ A **blocking inline script** in `src/app/layout.tsx` reads `theme`, `mode`, and 
 
 `src/features/core/components/admin-shell.tsx` wraps all admin pages with AppShell + Header + Footer (same pattern as CompanyShell).
 
-- **Admin nav**: Companies | Users | Billing | Analytics | Settings
+- **Admin nav**: Companies (all platform users) | Users | Billing | Analytics | Settings (super users only)
+- **Nav filtering**: `isSuper` prop controls which nav items are visible
+- **Route protection**: non-super users redirected to `/admin` if they URL-hack to super-only routes
 - **Admin settings sidebar**: General, Access Templates, Tags & Groups, Integrations, Platform
 
 ## Company Shell
 
 `src/features/core/components/company-shell.tsx` wraps all company-scoped pages with AppShell + Header + Footer.
 
+- **Admin banner**: accent-colored bar at top for platform users ("Admin session · Back to Admin")
 - **Nav groups** (Radix DropdownMenu): Dashboard (direct link) | Workforce (Realtime, Attendance, Schedule, Forecast) | People (Directory, HR, Staffing) | Business (Cost Planning, Analytics) | Settings (direct link)
 - **Nav filtering**: items hidden when `canAccess(href, "view")` returns false (ReBAC-driven)
 - **Mobile/tablet**: hamburger menu replaces nav, company name hidden (logo avatar only)
-- **Header actions**: ThemeSwitcher | NotificationBell | Expand toggle | User Avatar dropdown (Profile, Admin Panel for super users, Sign Out)
+- **Header actions**: ThemeSwitcher | NotificationBell | Expand toggle | User Avatar dropdown (Profile, Admin Panel for platform users, Sign Out)
 - Expand button is a header action (not internal to AppShell)
 
 ## Key Principles
@@ -441,22 +446,35 @@ Template-based permission system on both platform (main) and company (branch) le
 ### Data Flow
 
 ```
-access_templates (name, is_default, sensitivity_levels[])
+resolveCompanyAccess(session, company)
     ↓
-template_access (template_id, resource, action, scope_type, sensitivity_level)
+  1. Auto-provision branch user (getOrCreateBranchUser, internal)
+  2. Look up platform user (getPlatformUser)
+  3. Resolve template (resolvePlatformTemplate, internal):
+       override_template_id → platform access_template_id → branch access_template_id → super bypass
+  4. loadPermissions(db, templateId) → PermissionMap
     ↓
-loadPermissions(db, templateId) → PermissionMap
-    ↓ serialized across RSC boundary
-CompanyProvider (permissions prop)
+CompanyProvider (user, permissions, isSuper, isPlatformUser)
     ↓
 useAccess() → { canAccess(resource, action), getScope(resource, action), isSuper }
 ```
 
+### Template Precedence
+
+```
+1. Platform override  (user_company_access.override_template_id) → loaded from main DB
+2. Platform default   (core.users.access_template_id on main)    → loaded from main DB
+3. Branch default     (core.users.access_template_id on branch)  → loaded from branch DB
+4. Super user + no template anywhere                             → full bypass (isSuper=true)
+5. None of the above                                             → empty permissions
+```
+
 ### Server-Side Checks
 
+- `resolveCompanyAccess(session, company)` → `{user, permissions, isSuper, isPlatformUser}` — company layout entry point
 - `checkAccess(db, user, resource, action)` → `{allowed, scopeType}` — for server actions
 - `filterByScope(db, scopeType, userId, columns)` → SQL WHERE clause — for queries
-- `getActionContext(companySlug)` → `{user, company, branchDb, isSuper}` — for action setup
+- `getActionContext(companySlug)` → `{user, company, branchDb, isSuper}` — for action setup (uses resolveCompanyAccess internally)
 
 ### Template Editor
 
@@ -471,7 +489,7 @@ useAccess() → { canAccess(resource, action), getScope(resource, action), isSup
 
 ### Default Template Assignment
 
-`getOrCreateBranchUser()` assigns the company's default template (`is_default: true`) to new users automatically.
+Branch auto-provisioning (`getOrCreateBranchUser`, internal) assigns the company's default template (`is_default: true`) to new branch users. Platform users override this via `resolvePlatformTemplate`.
 
 ### Field Sensitivity
 
@@ -480,12 +498,21 @@ useAccess() → { canAccess(resource, action), getScope(resource, action), isSup
 - `access_templates.sensitivity_levels`: jsonb array of allowed levels 1–10
 - `canSeeLevel(allowedLevels, fieldLevel)`: returns true if the field should be visible
 
-## Super User Company Access
+## Platform User Access
+
+Two types of users:
+- **Platform users**: created in admin (`core.users` on main), access companies via `user_company_access`
+- **Company users**: auto-provisioned on a branch on first visit, get the branch's default template
+
+Platform users get their template from main (higher precedence than branch templates).
 
 - `core.user_company_access` table: user_id, company_id, override_template_id
-- `getSuperUserCompanyAccess()` resolves which template applies per company
-- Company layout: super users with a template get permissions loaded (not full bypass)
-- `is_super=true` without template = full bypass (legacy behavior)
+- `resolvePlatformTemplate()` (internal): resolves override → platform default → super bypass
+- `is_super=true` without template = full bypass
+- `is_super=true` with template = template-bound (isSuper set to false)
+- Admin layout: all platform users can access admin; super-only sections gated by `isSuper`
+- Admin panel nav: Companies visible to all, Users/Billing/Analytics/Settings require `isSuper`
+- Company shell: platform users see accent admin banner with "Back to Admin" link
 
 ## Tags & Groups
 
