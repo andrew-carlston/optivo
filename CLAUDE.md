@@ -42,6 +42,7 @@ React frontend (feature-based modules)
 |--------|----|---------|
 | production (main) | `br-frosty-recipe-amuoewi8` | Schema template + company routing + super users |
 | lawnstarter | `br-small-sea-amxcpb3n` | LawnStarter company data (forked from main) |
+| platform (admin) | `br-weathered-glade-am7hodpd` | Optivo's own internal company — slug `admin` |
 
 ### Branch Architecture
 
@@ -69,53 +70,76 @@ React frontend (feature-based modules)
 **Main:**
 - Super user: `andrew.carlston@gmail.com` (is_super: true)
 - Company: LawnStarter (slug: `lawnstarter`, branch_id: `br-small-sea-amxcpb3n`)
+- Company: Platform (slug: `admin`, branch_id: `br-weathered-glade-am7hodpd`) — Optivo's own company; routes to `/admin/*`
 
 ## URL Structure
+
+The admin panel IS a company (slug `admin`) using the same CompanyShell as any
+client app. Platform-only sections (managing other tenants, platform users, etc.)
+live under `/admin/platform/*` and only show in the Settings sidebar for super users.
 
 ```
 /                               Landing page
 /ui                             UI Kit preview (design system playground)
-/admin/login                    Super user login (email/password)
-/admin                          Company switcher (super users only)
-/admin/users                    Platform user list (avatar, template badge, company count)
-/admin/billing                  Billing (stub)
-/admin/analytics                Analytics (stub)
-/admin/settings                 Admin settings hub (sidebar: General, Access Templates, Tags & Groups, Integrations, Platform)
-/admin/settings/templates       Platform template list (ReBAC) — moved from /admin/templates
-/admin/settings/templates/[id]  Platform template editor
-/admin/settings/tags            Tag & group management
 /api/auth/[...all]              Better Auth API handler
 /api/company/[slug]             Company lookup (queries main branch)
-/[company]/login                Company-scoped login page
-/[company]/dashboard            Company-scoped pages
+
+# Admin panel (company features for the "admin" company)
+/admin/login                    Super user login
+/admin                          → redirects to /admin/dashboard
+/admin/dashboard                Dashboard for admin company
+/admin/directory                Directory
+/admin/realtime, /attendance, /schedule, /forecast   (stubs)
+/admin/hr, /staffing, /cost, /analytics              (stubs)
+/admin/profile
+/admin/settings                 Settings hub
+/admin/settings/org             Organization (Divisions, Locations, LOBs, Departments, Positions)
+/admin/settings/directory       Directory column config + statuses + default view
+/admin/settings/integrations, /points, /templates, /templates/[id]
+
+# Platform-only — super users via Settings sidebar
+/admin/platform/companies       Tenant switcher (was /admin)
+/admin/platform/users           Platform users
+/admin/platform/templates       Platform access templates + /[id] editor
+/admin/platform/tags            Platform tags & groups
+/admin/platform/billing         Billing (stub)
+/admin/platform/analytics       Platform analytics (stub)
+/admin/platform/integrations    Platform integrations (stub)
+/admin/platform/settings        Platform configuration (stub)
+
+# Client company routes (e.g., /lawnstarter/*) — same shape as /admin/*
+/[company]/login
+/[company]/dashboard
 /[company]/directory
-/[company]/realtime
-/[company]/attendance
-/[company]/schedule
-/[company]/forecast
-/[company]/staffing
-/[company]/cost
-/[company]/analytics
-/[company]/hr
-/[company]/settings              Settings hub (sidebar layout)
-/[company]/settings/org          Organization settings (stub)
-/[company]/settings/points       Points & Attendance settings (stub)
-/[company]/settings/integrations Integrations settings (stub)
-/[company]/settings/templates    Company template list (ReBAC)
-/[company]/settings/templates/[id] Company template editor
+/[company]/realtime, /attendance, /schedule, /forecast
+/[company]/hr, /staffing, /cost, /analytics
 /[company]/profile
+/[company]/settings              Settings hub
+/[company]/settings/org          Organization (Divisions/Locations/LOBs/Departments/Positions)
+/[company]/settings/directory    Directory column config + statuses
+/[company]/settings/integrations, /points, /templates, /templates/[id]
 ```
 
 ## Database Schemas (Postgres namespaces)
 
-41 tables across 8 namespaces + neon_auth:
-
 ```
-core.*          companies, users, user_company_access, config, audit_log, notifications,
-                access_templates, template_access, access_resources, template_companies,
+core.*          companies (incl. branch_host), users, user_company_access, config,
+                audit_log, notifications, access_templates (incl. sensitivity_levels,
+                group_name, tags), template_access, access_resources, template_companies,
                 field_sensitivity, template_field_overrides (ReBAC),
                 tags, tag_assignments
-hr.*            employees, departments, divisions, lobs, positions
+hr.*            divisions, lobs, departments, positions, locations,
+                employees, employee_locations (M2M)
+                — every org table has cost_code; locations have full address +
+                  is_remote + IANA timezone
+                — Hierarchy: Division → LOB → Department → Position;
+                  Location is parallel; Department links LOB + Location;
+                  Position links Division + LOB + Department + Location
+directory.*     columns (system + custom column registry per company),
+                status_options (configurable employment statuses),
+                saved_views (per-user view prefs),
+                row_locks (real-time edit locks),
+                pending_changes (server-side draft backup)
 attendance.*    config, log, points, point_history, first_seen, disputes
 realtime.*      agent_states, queue_metrics, queue_groups, queue_members, status_mappings
 schedule.*      shifts, templates, calendar_tokens
@@ -129,7 +153,6 @@ Future namespaces (not yet created):
 forecast.*      Models, predictions, actuals, scenarios
 staffing.*      Plans, headcount, skill groups, capacity
 cost.*          Budgets, rates, actuals, labor models
-directory.*     Agent profiles, columns, custom fields, system connections
 ```
 
 ## Project Structure
@@ -146,36 +169,23 @@ src/
     api/
       auth/[...all]/route.ts    Better Auth API handler
       company/[slug]/route.ts   Company lookup (Drizzle query on main)
-    admin/                        Super user routes (AdminShell layout)
-      layout.tsx                Validates super user access, wraps with AdminShell
-      page.tsx                  Company switcher
-      login/
-        page.tsx                Super user login (AuthCard, no signup)
-        login.scss
-      users/
-        page.tsx                Platform user list (avatar, template badge, company count)
-                                Click user → dialog: template selector, super toggle, company access
-                                Add User → create Better Auth account + core.users record
-                                Draft model: changes only persist on Save
-      billing/
-        page.tsx                Billing (stub)
-      analytics/
-        page.tsx                Analytics (stub)
+    admin/                        Admin company routes — uses CompanyShell, slug "admin"
+      layout.tsx                Resolves "admin" company → CompanyProvider + CompanyShell
+      page.tsx                  Redirects to /admin/dashboard
+      login/page.tsx            Super user login
+      dashboard, directory, hr, realtime, attendance, schedule, forecast,
+      staffing, cost, analytics, profile/    Same as company-scoped pages
       settings/
-        layout.tsx              Settings sidebar (General, Access Templates, Tags & Groups, Integrations, Platform)
-        page.tsx                General settings (stub)
-        templates/
-          page.tsx              Platform template list (moved from /admin/templates)
-          [id]/
-            page.tsx            Platform template editor
-        tags/
-          page.tsx              Tag & group management
-        integrations/
-          page.tsx              Integrations settings (stub)
-        platform/
-          page.tsx              Platform configuration (stub)
-      sign-out-button.tsx       Client sign-out component
-      admin.scss
+        layout.tsx              SettingsShell wrapper (super-only sections appear here)
+        page.tsx, org, directory, points, integrations, templates/[id]
+                                Same as /[company]/settings
+      platform/                 Super-only platform admin (visible via Settings sidebar)
+        layout.tsx              Same SettingsShell wrapper
+        companies/page.tsx      Tenant switcher (was /admin)
+        users/page.tsx          Platform user management
+        templates/page.tsx + [id]/page.tsx   Platform access templates
+        tags/page.tsx           Platform tags
+        billing, analytics, integrations, settings/page.tsx   (stubs)
     [company]/                  Company-scoped routes (slug from URL)
       layout.tsx                Auth + resolveCompanyAccess → CompanyProvider
       login/                    Login page (uses AuthCard component)
@@ -244,13 +254,15 @@ src/
         use-company.ts          Client hook: fetches company from /api/company/[slug]
         use-access.ts           useAccess() → {canAccess, getScope, isSuper}
       components/
-        admin-shell.tsx         Admin page wrapper (AppShell + Header + Footer + admin nav),
-                                nav: Companies (all users) | Users | Billing | Analytics | Settings (super only),
-                                isSuper prop filters nav + redirects away from super-only routes
-        company-shell.tsx       Company page wrapper (AppShell + Header + Footer + nav),
+        company-shell.tsx       Single shell used by every company app (incl. /admin),
                                 nav filtered by canAccess(href, "view"),
-                                admin banner (accent bar) for platform users with "Back to Admin" link
+                                companyRoute() helper routes to /admin/* on admin company,
+                                /{slug}/* otherwise; admin banner shown when isPlatformUser
+                                and not on the admin company itself
         company-shell.scss
+        settings-shell/         Shared sidebar shell for /admin/settings, /admin/platform,
+                                and /[company]/settings — super-only sections
+                                (Tenants/Access/Platform) appear when on admin company
         template-list/          Template card list with CRUD, create/delete dialogs,
                                 card layout: header (title + actions) top, info below,
                                 always-show groups/tags/companies sections (empty state),
@@ -266,7 +278,31 @@ src/
                                 assignTemplateToUser
     auth/
     hr/
+      actions/
+        org-actions.ts          CRUD for departments, divisions, lobs, positions, locations
+                                — all share cost_code; getOrgStructureAll batched loader
+      components/
+        org-settings/           Settings page for the org structure
+          org-settings.tsx      Main component (tabs, dialogs, state)
+          _shared.ts            Constants (TABS, NONE, EMPTY_LOC), helpers (toId)
+          cost-code.ts          Auto-gen + cascading composition (NA:R:S:T1:T1A)
+          org-cards.tsx         Per-entity card components (DivisionCard, LocationCard, etc.)
+          location-fields.tsx   Location-specific form fields (country/state/city, timezone)
     directory/
+      actions/
+        _shared.ts, _employee-shared.ts, _lock-shared.ts   Types + helpers
+        column-actions.ts       Column registry CRUD + system column seeding
+        status-actions.ts       Status options CRUD + system status seeding
+        view-actions.ts         Saved views CRUD
+        employee-queries.ts     Employee reads (list, detail, org options)
+        employee-mutations.ts   Employee writes (create, update, inline edit, archive)
+        locks.ts                Row lock acquire/release/override
+        pending-changes.ts      Draft backup CRUD
+        page-data-actions.ts    Batched directory page loader (one auth round-trip)
+        directory-actions.ts, employee-actions.ts, lock-actions.ts   Barrel re-exports
+      components/               directory-table, directory-toolbar, review-sidebar,
+                                pending-toast, employee-form, directory-settings, etc.
+      hooks/                    use-directory, use-draft-changes, use-directory-ws
     realtime/
       hooks/
       components/
@@ -322,13 +358,15 @@ src/
                                 template_access, access_resources, template_companies,
                                 field_sensitivity, template_field_overrides),
                                 tags, tag_assignments
-      hr.ts
+      hr.ts                     divisions, lobs, departments, positions, locations,
+                                employees, employee_locations
+      directory.ts              columns, status_options, saved_views, row_locks, pending_changes
       attendance.ts
       realtime.ts
       schedule.ts
       system.ts
       analytics.ts
-      index.ts                  Namespaced exports (core.*, hr.*, etc.)
+      index.ts                  Namespaced exports (core.*, hr.*, directory.*, etc.)
     migrations/                 Generated by drizzle-kit
     client.ts                   Neon serverless connection + Drizzle instance
 
@@ -378,7 +416,8 @@ npx drizzle-kit studio
 - Shadow tokens: `--shadow-xs`, `--shadow-sm`, `--shadow-md`, `--shadow-lg`, `--shadow-inset`
 - Card variants: `flat` (default), `raised` (elevated), `inset` (recessed)
 - UI primitives (15): Button, Card, Select (+ MultiSelect), Switch, Input, Badge, Skeleton, AccessGate, AppShell, Header, Footer, AuthCard, Avatar, ThemeSwitcher, NotificationBell
-- Feature shells: CompanyShell, AdminShell (in `features/core/components/`, not the UI library)
+- Feature shells: CompanyShell, SettingsShell (in `features/core/components/`, not the UI library)
+  AdminShell was deleted — admin panel uses CompanyShell with the "admin" company
 - Dropdown style: pill-shaped rows, filled circle check icons, hover border
 - Skeletons: left-to-right shimmer, 2.5s cycle, deterministic widths
 - All timestamps UTC in DB, displayed in user's timezone
@@ -395,25 +434,38 @@ A **blocking inline script** in `src/app/layout.tsx` reads `theme`, `mode`, and 
 - **CompanyShell** syncs expanded state via `useEffect` (only for the toggle button icon)
 - Theme/mode persistence still uses localStorage; the ThemeSwitcher component writes to it and updates DOM attributes
 
-## Admin Shell
+## Company Shell (single shell, used for /admin and all client companies)
 
-`src/features/core/components/admin-shell.tsx` wraps all admin pages with AppShell + Header + Footer (same pattern as CompanyShell).
+`src/features/core/components/company-shell.tsx` wraps every company app —
+including `/admin/*` (the platform's own internal company, slug `admin`).
+There is no separate AdminShell; everything goes through CompanyShell.
 
-- **Admin nav**: Companies (all platform users) | Users | Billing | Analytics | Settings (super users only)
-- **Nav filtering**: `isSuper` prop controls which nav items are visible
-- **Route protection**: non-super users redirected to `/admin` if they URL-hack to super-only routes
-- **Admin settings sidebar**: General, Access Templates, Tags & Groups, Integrations, Platform
-
-## Company Shell
-
-`src/features/core/components/company-shell.tsx` wraps all company-scoped pages with AppShell + Header + Footer.
-
-- **Admin banner**: accent-colored bar at top for platform users ("Admin session · Back to Admin")
-- **Nav groups** (Radix DropdownMenu): Dashboard (direct link) | Workforce (Realtime, Attendance, Schedule, Forecast) | People (Directory, HR, Staffing) | Business (Cost Planning, Analytics) | Settings (direct link)
+- **`companyRoute(href)` helper** — builds `/admin/{href}` when on the admin
+  company, `/{slug}/{href}` otherwise. Lets nav items work in both contexts.
+- **Admin banner**: only shown when `isPlatformUser` is true AND not currently
+  on the admin company ("Admin session · Back to Admin")
+- **Nav groups** (Radix DropdownMenu): Dashboard | Workforce (Realtime,
+  Attendance, Schedule, Forecast) | People (Directory, HR, Staffing) | Business
+  (Cost Planning, Analytics) | Settings
 - **Nav filtering**: items hidden when `canAccess(href, "view")` returns false (ReBAC-driven)
-- **Mobile/tablet**: hamburger menu replaces nav, company name hidden (logo avatar only)
-- **Header actions**: ThemeSwitcher | NotificationBell | Expand toggle | User Avatar dropdown (Profile, Admin Panel for platform users, Sign Out)
-- Expand button is a header action (not internal to AppShell)
+- **Mobile/tablet**: hamburger menu replaces nav
+- **Header actions**: ThemeSwitcher | NotificationBell | Expand toggle | User
+  Avatar dropdown (Profile, Admin Panel link when platform user not on admin, Sign Out)
+
+## Settings Shell (shared sidebar for /admin/settings, /admin/platform, /[company]/settings)
+
+`src/features/core/components/settings-shell/settings-shell.tsx` renders the
+sidebar + content layout used by both company settings and platform admin
+pages. Super users on the admin company see extra sections in the sidebar:
+
+- **Settings** (always): General, Organization, Directory, Points & Attendance,
+  Integrations, Access Templates
+- **Tenants** (super on admin only): Companies
+- **Access** (super on admin only): Platform Users, Templates, Tags
+- **Platform** (super on admin only): Billing, Analytics, Integrations, Settings
+
+Sidebar is a sticky surface card with pill-shaped nav items matching the header
+nav pattern (transparent border → `--border` on hover → `--pop` on active).
 
 ## Key Principles
 

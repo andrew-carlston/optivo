@@ -9,16 +9,20 @@
   height: 34px;
   border-radius: $radius-md;
   color: var(--muted-fg);
+  background: none;
+  border: 1px solid transparent;
   cursor: pointer;
   transition: all 0.15s;
 
   &:hover {
     background: var(--surface-2);
+    border-color: var(--border);
     color: var(--fg);
   }
 
   &[data-state="open"] {
-    background: var(--surface-2);
+    background: var(--pop-muted);
+    border-color: var(--pop);
     color: var(--pop);
   }
 }

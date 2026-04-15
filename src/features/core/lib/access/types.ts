@@ -11,7 +11,6 @@ export const RESOURCES = {
   staffing: "staffing",
   cost: "cost",
   analytics: "analytics",
-  hr: "hr",
   "settings.general": "settings.general",
   "settings.org": "settings.org",
   "settings.points": "settings.points",

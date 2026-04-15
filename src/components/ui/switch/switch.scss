@@ -36,3 +36,24 @@
     }
   }
 }
+
+// Switch with inline label
+.switch-field {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-sm;
+  font-size: $text-sm;
+  font-weight: 500;
+  color: var(--fg);
+  cursor: pointer;
+  user-select: none;
+
+  &__label {
+    line-height: 1.2;
+  }
+
+  &--disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}

@@ -55,11 +55,16 @@
     &:hover { background: var(--pop-muted); border-color: var(--pop); color: var(--pop); }
   }
 
-  // Ghost — no border
+  // Ghost — transparent at rest, bordered pill on hover (matches nav pattern)
   &--ghost {
     background: transparent;
     border-color: transparent;
-    &:hover { background: var(--surface-2); color: var(--fg); border-color: transparent; }
+    color: var(--muted-fg);
+    &:hover {
+      background: var(--surface-2);
+      border-color: var(--border);
+      color: var(--fg);
+    }
   }
 
   // Danger

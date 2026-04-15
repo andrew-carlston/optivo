@@ -64,6 +64,7 @@ const NAV_GROUPS: { label: string; items: NavLink[] }[] = [
   },
 ];
 
+
 export function CompanyShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -89,9 +90,15 @@ export function CompanyShell({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const isAdminCompany = slug === "admin";
+  // Platform-admin pages live under /admin/platform/* but are managed from the
+  // Settings sidebar (super-only sections). Treat them as "under Settings" for
+  // header highlighting.
+  const isOnPlatform = segments[0] === "admin" && segments[1] === "platform";
+
   async function handleSignOut() {
     await signOut();
-    window.location.href = `/${slug}/login`;
+    window.location.href = isAdminCompany ? "/admin/login" : `/${slug}/login`;
   }
 
   const isGroupActive = (items: NavLink[]) =>
@@ -103,10 +110,13 @@ export function CompanyShell({ children }: { children: React.ReactNode }) {
     items: group.items.filter((item) => canAccess(item.href, "view")),
   })).filter((group) => group.items.length > 0);
 
+  // Company routes — /admin/* on admin company, /{slug}/* otherwise
+  const companyRoute = (href: string) => isAdminCompany ? `/admin/${href}` : `/${slug}/${href}`;
+
   const headerNav = (
     <>
       {canAccess("dashboard", "view") && (
-        <NavItem href={`/${slug}/dashboard`} active={activeSegment === "dashboard"}>
+        <NavItem href={companyRoute("dashboard")} active={!isOnPlatform && activeSegment === "dashboard"}>
           <LayoutDashboard size={15} />
           Dashboard
         </NavItem>
@@ -118,7 +128,7 @@ export function CompanyShell({ children }: { children: React.ReactNode }) {
             <button
               className={cn(
                 "nav-dropdown__trigger",
-                isGroupActive(group.items) && "nav-dropdown__trigger--active"
+                !isOnPlatform && isGroupActive(group.items) && "nav-dropdown__trigger--active"
               )}
             >
               {group.label}
@@ -132,9 +142,9 @@ export function CompanyShell({ children }: { children: React.ReactNode }) {
                   key={href}
                   className={cn(
                     "nav-dropdown__item",
-                    activeSegment === href && "nav-dropdown__item--active"
+                    !isOnPlatform && activeSegment === href && "nav-dropdown__item--active"
                   )}
-                  onSelect={() => router.push(`/${slug}/${href}`)}
+                  onSelect={() => router.push(companyRoute(href))}
                 >
                   <Icon size={15} />
                   {label}
@@ -146,7 +156,7 @@ export function CompanyShell({ children }: { children: React.ReactNode }) {
       ))}
 
       {canAccess("settings.general", "view") && (
-        <NavItem href={`/${slug}/settings`} active={activeSegment === "settings"}>
+        <NavItem href={companyRoute("settings")} active={isOnPlatform || activeSegment === "settings"}>
           <Settings size={15} />
           Settings
         </NavItem>
@@ -165,8 +175,8 @@ export function CompanyShell({ children }: { children: React.ReactNode }) {
         <DropdownMenu.Content className="mobile-menu__content" sideOffset={6} align="start">
           {canAccess("dashboard", "view") && (
             <DropdownMenu.Item
-              className={cn("nav-dropdown__item", activeSegment === "dashboard" && "nav-dropdown__item--active")}
-              onSelect={() => router.push(`/${slug}/dashboard`)}
+              className={cn("nav-dropdown__item", !isOnPlatform && activeSegment === "dashboard" && "nav-dropdown__item--active")}
+              onSelect={() => router.push(companyRoute("dashboard"))}
             >
               <LayoutDashboard size={15} />
               Dashboard
@@ -181,8 +191,8 @@ export function CompanyShell({ children }: { children: React.ReactNode }) {
               {group.items.map(({ href, label, icon: Icon }) => (
                 <DropdownMenu.Item
                   key={href}
-                  className={cn("nav-dropdown__item", activeSegment === href && "nav-dropdown__item--active")}
-                  onSelect={() => router.push(`/${slug}/${href}`)}
+                  className={cn("nav-dropdown__item", !isOnPlatform && activeSegment === href && "nav-dropdown__item--active")}
+                  onSelect={() => router.push(companyRoute(href))}
                 >
                   <Icon size={15} />
                   {label}
@@ -195,14 +205,15 @@ export function CompanyShell({ children }: { children: React.ReactNode }) {
             <>
               <DropdownMenu.Separator className="user-menu__separator" />
               <DropdownMenu.Item
-                className={cn("nav-dropdown__item", activeSegment === "settings" && "nav-dropdown__item--active")}
-                onSelect={() => router.push(`/${slug}/settings`)}
+                className={cn("nav-dropdown__item", (isOnPlatform || activeSegment === "settings") && "nav-dropdown__item--active")}
+                onSelect={() => router.push(companyRoute("settings"))}
               >
                 <Settings size={15} />
                 Settings
               </DropdownMenu.Item>
             </>
           )}
+
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
     </DropdownMenu.Root>
@@ -241,12 +252,12 @@ export function CompanyShell({ children }: { children: React.ReactNode }) {
             <DropdownMenu.Separator className="user-menu__separator" />
             <DropdownMenu.Item
               className="user-menu__item"
-              onSelect={() => router.push(`/${slug}/profile`)}
+              onSelect={() => router.push(companyRoute("profile"))}
             >
               <User size={15} />
               Profile
             </DropdownMenu.Item>
-            {isPlatformUser && (
+            {isPlatformUser && !isAdminCompany && (
               <DropdownMenu.Item
                 className="user-menu__item"
                 onSelect={() => router.push("/admin")}
@@ -271,7 +282,7 @@ export function CompanyShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {isPlatformUser && (
+      {isPlatformUser && !isAdminCompany && (
         <div className="admin-banner">
           <Shield size={13} />
           <span>Admin session</span>

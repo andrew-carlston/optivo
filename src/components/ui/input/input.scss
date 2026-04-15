@@ -1,6 +1,7 @@
 @use "../../../styles/tokens" as *;
 
 .input {
+  box-sizing: border-box;
   width: 100%;
   padding: $space-sm $space-md;
   border: 1px solid var(--border);
@@ -9,6 +10,7 @@
   color: var(--fg);
   font-size: $text-sm;
   font-family: inherit;
+  line-height: 1.5;
   min-height: 40px;
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;

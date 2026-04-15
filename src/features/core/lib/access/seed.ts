@@ -24,7 +24,7 @@ export const MODULE_GROUPS = [
     label: "People",
     resources: [
       { resource: RESOURCES.directory, label: "Directory" },
-      { resource: RESOURCES.hr, label: "HR" },
+      { resource: RESOURCES.directory, label: "Directory" },
       { resource: RESOURCES.staffing, label: "Staffing" },
     ],
   },

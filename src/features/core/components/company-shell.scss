@@ -107,24 +107,24 @@
   display: flex;
   align-items: center;
   gap: $space-sm;
-  padding: $space-sm $space-md;
-  border-radius: $radius-md;
+  padding: $space-xs $space-md;
+  border-radius: $radius-full;
   font-size: $text-sm;
   font-weight: 500;
-  color: var(--fg);
+  color: var(--muted-fg);
   cursor: pointer;
   outline: none;
-  transition: all 0.12s;
+  transition: all 0.15s;
   border: 1px solid transparent;
 
   &:hover,
   &[data-highlighted] {
+    color: var(--fg);
     background: var(--surface-2);
     border-color: var(--border);
   }
 
   svg {
-    color: var(--muted-fg);
     flex-shrink: 0;
   }
 
@@ -155,11 +155,14 @@
   height: 34px;
   border-radius: $radius-md;
   color: var(--muted-fg);
+  background: none;
+  border: 1px solid transparent;
   cursor: pointer;
   transition: all 0.15s;
 
   &:hover {
     background: var(--surface-2);
+    border-color: var(--border);
     color: var(--fg);
   }
 }
@@ -175,16 +178,15 @@
   height: 34px;
   border-radius: $radius-md;
   color: var(--muted-fg);
+  background: none;
+  border: 1px solid transparent;
   cursor: pointer;
   transition: all 0.15s;
 
-  &:hover {
-    background: var(--surface-2);
-    color: var(--fg);
-  }
-
+  &:hover,
   &[data-state="open"] {
     background: var(--surface-2);
+    border-color: var(--border);
     color: var(--fg);
   }
 }
@@ -287,18 +289,19 @@
   display: flex;
   align-items: center;
   gap: $space-sm;
-  padding: $space-sm $space-md;
-  border-radius: $radius-md;
+  padding: $space-xs $space-md;
+  border-radius: $radius-full;
   font-size: $text-sm;
   font-weight: 500;
-  color: var(--fg);
+  color: var(--muted-fg);
   cursor: pointer;
   outline: none;
-  transition: all 0.12s;
+  transition: all 0.15s;
   border: 1px solid transparent;
 
   &:hover,
   &[data-highlighted] {
+    color: var(--fg);
     background: var(--surface-2);
     border-color: var(--border);
   }
@@ -311,7 +314,6 @@
   }
 
   svg {
-    color: var(--muted-fg);
     flex-shrink: 0;
   }
 

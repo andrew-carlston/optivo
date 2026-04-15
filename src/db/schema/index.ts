@@ -10,8 +10,9 @@ export * as schedule from "./schedule";
 export * as system from "./system";
 export * as analytics from "./analytics";
 
+export * as directory from "./directory";
+
 // Future modules:
 // export * as forecast from "./forecast";
 // export * as staffing from "./staffing";
 // export * as cost from "./cost";
-// export * as directory from "./directory";

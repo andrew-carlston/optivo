@@ -1,12 +1,28 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import * as RadixSelect from "@radix-ui/react-select";
+import { useState, useRef, useEffect, useCallback } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { ChevronDown, Check, Search, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import "./select.scss";
+
+const SEARCH_AUTO_THRESHOLD = 6;
+
+/**
+ * Find the next focusable element after `from` in document tab order.
+ * Used by dropdowns to forward Tab/Shift+Tab to the next form field.
+ */
+function findFocusableSibling(from: HTMLElement | null, direction: 1 | -1): HTMLElement | null {
+  if (!from) return null;
+  const selector =
+    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  const all = Array.from(document.querySelectorAll<HTMLElement>(selector))
+    .filter((el) => el.offsetParent !== null);  // visible only
+  const index = all.indexOf(from);
+  if (index === -1) return null;
+  return all[index + direction] ?? null;
+}
 
 // ── Types ──
 
@@ -15,13 +31,79 @@ export interface SelectOption {
   label: string;
 }
 
-// ── Single Select (Radix) ──
+// ── Shared keyboard nav helpers ──
+
+/**
+ * Hook that wires up arrow/enter/home/end keyboard nav for a popover-based
+ * dropdown. Returns the highlighted index, key handler, and a setter that
+ * mouse hover can use to sync.
+ */
+function useDropdownKeys<T>(
+  items: T[],
+  onSelect: (item: T) => void,
+  open: boolean,
+  resetKey?: any,
+) {
+  const [highlightedIndex, setHighlightedIndex] = useState(0);
+  const itemRefs = useRef<(HTMLElement | null)[]>([]);
+
+  // Reset highlight when the list changes or the popover opens
+  useEffect(() => {
+    setHighlightedIndex(0);
+  }, [resetKey, open, items.length]);
+
+  // Scroll highlighted into view
+  useEffect(() => {
+    const el = itemRefs.current[highlightedIndex];
+    el?.scrollIntoView({ block: "nearest" });
+  }, [highlightedIndex]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (items.length === 0) return;
+      switch (e.key) {
+        case "ArrowDown":
+          e.preventDefault();
+          setHighlightedIndex((i) => (i + 1) % items.length);
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          setHighlightedIndex((i) => (i - 1 + items.length) % items.length);
+          break;
+        case "Home":
+          e.preventDefault();
+          setHighlightedIndex(0);
+          break;
+        case "End":
+          e.preventDefault();
+          setHighlightedIndex(items.length - 1);
+          break;
+        case "Enter":
+          e.preventDefault();
+          const item = items[highlightedIndex];
+          if (item) onSelect(item);
+          break;
+      }
+    },
+    [items, highlightedIndex, onSelect],
+  );
+
+  const setItemRef = useCallback((index: number) => (el: HTMLElement | null) => {
+    itemRefs.current[index] = el;
+  }, []);
+
+  return { highlightedIndex, setHighlightedIndex, handleKeyDown, setItemRef };
+}
+
+// ── Single Select ──
 
 export interface SelectProps {
   options: SelectOption[];
   value?: string;
   onChange?: (value: string) => void;
   placeholder?: string;
+  /** Force-show the search input. Defaults to auto (shown when options > 6). */
+  searchable?: boolean;
   loading?: boolean;
   disabled?: boolean;
   className?: string;
@@ -29,38 +111,137 @@ export interface SelectProps {
 
 export function Select({
   options, value, onChange, placeholder = "Select...",
-  loading, disabled, className,
+  searchable, loading, disabled, className,
 }: SelectProps) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const focusOnCloseRef = useRef<HTMLElement | null>(null);
+
   if (loading) return <Skeleton width="100%" height={40} radius="lg" />;
 
-  return (
-    <RadixSelect.Root value={value} onValueChange={onChange} disabled={disabled}>
-      <RadixSelect.Trigger className={cn("select__trigger", className)}>
-        <RadixSelect.Value placeholder={placeholder} />
-        <RadixSelect.Icon>
-          <ChevronDown size={16} />
-        </RadixSelect.Icon>
-      </RadixSelect.Trigger>
+  const showSearch = searchable ?? options.length > SEARCH_AUTO_THRESHOLD;
+  const selected = options.find((o) => o.value === value);
+  const filtered = showSearch && search
+    ? options.filter((o) => o.label.toLowerCase().includes(search.toLowerCase()))
+    : options;
 
-      <RadixSelect.Portal>
-        <RadixSelect.Content className="select__dropdown" position="popper" sideOffset={4}>
-          <RadixSelect.Viewport className="select__options">
-            {options.map((opt) => (
-              <RadixSelect.Item key={opt.value} value={opt.value} className="select__option">
-                <RadixSelect.ItemText>{opt.label}</RadixSelect.ItemText>
-                <RadixSelect.ItemIndicator className="select__option-check">
-                  <Check size={10} />
-                </RadixSelect.ItemIndicator>
-              </RadixSelect.Item>
-            ))}
-          </RadixSelect.Viewport>
-        </RadixSelect.Content>
-      </RadixSelect.Portal>
-    </RadixSelect.Root>
+  const handleSelect = useCallback((opt: SelectOption) => {
+    onChange?.(opt.value);
+    setOpen(false);
+  }, [onChange]);
+
+  const { highlightedIndex, setHighlightedIndex, handleKeyDown, setItemRef } =
+    useDropdownKeys(filtered, handleSelect, open, search);
+
+  function handleTriggerKeyDown(e: React.KeyboardEvent) {
+    if (open) return;
+    if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === " ") {
+      e.preventDefault();
+      setOpen(true);
+      return;
+    }
+    // Printable character — open and seed the search input
+    if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault();
+      if (showSearch) setSearch(e.key);
+      setOpen(true);
+    }
+  }
+
+  // Tab inside the dropdown closes it and forwards focus to the next form field.
+  function handleContentKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Tab") {
+      e.preventDefault();
+      focusOnCloseRef.current = findFocusableSibling(triggerRef.current, e.shiftKey ? -1 : 1);
+      setOpen(false);
+      return;
+    }
+    handleKeyDown(e);
+  }
+
+  return (
+    <Popover.Root open={open} onOpenChange={(o) => { setOpen(o); if (!o) setSearch(""); }}>
+      <Popover.Trigger asChild disabled={disabled}>
+        <button
+          ref={triggerRef}
+          type="button"
+          className={cn("select__trigger", disabled && "select__trigger--disabled", className)}
+          onKeyDown={handleTriggerKeyDown}
+        >
+          {selected ? (
+            <span className="select__value">{selected.label}</span>
+          ) : (
+            <span className="select__placeholder">{placeholder}</span>
+          )}
+          <ChevronDown size={16} />
+        </button>
+      </Popover.Trigger>
+
+      <Popover.Portal>
+        <Popover.Content
+          className="select__dropdown"
+          sideOffset={4}
+          align="start"
+          onKeyDown={handleContentKeyDown}
+          onCloseAutoFocus={(e) => {
+            const next = focusOnCloseRef.current;
+            if (next) {
+              e.preventDefault();
+              next.focus();
+              focusOnCloseRef.current = null;
+            }
+          }}
+        >
+          {showSearch && (
+            <div className="select__search">
+              <Search size={14} />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search..."
+                autoFocus
+              />
+            </div>
+          )}
+          <div className="select__options">
+            {filtered.length === 0 && (
+              <div className="select__empty">No results</div>
+            )}
+            {filtered.map((opt, i) => {
+              const isActive = opt.value === value;
+              const isHighlighted = i === highlightedIndex;
+              return (
+                <button
+                  key={opt.value}
+                  ref={setItemRef(i)}
+                  type="button"
+                  className={cn(
+                    "select__option",
+                    isActive && "select__option--active",
+                    isHighlighted && "select__option--highlighted",
+                  )}
+                  onClick={() => handleSelect(opt)}
+                  onMouseEnter={() => setHighlightedIndex(i)}
+                >
+                  <span className="select__option-label">{opt.label}</span>
+                  {isActive && (
+                    <span className="select__option-check">
+                      <Check size={12} />
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   );
 }
 
-// ── Multi Select (Radix Popover + custom list) ──
+// ── Multi Select ──
 
 export interface MultiSelectProps {
   options: SelectOption[];
@@ -78,8 +259,10 @@ export function MultiSelect({
   options, selected, onChange, placeholder = "Select...",
   searchable = true, loading, disabled, mixed, className,
 }: MultiSelectProps) {
+  const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const searchRef = useRef<HTMLInputElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const focusOnCloseRef = useRef<HTMLElement | null>(null);
 
   if (loading) return <Skeleton width="100%" height={40} radius="lg" />;
 
@@ -87,23 +270,55 @@ export function MultiSelect({
     o.label.toLowerCase().includes(search.toLowerCase())
   );
 
-  const toggle = (val: string) => {
+  const toggle = useCallback((opt: SelectOption) => {
     onChange(
-      selected.includes(val)
-        ? selected.filter((v) => v !== val)
-        : [...selected, val]
+      selected.includes(opt.value)
+        ? selected.filter((v) => v !== opt.value)
+        : [...selected, opt.value]
     );
-  };
+  }, [selected, onChange]);
 
   const remove = (val: string, e: React.MouseEvent) => {
     e.stopPropagation();
     onChange(selected.filter((v) => v !== val));
   };
 
+  const { highlightedIndex, setHighlightedIndex, handleKeyDown, setItemRef } =
+    useDropdownKeys(filtered, toggle, open, search);
+
+  function handleTriggerKeyDown(e: React.KeyboardEvent) {
+    if (open) return;
+    if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === " ") {
+      e.preventDefault();
+      setOpen(true);
+      return;
+    }
+    if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault();
+      if (searchable) setSearch(e.key);
+      setOpen(true);
+    }
+  }
+
+  function handleContentKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Tab") {
+      e.preventDefault();
+      focusOnCloseRef.current = findFocusableSibling(triggerRef.current, e.shiftKey ? -1 : 1);
+      setOpen(false);
+      return;
+    }
+    handleKeyDown(e);
+  }
+
   return (
-    <Popover.Root onOpenChange={(open) => { if (!open) setSearch(""); }}>
+    <Popover.Root open={open} onOpenChange={(o) => { setOpen(o); if (!o) setSearch(""); }}>
       <Popover.Trigger asChild disabled={disabled}>
-        <button type="button" className={cn("select__trigger select__trigger--multi", disabled && "select__trigger--disabled", className)}>
+        <button
+          ref={triggerRef}
+          type="button"
+          className={cn("select__trigger select__trigger--multi", disabled && "select__trigger--disabled", className)}
+          onKeyDown={handleTriggerKeyDown}
+        >
           <div className="select__chips">
             {(selected.length === 0 || mixed) && (
               <span className="select__placeholder">{placeholder}</span>
@@ -128,12 +343,24 @@ export function MultiSelect({
       </Popover.Trigger>
 
       <Popover.Portal>
-        <Popover.Content className="select__dropdown" sideOffset={4} align="start">
+        <Popover.Content
+          className="select__dropdown"
+          sideOffset={4}
+          align="start"
+          onKeyDown={handleContentKeyDown}
+          onCloseAutoFocus={(e) => {
+            const next = focusOnCloseRef.current;
+            if (next) {
+              e.preventDefault();
+              next.focus();
+              focusOnCloseRef.current = null;
+            }
+          }}
+        >
           {searchable && (
             <div className="select__search">
               <Search size={14} />
               <input
-                ref={searchRef}
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -150,14 +377,21 @@ export function MultiSelect({
             {filtered.length === 0 && (
               <div className="select__empty">No results</div>
             )}
-            {filtered.map((opt) => {
+            {filtered.map((opt, i) => {
               const isSelected = selected.includes(opt.value);
+              const isHighlighted = i === highlightedIndex;
               return (
                 <button
                   key={opt.value}
+                  ref={setItemRef(i)}
                   type="button"
-                  className={cn("select__option select__option--multi", isSelected && "select__option--active")}
-                  onClick={() => toggle(opt.value)}
+                  className={cn(
+                    "select__option select__option--multi",
+                    isSelected && "select__option--active",
+                    isHighlighted && "select__option--highlighted",
+                  )}
+                  onClick={() => toggle(opt)}
+                  onMouseEnter={() => setHighlightedIndex(i)}
                 >
                   <span className="select__option-label">{opt.label}</span>
                   {isSelected && (

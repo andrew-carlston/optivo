@@ -1,0 +1,161 @@
+@use "../../../../styles/tokens" as *;
+
+// ── Overlay ──
+
+.emp-form__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: $z-modal;
+  animation: emp-form-fade-in 0.15s ease;
+}
+
+// ── Dialog ──
+
+.emp-form__dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(600px, 92vw);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: $radius-lg;
+  box-shadow: var(--shadow-lg);
+  z-index: $z-modal + 1;
+  animation: emp-form-fade-in 0.15s ease;
+  overflow: hidden;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+// ── Header ──
+
+.emp-form__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-md;
+  padding: $space-lg $space-xl;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.emp-form__title {
+  font-size: $text-lg;
+  font-weight: 600;
+  color: var(--fg);
+  margin: 0;
+}
+
+// ── Body (scrollable form) ──
+
+.emp-form__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: $space-xl;
+  display: flex;
+  flex-direction: column;
+  gap: $space-xl;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+  }
+}
+
+// ── Section ──
+
+.emp-form__section {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.emp-form__section-label {
+  font-size: $text-xs;
+  font-weight: 600;
+  color: var(--muted-fg);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-bottom: $space-sm;
+  border-bottom: 1px solid var(--border);
+}
+
+// ── Grid (two-column) ──
+
+.emp-form__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-md;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Field ──
+
+.emp-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+
+  &--full {
+    grid-column: 1 / -1;
+  }
+}
+
+.emp-form__label {
+  font-size: $text-sm;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+// ── Actions ──
+
+.emp-form__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $space-sm;
+  padding-top: $space-lg;
+  border-top: 1px solid var(--border);
+
+  @media (max-width: 768px) {
+    flex-direction: column-reverse;
+
+    .btn {
+      width: 100%;
+    }
+  }
+}
+
+// ── Animations ──
+
+@keyframes emp-form-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

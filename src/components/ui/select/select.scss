@@ -35,6 +35,14 @@
 }
 
 .select__placeholder { color: var(--muted-fg); }
+.select__value {
+  color: var(--fg);
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 // ── Chips (Multi) ──
 
@@ -165,24 +173,34 @@
   border: 1px solid transparent;
   border-radius: $radius-full;
   background: transparent;
-  color: var(--fg);
+  color: var(--muted-fg);
   font-size: 13px;
+  font-weight: 500;
   font-family: inherit;
   cursor: pointer;
   outline: none;
-  transition: all 0.12s;
+  transition: all 0.15s;
   min-height: 32px;
 
-  &:hover, &[data-highlighted] {
+  // Hover or keyboard-highlighted — same visual treatment
+  &:hover, &[data-highlighted], &--highlighted {
     background: var(--surface-2);
-    border-color: var(--border-strong);
+    border-color: var(--border);
+    color: var(--fg);
   }
 
-  // Selected — pop tint background + border
+  // Selected — accent pill (matches active nav/sidebar item)
   &--active, &[data-state="checked"] {
     background: var(--pop-muted);
     border-color: var(--pop);
-    font-weight: 500;
+    color: var(--pop);
+    font-weight: 600;
+  }
+
+  // Selected + keyboard-highlighted (stronger emphasis)
+  &--active.select__option--highlighted {
+    border-color: var(--pop);
+    background: var(--pop-muted);
   }
 
   [data-radix-select-item-indicator] { display: flex; }

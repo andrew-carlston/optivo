@@ -1,7 +1,7 @@
-export default function AdminAnalyticsPage() {
+export default function AnalyticsPage() {
   return (
     <div>
-      <h1>Platform Analytics</h1>
+      <h1>Analytics</h1>
       <p>Coming soon.</p>
     </div>
   );

@@ -1,0 +1,388 @@
+@use "../../../../styles/tokens" as *;
+
+.dir-table {
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+  width: 100%;
+
+  // ── Loading / Empty States ──
+
+  &--loading {
+    min-height: 300px;
+  }
+
+  &--empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+  }
+
+  &__empty-msg {
+    font-size: $text-sm;
+    color: var(--muted-fg);
+    text-align: center;
+    padding: $space-2xl;
+  }
+
+  // ── Scroll Wrapper ──
+
+  &__scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--border);
+    border-radius: $radius-md;
+    background: var(--surface);
+
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+  }
+
+  // ── Table ──
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: $text-sm;
+    white-space: nowrap;
+    table-layout: auto;
+  }
+
+  // ── Header ──
+
+  &__thead {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--surface-2);
+  }
+
+  &__th {
+    padding: $space-sm $space-md;
+    text-align: left;
+    font-weight: 600;
+    font-size: $text-xs;
+    color: var(--muted-fg);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-bottom: 1px solid var(--border);
+    user-select: none;
+
+    &--lock {
+      width: 32px;
+      min-width: 32px;
+      max-width: 32px;
+      padding: $space-sm $space-xs;
+      text-align: center;
+      color: var(--muted-fg);
+    }
+  }
+
+  &__th-content {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+  }
+
+  &__th-sort {
+    all: unset;
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+    cursor: pointer;
+    transition: color 0.12s;
+
+    &:hover {
+      color: var(--fg);
+    }
+  }
+
+  &__th-label {
+    white-space: nowrap;
+  }
+
+  &__th-arrow {
+    display: flex;
+    align-items: center;
+    opacity: 0.5;
+    transition: opacity 0.12s;
+
+    .dir-table__th-sort:hover & {
+      opacity: 1;
+    }
+  }
+
+  &__th-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: auto;
+    padding-left: $space-xs;
+  }
+
+  &__th-icon {
+    all: unset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: $radius-sm;
+    color: var(--muted-fg);
+    cursor: pointer;
+    transition: color 0.12s, background 0.12s;
+    opacity: 0.5;
+
+    &:hover {
+      opacity: 1;
+      color: var(--fg);
+      background: var(--surface);
+    }
+
+    &--active {
+      opacity: 1;
+      color: var(--pop);
+      background: var(--pop-muted);
+
+      &:hover {
+        color: var(--pop);
+      }
+    }
+  }
+
+  // ── Body ──
+
+  &__tbody {
+    background: var(--surface);
+  }
+
+  &__tr {
+    cursor: pointer;
+    transition: background 0.1s;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid var(--border);
+    }
+
+    &:hover {
+      background: var(--surface-2);
+    }
+
+    &--locked {
+      opacity: 0.65;
+      background: var(--surface);
+
+      &:hover {
+        opacity: 0.75;
+      }
+    }
+
+    &--self-locked {
+      background: var(--surface);
+    }
+
+    &--edited {
+      // subtle left accent for rows with pending edits
+    }
+  }
+
+  &__td {
+    padding: $space-xs $space-md;
+    vertical-align: middle;
+    min-height: $touch-min;
+
+    &--lock {
+      width: 32px;
+      min-width: 32px;
+      max-width: 32px;
+      padding: $space-xs $space-xs;
+      text-align: center;
+    }
+  }
+
+  // ── Lock Button ──
+
+  &__lock-btn {
+    all: unset;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: $radius-sm;
+    cursor: default;
+    transition: background 0.12s, color 0.12s;
+
+    &--other {
+      color: var(--warning);
+      cursor: pointer;
+
+      &:hover {
+        background: var(--warning-muted, rgba(245, 158, 11, 0.12));
+      }
+    }
+
+    &--self {
+      color: var(--pop);
+    }
+  }
+
+  // ── Cell Variants ──
+
+  &__cell-text {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+    color: var(--fg);
+
+    &--edited {
+      background: var(--warning-muted, rgba(245, 158, 11, 0.12));
+      color: var(--warning);
+      font-weight: 600;
+      padding: 1px $space-xs;
+      border-radius: 3px;
+    }
+  }
+
+  &__cell-btn {
+    all: unset;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+    cursor: text;
+    color: var(--fg);
+    padding: 2px $space-xs;
+    border-radius: 3px;
+    min-height: 22px;
+    transition: background 0.1s;
+
+    &:hover {
+      background: var(--surface-2);
+    }
+
+    &--edited {
+      background: var(--warning-muted, rgba(245, 158, 11, 0.12));
+      color: var(--warning);
+      font-weight: 600;
+
+      &:hover {
+        background: var(--warning-muted, rgba(245, 158, 11, 0.18));
+      }
+    }
+  }
+
+  &__cell-select {
+    min-width: 120px;
+
+    &--edited {
+      .select__trigger {
+        background: var(--warning-muted, rgba(245, 158, 11, 0.12));
+        color: var(--warning);
+        font-weight: 600;
+        border-color: var(--warning);
+      }
+    }
+  }
+
+  &__cell-date {
+    min-width: 130px;
+
+    &--edited {
+      .dir-table__date-input {
+        background: var(--warning-muted, rgba(245, 158, 11, 0.12));
+        color: var(--warning);
+        font-weight: 600;
+        border-color: var(--warning);
+      }
+    }
+  }
+
+  // ── Inline Editors ──
+
+  &__inline-input {
+    font-size: $text-sm;
+    height: 28px;
+    min-width: 100px;
+    padding: $space-xs $space-sm;
+  }
+
+  &__inline-select {
+    font-size: $text-sm;
+
+    // Make the select trigger compact
+    &.select__trigger {
+      height: 28px;
+      min-height: 28px;
+      font-size: $text-sm;
+      padding: $space-xs $space-sm;
+    }
+  }
+
+  &__date-input {
+    all: unset;
+    display: block;
+    font-size: $text-sm;
+    color: var(--fg);
+    padding: 2px $space-xs;
+    border: 1px solid var(--border);
+    border-radius: $radius-sm;
+    height: 28px;
+    background: var(--surface);
+    cursor: pointer;
+    transition: border-color 0.12s;
+
+    &:hover {
+      border-color: var(--border-strong);
+    }
+
+    &:focus {
+      border-color: var(--pop);
+      outline: none;
+    }
+  }
+
+  // ── Footer ──
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $space-xs $space-sm;
+  }
+
+  &__count {
+    font-size: $text-xs;
+    color: var(--muted-fg);
+  }
+
+  // ── Responsive ──
+
+  @media (max-width: 768px) {
+    &__th,
+    &__td {
+      padding: $space-xs $space-sm;
+    }
+
+    &__cell-text,
+    &__cell-btn {
+      max-width: 140px;
+    }
+
+    &__th-actions {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,168 @@
+@use "../../../../styles/tokens" as *;
+
+.dir-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+
+  // ── Top Row ──
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    flex-wrap: wrap;
+  }
+
+  // ── Search ──
+
+  &__search {
+    flex: 1;
+    min-width: 180px;
+    max-width: 320px;
+
+    @media (max-width: 768px) {
+      max-width: none;
+      flex-basis: 100%;
+      order: 1;
+    }
+  }
+
+  // ── Filter Toggle (mobile only) ──
+
+  &__filter-toggle {
+    all: unset;
+    display: none;
+    align-items: center;
+    gap: $space-xs;
+    padding: $space-sm $space-md;
+    font-size: $text-sm;
+    font-weight: 500;
+    color: var(--muted-fg);
+    border: 1px solid var(--border);
+    border-radius: $radius-sm;
+    cursor: pointer;
+    min-height: $touch-min;
+    transition: color 0.12s, border-color 0.12s;
+
+    &:hover {
+      color: var(--fg);
+      border-color: var(--border-strong);
+    }
+
+    @media (max-width: 768px) {
+      display: flex;
+      order: 3;
+    }
+  }
+
+  &__filter-count {
+    font-size: $text-xs;
+    padding: 0 $space-xs;
+    min-width: 18px;
+    text-align: center;
+  }
+
+  // ── Desktop Filters ──
+
+  &__filters {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  &__filter {
+    min-width: 140px;
+    max-width: 200px;
+  }
+
+  // ── Actions ──
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+    margin-left: auto;
+    flex-shrink: 0;
+
+    @media (max-width: 768px) {
+      order: 2;
+      margin-left: auto;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+  }
+
+  // ── View Switcher ──
+
+  &__view {
+    min-width: 140px;
+    max-width: 180px;
+
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  // ── Button Internals ──
+
+  &__btn-label {
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  &__pending-badge {
+    font-size: $text-xs;
+    padding: 0 $space-xs;
+    min-width: 18px;
+    text-align: center;
+    margin-left: $space-xs;
+  }
+
+  // ── Mobile Filters (collapsible) ──
+
+  &__mobile-filters {
+    display: none;
+    flex-direction: column;
+    gap: $space-sm;
+    padding: $space-md;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: $radius-md;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.25s ease;
+    padding-top: 0;
+    padding-bottom: 0;
+
+    @media (max-width: 768px) {
+      display: flex;
+    }
+
+    &--open {
+      max-height: 400px;
+      opacity: 1;
+      padding: $space-md;
+    }
+  }
+
+  &__mobile-filter {
+    display: flex;
+    flex-direction: column;
+    gap: $space-xs;
+  }
+
+  &__mobile-label {
+    font-size: $text-xs;
+    font-weight: 600;
+    color: var(--muted-fg);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+}

@@ -1,7 +1,7 @@
-export default function AdminSettingsPage() {
+export default function SettingsPage() {
   return (
     <div>
-      <h1>Platform Settings</h1>
+      <h1>Settings</h1>
       <p>Coming soon.</p>
     </div>
   );

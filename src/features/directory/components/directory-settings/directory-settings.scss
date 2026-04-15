@@ -1,0 +1,332 @@
+@use "../../../../styles/tokens" as *;
+
+.dir-settings {
+  display: flex;
+  flex-direction: column;
+  gap: $space-lg;
+
+  // ── Header ──
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-md;
+
+    h2 {
+      font-size: $text-lg;
+      font-weight: 600;
+      color: var(--fg);
+      margin: 0;
+    }
+  }
+
+  // ── Tabs (underline style) ──
+  &__tabs {
+    display: flex;
+    gap: $space-xs;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  &__tab {
+    all: unset;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    padding: $space-sm $space-md;
+    font-size: $text-sm;
+    font-weight: 500;
+    color: var(--muted-fg);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.12s;
+
+    &::after {
+      content: "";
+      position: absolute;
+      left: $space-md;
+      right: $space-md;
+      bottom: -1px;
+      height: 2px;
+      background: var(--pop);
+      border-radius: 2px 2px 0 0;
+      opacity: 0;
+      transition: opacity 0.12s;
+    }
+
+    &:hover {
+      color: var(--fg);
+    }
+
+    &--active {
+      color: var(--pop);
+      font-weight: 600;
+
+      &::after {
+        opacity: 1;
+      }
+    }
+  }
+
+  // ── Column List ──
+  &__col-list {
+    display: flex;
+    flex-direction: column;
+    gap: $space-xs;
+  }
+
+  &__col-row {
+    display: flex;
+    align-items: center;
+    gap: $space-md;
+    padding: $space-sm $space-md;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: $radius-md;
+    transition: border-color 0.12s;
+
+    &:hover {
+      border-color: var(--border-strong);
+    }
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: $space-sm;
+    }
+  }
+
+  &__col-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__col-name {
+    font-size: $text-sm;
+    font-weight: 600;
+    color: var(--fg);
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+  }
+
+  &__col-key {
+    font-size: $text-xs;
+    color: var(--muted-fg);
+    font-family: monospace;
+  }
+
+  &__col-controls {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    flex-shrink: 0;
+
+    @media (max-width: 768px) {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+
+  &__col-toggle {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+    font-size: $text-xs;
+    color: var(--muted-fg);
+    white-space: nowrap;
+  }
+
+  &__col-sensitivity {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+    font-size: $text-xs;
+    color: var(--muted-fg);
+    min-width: 80px;
+  }
+
+  // ── Status List ──
+  &__status-list {
+    display: flex;
+    flex-direction: column;
+    gap: $space-xs;
+  }
+
+  &__status-row {
+    display: flex;
+    align-items: center;
+    gap: $space-md;
+    padding: $space-sm $space-md;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: $radius-md;
+
+    @media (max-width: 768px) {
+      flex-wrap: wrap;
+      gap: $space-sm;
+    }
+  }
+
+  &__status-swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: $radius-full;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+  }
+
+  &__status-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__status-label {
+    font-size: $text-sm;
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  &__status-value {
+    font-size: $text-xs;
+    color: var(--muted-fg);
+    font-family: monospace;
+  }
+
+  &__status-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  // ── Empty ──
+  &__empty {
+    text-align: center;
+    color: var(--muted-fg);
+    padding: $space-2xl;
+    font-size: $text-sm;
+  }
+
+  // ── Toolbar ──
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: $space-sm;
+  }
+
+  // ── Dialog ──
+  &__overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: $z-modal;
+    animation: dir-fade-in 0.15s ease;
+  }
+
+  &__dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(480px, 90vw);
+    max-height: 85vh;
+    overflow-y: auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: $radius-lg;
+    box-shadow: var(--shadow-lg);
+    padding: $space-xl;
+    z-index: $z-modal;
+    animation: dir-fade-in 0.15s ease;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &__dialog-title {
+    font-size: $text-lg;
+    font-weight: 600;
+    color: var(--fg);
+    margin: 0 0 $space-lg;
+  }
+
+  &__dialog-fields {
+    display: flex;
+    flex-direction: column;
+    gap: $space-md;
+    margin-bottom: $space-lg;
+  }
+
+  &__dialog-label {
+    display: flex;
+    flex-direction: column;
+    gap: $space-xs;
+    font-size: $text-sm;
+    font-weight: 500;
+    color: var(--fg);
+  }
+
+  &__dialog-row {
+    display: flex;
+    gap: $space-sm;
+
+    > * {
+      flex: 1;
+    }
+
+    @media (max-width: 480px) {
+      flex-direction: column;
+    }
+  }
+
+  &__dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $space-sm;
+  }
+
+  &__color-input {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+
+    input[type="color"] {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border);
+      border-radius: $radius-sm;
+      padding: 2px;
+      cursor: pointer;
+      background: var(--surface);
+
+      &::-webkit-color-swatch-wrapper {
+        padding: 0;
+      }
+
+      &::-webkit-color-swatch {
+        border: none;
+        border-radius: 4px;
+      }
+    }
+  }
+}
+
+@keyframes dir-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
