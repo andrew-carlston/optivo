@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Building2, Search, Archive } from "lucide-react";
+import { Building2, Search, Archive, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input/input";
 import { Select, type SelectOption } from "@/components/ui/select/select";
@@ -239,6 +239,34 @@ export function OrgSettings({
   function handleEditCostCodeChange(value: string) {
     setEditCostCode(value.toUpperCase());
     setEditCostCodeManual(true);
+  }
+
+  // Regenerate — ignore the manual flag and rebuild from name + current parent dropdowns.
+  // Useful when parent cost codes were stale or missing when the item was first created.
+  function regenerateCreateCostCode() {
+    if (!createName.trim()) return;
+    const local = generateLocalCode(createName, existingLocalCodes);
+    setCreateCostCode(composeFullCode(tab, local, {
+      parentLocId: createParentId,
+      divisionId: createDivisionId,
+      lobId: createLobId,
+      deptId: createDeptId,
+      locationId: createLocationId,
+    }, { divisions, locations, lobs, departments }));
+    setCreateCostCodeManual(false);
+  }
+
+  function regenerateEditCostCode() {
+    if (!editName.trim()) return;
+    const local = generateLocalCode(editName, existingLocalCodes);
+    setEditCostCode(composeFullCode(tab, local, {
+      parentLocId: editParentId,
+      divisionId: editDivisionId,
+      lobId: editLobId,
+      deptId: editDeptId,
+      locationId: editLocationId,
+    }, { divisions, locations, lobs, departments }));
+    setEditCostCodeManual(false);
   }
 
   function openEdit(item: any) {
@@ -659,12 +687,23 @@ export function OrgSettings({
               </div>
               <label className="org-settings__dialog-cost">
                 <span className="org-settings__dialog-cost-label">Cost Code</span>
-                <Input
-                  className="org-settings__dialog-cost-input"
-                  placeholder="Auto-filled"
-                  value={createCostCode}
-                  onChange={(e) => handleCreateCostCodeChange(e.target.value)}
-                />
+                <div className="org-settings__dialog-cost-wrap">
+                  <Input
+                    className="org-settings__dialog-cost-input"
+                    placeholder="Auto-filled"
+                    value={createCostCode}
+                    onChange={(e) => handleCreateCostCodeChange(e.target.value)}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={regenerateCreateCostCode}
+                    title="Regenerate from parents"
+                    type="button"
+                  >
+                    <RotateCcw size={14} />
+                  </Button>
+                </div>
               </label>
             </div>
             <div className="org-settings__dialog-body">
@@ -693,12 +732,23 @@ export function OrgSettings({
               </div>
               <label className="org-settings__dialog-cost">
                 <span className="org-settings__dialog-cost-label">Cost Code</span>
-                <Input
-                  className="org-settings__dialog-cost-input"
-                  placeholder="Required"
-                  value={editCostCode}
-                  onChange={(e) => handleEditCostCodeChange(e.target.value)}
-                />
+                <div className="org-settings__dialog-cost-wrap">
+                  <Input
+                    className="org-settings__dialog-cost-input"
+                    placeholder="Required"
+                    value={editCostCode}
+                    onChange={(e) => handleEditCostCodeChange(e.target.value)}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={regenerateEditCostCode}
+                    title="Regenerate from parents"
+                    type="button"
+                  >
+                    <RotateCcw size={14} />
+                  </Button>
+                </div>
               </label>
             </div>
             <div className="org-settings__dialog-body">

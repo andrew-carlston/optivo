@@ -249,7 +249,7 @@
     flex-direction: column;
     gap: 2px;
     flex-shrink: 0;
-    width: 140px;
+    width: 180px;
   }
 
   &__dialog-cost-label {
@@ -258,6 +258,19 @@
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--muted-fg);
+  }
+
+  &__dialog-cost-wrap {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+
+    .btn {
+      min-height: 32px;
+      width: 32px;
+      padding: 0;
+      flex-shrink: 0;
+    }
   }
 
   &__dialog-cost-input {

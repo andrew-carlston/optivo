@@ -7,17 +7,23 @@ import { cn } from "@/lib/cn";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import "./select.scss";
 
-const SEARCH_AUTO_THRESHOLD = 6;
+// Search is shown on every dropdown by default; pass `searchable={false}` to hide it.
 
 /**
- * Find the next focusable element after `from` in document tab order.
- * Used by dropdowns to forward Tab/Shift+Tab to the next form field.
+ * Find the next focusable element after `from` in tab order.
+ * Scopes the search to the nearest dialog/form container (falls back to document)
+ * so Tab from a dropdown stays within the current form instead of jumping to
+ * unrelated elements in the page.
  */
 function findFocusableSibling(from: HTMLElement | null, direction: 1 | -1): HTMLElement | null {
   if (!from) return null;
+  const scope =
+    (from.closest('[role="dialog"]') as HTMLElement | null) ??
+    (from.closest("form") as HTMLElement | null) ??
+    document.body;
   const selector =
     'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-  const all = Array.from(document.querySelectorAll<HTMLElement>(selector))
+  const all = Array.from(scope.querySelectorAll<HTMLElement>(selector))
     .filter((el) => el.offsetParent !== null);  // visible only
   const index = all.indexOf(from);
   if (index === -1) return null;
@@ -102,7 +108,7 @@ export interface SelectProps {
   value?: string;
   onChange?: (value: string) => void;
   placeholder?: string;
-  /** Force-show the search input. Defaults to auto (shown when options > 6). */
+  /** Defaults to true. Set to false to hide the search input for short lists. */
   searchable?: boolean;
   loading?: boolean;
   disabled?: boolean;
@@ -120,7 +126,7 @@ export function Select({
 
   if (loading) return <Skeleton width="100%" height={40} radius="lg" />;
 
-  const showSearch = searchable ?? options.length > SEARCH_AUTO_THRESHOLD;
+  const showSearch = searchable ?? true;
   const selected = options.find((o) => o.value === value);
   const filtered = showSearch && search
     ? options.filter((o) => o.label.toLowerCase().includes(search.toLowerCase()))
