@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn, signUp, useSession } from "@/lib/auth-client";
+import { signIn, signUp, signOut, useSession } from "@/lib/auth-client";
 import { AuthCard } from "@/components/ui/auth-card/auth-card";
+import { Button } from "@/components/ui/button/button";
+import { Avatar } from "@/components/ui/avatar/avatar";
 import "./login.scss";
 
 export default function AdminLoginPage() {
@@ -11,15 +13,6 @@ export default function AdminLoginPage() {
   const { data: session, isPending } = useSession();
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [authenticated, setAuthenticated] = useState(false);
-
-  // Redirect if already logged in
-  useEffect(() => {
-    if (session?.user) {
-      setAuthenticated(true);
-      router.push("/admin");
-    }
-  }, [session, router]);
 
   async function handleGoogleSSO() {
     setError("");
@@ -54,11 +47,33 @@ export default function AdminLoginPage() {
     }
   }
 
-  // Authenticated — show card skeleton while redirecting
-  if (authenticated || session?.user) {
+  async function handleSignOut() {
+    await signOut();
+    // Hard reload to clear client auth state
+    window.location.href = "/admin/login";
+  }
+
+  if (isPending) {
     return (
       <div className="admin-login">
         <AuthCard companyName="" loading />
+      </div>
+    );
+  }
+
+  // Already signed in — offer to continue or switch accounts
+  if (session?.user) {
+    return (
+      <div className="admin-login">
+        <div className="admin-login__signed-in">
+          <Avatar src={session.user.image ?? null} fallback={session.user.name ?? session.user.email} size="lg" />
+          <h2>Already signed in</h2>
+          <p>{session.user.email}</p>
+          <div className="admin-login__actions">
+            <Button variant="primary" onClick={() => router.push("/admin")}>Continue to Admin</Button>
+            <Button variant="outline" onClick={handleSignOut}>Sign out</Button>
+          </div>
+        </div>
       </div>
     );
   }

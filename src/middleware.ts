@@ -10,19 +10,24 @@ const SESSION_COOKIE = "better-auth.session_token";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Forward pathname to server components (layouts can't access it otherwise)
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-pathname", pathname);
+  const passthrough = () => NextResponse.next({ request: { headers: requestHeaders } });
+
   // Allow public paths
   if (PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
-    return NextResponse.next();
+    return passthrough();
   }
 
   const parts = pathname.split("/").filter(Boolean);
 
   // Allow login pages without auth
   if (parts[0] === "admin" && parts[1] === "login") {
-    return NextResponse.next();
+    return passthrough();
   }
   if (parts.length >= 2 && parts[1] === "login") {
-    return NextResponse.next();
+    return passthrough();
   }
 
   // Check for session cookie (fast gate — full validation in layouts)
@@ -40,7 +45,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  return NextResponse.next();
+  return passthrough();
 }
 
 export const config = {

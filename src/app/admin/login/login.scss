@@ -7,4 +7,42 @@
   min-height: 100vh;
   background: var(--bg);
   padding: $space-lg;
+
+  &__signed-in {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-md;
+    padding: $space-2xl;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: $radius-lg;
+    box-shadow: var(--shadow-md);
+    max-width: 360px;
+    width: 100%;
+    text-align: center;
+
+    h2 {
+      font-size: $text-lg;
+      font-weight: 600;
+      margin: $space-sm 0 0;
+      color: var(--fg);
+    }
+
+    p {
+      font-size: $text-sm;
+      color: var(--muted-fg);
+      margin: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: $space-sm;
+    width: 100%;
+    margin-top: $space-md;
+
+    > * { width: 100%; }
+  }
 }
