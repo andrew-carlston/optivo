@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useRef, useEffect, useCallback, useTransition } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Search, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input/input";
@@ -84,13 +85,36 @@ function updateList(data: OrgData, tab: Tab, fn: (items: any[]) => any[]): OrgDa
 
 // ── Component ──
 
+const VALID_TABS = new Set<string>(["divisions","departments","lobs","positions","locations","employment_types","working_statuses"]);
+
 export function OrgSettings({ companySlug, initialData }: OrgSettingsProps) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const paramTab = searchParams.get("tab");
+  const initialTab: Tab = paramTab && VALID_TABS.has(paramTab) ? (paramTab as Tab) : "divisions";
+
   const [data, setData] = useState<OrgData>(initialData);
-  const [tab, setTab] = useState<Tab>("divisions");
+  const [tab, setTab] = useState<Tab>(initialTab);
   const [search, setSearch] = useState("");
   const [showInactive, setShowInactive] = useState(false);
   const [draft, setDraft] = useState<DraftRow | null>(null);
   const [, startTransition] = useTransition();
+
+  function changeTab(next: Tab) {
+    setTab(next);
+    setSearch("");
+    setDraft(null);
+    const params = new URLSearchParams(searchParams.toString());
+    if (next === "divisions") {
+      params.delete("tab");
+    } else {
+      params.set("tab", next);
+    }
+    const qs = params.toString();
+    router.replace(`${pathname}${qs ? `?${qs}` : ""}`, { scroll: false });
+  }
 
   // Sync if parent re-renders with fresh data (e.g., navigation)
   useEffect(() => { setData(initialData); }, [initialData]);
@@ -427,7 +451,7 @@ export function OrgSettings({ companySlug, initialData }: OrgSettingsProps) {
           <button
             key={t.key}
             className={cn("org-settings__tab", tab === t.key && "org-settings__tab--active")}
-            onClick={() => { setTab(t.key); setSearch(""); setDraft(null); }}
+            onClick={() => changeTab(t.key)}
           >
             <t.icon size={14} />
             {t.label}

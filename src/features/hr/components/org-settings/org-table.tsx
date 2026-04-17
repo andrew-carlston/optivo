@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Archive, ArchiveRestore, Check, RotateCcw, X, ChevronDown, ChevronRight } from "lucide-react";
+import { ColorPicker } from "@/components/ui/color-picker/color-picker";
 import { Button } from "@/components/ui/button/button";
 import { Select, type SelectOption } from "@/components/ui/select/select";
 import { Switch } from "@/components/ui/switch/switch";
@@ -260,18 +261,11 @@ function InlineColor({
   disabled?: boolean;
 }) {
   return (
-    <label className="org-table__color-label">
-      <span className="org-table__color-dot" style={{ background: value }} />
-      <input
-        type="color"
-        className="org-table__color-input"
-        value={value}
-        disabled={disabled}
-        onChange={async (e) => {
-          await onCommit(e.target.value);
-        }}
-      />
-    </label>
+    <ColorPicker
+      value={value}
+      disabled={disabled}
+      onChange={(c) => onCommit(c)}
+    />
   );
 }
 

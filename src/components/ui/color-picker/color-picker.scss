@@ -1,0 +1,189 @@
+@use "../../../styles/tokens" as *;
+
+.color-picker {
+  &__trigger {
+    all: unset;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: $radius-full;
+    box-shadow: inset 0 0 0 1px var(--border);
+    transition: box-shadow 0.15s;
+
+    &:hover:not(&--disabled) {
+      box-shadow: inset 0 0 0 1px var(--fg);
+    }
+
+    &--disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+
+  &__swatch {
+    display: block;
+    width: 22px;
+    height: 22px;
+    border-radius: $radius-full;
+  }
+
+  &__popover {
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--border), var(--shadow-lg);
+    border-radius: $radius-lg;
+    padding: $space-sm;
+    z-index: $z-modal + 10;
+    animation: colorPickerIn 0.12s ease;
+    width: 224px;
+  }
+
+  // ── Saturation × Brightness panel ──
+  &__panel {
+    position: relative;
+    width: 100%;
+    height: 140px;
+    border-radius: $radius-sm;
+    cursor: crosshair;
+    overflow: hidden;
+    touch-action: none;
+    margin-bottom: $space-sm;
+  }
+
+  &__panel-white {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, #fff, transparent);
+  }
+
+  &__panel-black {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, #000, transparent);
+  }
+
+  &__panel-thumb {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: $radius-full;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  // ── Hue slider ──
+  &__hue {
+    position: relative;
+    width: 100%;
+    height: 14px;
+    border-radius: $radius-full;
+    background: linear-gradient(
+      to right,
+      hsl(0, 100%, 50%),
+      hsl(60, 100%, 50%),
+      hsl(120, 100%, 50%),
+      hsl(180, 100%, 50%),
+      hsl(240, 100%, 50%),
+      hsl(300, 100%, 50%),
+      hsl(360, 100%, 50%)
+    );
+    cursor: pointer;
+    touch-action: none;
+    margin-bottom: $space-sm;
+  }
+
+  &__hue-thumb {
+    position: absolute;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    border-radius: $radius-full;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  // ── Preset grid ──
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 3px;
+  }
+
+  &__cell {
+    all: unset;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+    transition: transform 0.1s, box-shadow 0.1s;
+
+    &:hover {
+      transform: scale(1.2);
+      z-index: 1;
+    }
+
+    &--active {
+      box-shadow: inset 0 0 0 2px var(--fg), 0 0 0 2px var(--surface);
+    }
+  }
+
+  // ── Custom hex input ──
+  &__custom {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: $space-sm;
+    padding-top: $space-sm;
+    border-top: 1px solid var(--border);
+  }
+
+  &__hash {
+    font-size: $text-sm;
+    font-weight: 600;
+    color: var(--muted-fg);
+    padding-left: 2px;
+  }
+
+  &__input {
+    flex: 1;
+    min-width: 0;
+    background: var(--input-bg);
+    color: var(--fg);
+    border: none;
+    box-shadow: inset 0 0 0 1px var(--border);
+    border-radius: $radius-sm;
+    padding: 4px $space-xs;
+    font-size: $text-sm;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    outline: none;
+    text-transform: uppercase;
+
+    &:focus {
+      box-shadow: inset 0 0 0 1px var(--pop);
+    }
+
+    &::placeholder {
+      color: var(--muted-fg);
+      text-transform: uppercase;
+    }
+  }
+
+  &__preview {
+    width: 24px;
+    height: 24px;
+    border-radius: $radius-sm;
+    flex-shrink: 0;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+  }
+}
+
+@keyframes colorPickerIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}

@@ -354,6 +354,8 @@ src/
     skeleton/                   Shimmer loading placeholders
     switch/                     Toggle switch (Radix)
     theme-switcher/             Mode slider + theme picker (Radix DropdownMenu, localStorage)
+    color-picker/               HSV gradient panel + hue slider + preset grid + hex input
+                                (Radix Popover, themed, commits on pointer up not drag)
     access-gate/                Permission wrapper (wired to useAccess, graceful outside CompanyProvider)
 
   styles/
@@ -427,7 +429,7 @@ npx drizzle-kit studio
 - `--pop` is the accent color per theme
 - Shadow tokens: `--shadow-xs`, `--shadow-sm`, `--shadow-md`, `--shadow-lg`, `--shadow-inset`
 - Card variants: `flat` (default), `raised` (elevated), `inset` (recessed)
-- UI primitives (15): Button, Card, Select (+ MultiSelect), Switch, Input, Badge, Skeleton, AccessGate, AppShell, Header, Footer, AuthCard, Avatar, ThemeSwitcher, NotificationBell
+- UI primitives (16): Button, Card, Select (+ MultiSelect), Switch, Input, Badge, Skeleton, AccessGate, AppShell, Header, Footer, AuthCard, Avatar, ThemeSwitcher, NotificationBell, ColorPicker
 - Feature shells: CompanyShell, SettingsShell (in `features/core/components/`, not the UI library)
   AdminShell was deleted — admin panel uses CompanyShell with the "admin" company
 - Dropdown style: pill-shaped rows, filled circle check icons, hover border
@@ -507,6 +509,7 @@ Sidebar is a sticky surface card with pill-shaped nav items using the shared
 19. **Server Component pages + optimistic mutations** — pages fetch data server-side (no client waterfall), client components receive `initialData` + `companySlug`, mutations update local state instantly then background-refresh via `useTransition`
 20. **Shared nav-pill mixin** — `@include nav-pill` in `_tokens.scss` for all pill-shaped interactive elements; active = text + border only, no bg fill
 21. **box-shadow borders on rounded elements** — `box-shadow: inset 0 0 0 1px` instead of CSS `border` for smooth anti-aliased corners
+22. **URL-persisted tab state** — tabs use `?tab=` search params so refresh/back/bookmarks restore the active tab
 
 ## ReBAC (Relationship-Based Access Control)
 
