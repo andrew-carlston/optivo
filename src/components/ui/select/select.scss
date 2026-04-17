@@ -164,20 +164,19 @@
 }
 
 .select__option {
+  all: unset;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
   padding: 6px 12px;
-  border: none;
   border-radius: $radius-full;
-  background: transparent;
   color: var(--muted-fg);
   font-size: 13px;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  outline: none;
   transition: color 0.15s, box-shadow 0.15s, background 0.15s;
   min-height: 32px;
 
