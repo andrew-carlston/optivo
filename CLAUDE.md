@@ -94,7 +94,7 @@ live under `/admin/platform/*` and only show in the Settings sidebar for super u
 /admin/profile
 /admin/settings                 Settings hub
 /admin/settings/org             Organization (5 tabs: Divisions, Departments, LOBs, Roles, Locations)
-/admin/settings/directory       Directory settings (4 tabs: Columns, Employment Types, Working Statuses, Default View)
+/admin/settings/directory       Directory column manager (drag-to-reorder, visibility/edit toggles, sensitivity; select-type columns expand to show inline options editor for ET/WS/custom)
 /admin/settings/integrations, /points, /templates, /templates/[id]
 
 # Platform-only — super users via Settings sidebar
@@ -116,7 +116,7 @@ live under `/admin/platform/*` and only show in the Settings sidebar for super u
 /[company]/profile
 /[company]/settings              Settings hub
 /[company]/settings/org          Organization (5 tabs: Divisions, Departments, LOBs, Roles, Locations)
-/[company]/settings/directory    Directory settings (4 tabs: Columns, Employment Types, Working Statuses, Default View)
+/[company]/settings/directory    Directory column manager (same as admin)
 /[company]/settings/integrations, /points, /templates, /templates/[id]
 ```
 
@@ -315,9 +315,12 @@ src/
       components/               directory-table, directory-toolbar, review-sidebar,
                                 pending-toast, employee-form, etc.
       components/
-        directory-settings/     Settings page (Columns with reorder, Employment Types,
-                                Working Statuses with color picker, Default View);
-                                Server Component pages, optimistic updates, inline editing
+        directory-settings/     Column manager — single page, no tabs; drag-to-reorder
+                                via @dnd-kit; select-type columns expand to show inline
+                                options editor (ET → hr.employment_types, WS →
+                                hr.working_statuses, org fields → link to org settings,
+                                custom → column.options jsonb); color picker for WS;
+                                Server Component pages, optimistic updates
       hooks/                    use-directory, use-draft-changes, use-directory-ws
     realtime/
       hooks/

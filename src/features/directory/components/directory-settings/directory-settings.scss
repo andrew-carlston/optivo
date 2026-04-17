@@ -20,59 +20,6 @@
     }
   }
 
-  // ── Tabs (underline style) ──
-  &__tabs {
-    display: flex;
-    gap: $space-xs;
-    border-bottom: 1px solid var(--border);
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  }
-
-  &__tab {
-    all: unset;
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: $space-sm;
-    padding: $space-sm $space-md;
-    font-size: $text-sm;
-    font-weight: 500;
-    color: var(--muted-fg);
-    cursor: pointer;
-    white-space: nowrap;
-    transition: color 0.12s;
-
-    &::after {
-      content: "";
-      position: absolute;
-      left: $space-md;
-      right: $space-md;
-      bottom: -1px;
-      height: 2px;
-      background: var(--pop);
-      border-radius: 2px 2px 0 0;
-      opacity: 0;
-      transition: opacity 0.12s;
-    }
-
-    &:hover {
-      color: var(--fg);
-    }
-
-    &--active {
-      color: var(--pop);
-      font-weight: 600;
-
-      &::after {
-        opacity: 1;
-      }
-    }
-  }
 
   // ── Column List ──
   &__col-list {
@@ -102,33 +49,24 @@
     }
   }
 
-  &__col-order {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    flex-shrink: 0;
-  }
-
-  &__col-arrow {
+  &__col-grip {
     all: unset;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 22px;
-    height: 16px;
-    border-radius: $radius-sm;
+    width: 24px;
+    flex-shrink: 0;
     color: var(--muted-fg);
-    cursor: pointer;
-    transition: background 0.12s, color 0.12s;
+    cursor: grab;
+    touch-action: none;
+    transition: color 0.12s;
 
-    &:hover:not(:disabled) {
-      background: var(--surface-2);
+    &:hover {
       color: var(--fg);
     }
 
-    &:disabled {
-      opacity: 0.25;
-      cursor: default;
+    &:active {
+      cursor: grabbing;
     }
   }
 
@@ -185,61 +123,116 @@
     min-width: 80px;
   }
 
-  // ── Status List ──
-  &__status-list {
-    display: flex;
-    flex-direction: column;
-    gap: $space-xs;
-  }
-
-  &__status-row {
+  // ── Column expand chevron ──
+  &__col-expand {
+    all: unset;
     display: flex;
     align-items: center;
-    gap: $space-md;
-    padding: $space-sm $space-md;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: $radius-md;
+    justify-content: center;
+    width: 20px;
+    flex-shrink: 0;
+    color: var(--muted-fg);
+    cursor: pointer;
+    transition: color 0.12s;
 
-    @media (max-width: 768px) {
-      flex-wrap: wrap;
-      gap: $space-sm;
+    &:hover {
+      color: var(--fg);
     }
   }
 
-  &__status-swatch {
-    width: 16px;
-    height: 16px;
-    border-radius: $radius-full;
-    flex-shrink: 0;
-    border: 1px solid var(--border);
+  // ── Expanded options section (below a column row) ──
+  &__col-options {
+    margin: -$space-xs 0 $space-xs;
+    padding: $space-md $space-lg $space-md calc($space-lg + 44px);
+    background: var(--surface-2);
+    box-shadow: inset 0 0 0 1px var(--border);
+    border-radius: 0 0 $radius-md $radius-md;
   }
 
-  &__status-info {
+  &__col-options-note {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    font-size: $text-sm;
+    color: var(--muted-fg);
+    margin: 0;
+
+    strong {
+      color: var(--pop);
+    }
+  }
+
+  // ── Options list (inline, used by ET/WS/custom select) ──
+  &__opts {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    flex: 1;
-    min-width: 0;
   }
 
-  &__status-label {
-    font-size: $text-sm;
-    font-weight: 600;
-    color: var(--fg);
-  }
-
-  &__status-value {
-    font-size: $text-xs;
-    color: var(--muted-fg);
-    font-family: monospace;
-  }
-
-  &__status-actions {
+  &__opt-row {
     display: flex;
     align-items: center;
-    gap: 2px;
-    flex-shrink: 0;
+    gap: $space-sm;
+    padding: $space-xs $space-sm;
+    border-radius: $radius-sm;
+    transition: background 0.12s;
+
+    &:hover {
+      background: var(--surface);
+    }
+
+    &--draft {
+      background: var(--surface);
+      padding: $space-sm;
+      border-radius: $radius-md;
+    }
+  }
+
+  &__opt-label {
+    all: unset;
+    flex: 1;
+    font-size: $text-sm;
+    color: var(--fg);
+    cursor: text;
+    padding: 2px $space-xs;
+    border-radius: $radius-sm;
+    transition: background 0.12s;
+
+    &:hover {
+      background: var(--surface);
+    }
+  }
+
+  &__opt-input {
+    flex: 1;
+    height: 28px;
+    padding: 2px $space-sm;
+    background: var(--input-bg);
+    color: var(--fg);
+    border: none;
+    box-shadow: inset 0 0 0 1px var(--pop);
+    border-radius: $radius-sm;
+    font: inherit;
+    font-size: $text-sm;
+    outline: none;
+  }
+
+  &__opt-add {
+    all: unset;
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+    padding: $space-xs $space-sm;
+    font-size: $text-sm;
+    color: var(--muted-fg);
+    cursor: pointer;
+    border-radius: $radius-sm;
+    transition: color 0.12s, background 0.12s;
+
+    &:hover {
+      color: var(--pop);
+      background: var(--surface);
+    }
   }
 
   // ── Empty ──
@@ -330,100 +323,6 @@
     gap: $space-sm;
   }
 
-  // ── Entity list (Employment Types / Working Statuses) ──
-
-  &__entity-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    border-radius: $radius-md;
-    overflow: hidden;
-  }
-
-  &__entity-row {
-    display: flex;
-    align-items: center;
-    gap: $space-md;
-    padding: $space-sm $space-md;
-    background: var(--surface);
-    transition: background 0.12s;
-
-    &:hover {
-      background: var(--surface-2);
-    }
-
-    &--archived {
-      opacity: 0.6;
-    }
-
-    &--draft {
-      background: var(--surface-2);
-    }
-  }
-
-  &__entity-info {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: $space-sm;
-    min-width: 0;
-  }
-
-  &__entity-name {
-    all: unset;
-    cursor: text;
-    font-size: $text-sm;
-    font-weight: 500;
-    color: var(--fg);
-    padding: 4px $space-xs;
-    border-radius: $radius-sm;
-    transition: background 0.12s;
-
-    &:hover:not(:disabled) {
-      background: var(--surface-2);
-    }
-
-    &:disabled {
-      cursor: default;
-    }
-  }
-
-  &__entity-input {
-    width: 100%;
-    max-width: 300px;
-    height: 32px;
-    padding: 4px $space-sm;
-    background: var(--surface);
-    color: var(--fg);
-    border: none;
-    box-shadow: inset 0 0 0 1px var(--pop);
-    border-radius: $radius-sm;
-    font: inherit;
-    font-size: $text-sm;
-    outline: none;
-  }
-
-  &__entity-code {
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: $text-sm;
-    color: var(--muted-fg);
-  }
-
-  &__entity-count {
-    font-size: $text-sm;
-    color: var(--muted-fg);
-    font-variant-numeric: tabular-nums;
-    min-width: 30px;
-    text-align: center;
-  }
-
-  &__entity-actions {
-    display: flex;
-    gap: 2px;
-    flex-shrink: 0;
-  }
 }
 
 @keyframes dir-fade-in {

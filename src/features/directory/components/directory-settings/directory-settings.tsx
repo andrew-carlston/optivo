@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useTransition } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Columns3, LayoutGrid, FileBadge, Activity, Archive, Pencil, Eye, EyeOff, ShieldCheck, Plus, GripVertical } from "lucide-react";
+import { Archive, Pencil, Eye, EyeOff, ShieldCheck, Plus, GripVertical, ChevronDown, ChevronRight, Activity, Link2 } from "lucide-react";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -11,13 +11,11 @@ import { Input } from "@/components/ui/input/input";
 import { Badge } from "@/components/ui/badge/badge";
 import { Switch } from "@/components/ui/switch/switch";
 import { Select, type SelectOption } from "@/components/ui/select/select";
-import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { ColorPicker } from "@/components/ui/color-picker/color-picker";
 import { cn } from "@/lib/cn";
-import type { ColumnRow, StatusOptionRow } from "@/features/directory/actions/directory-actions";
+import type { ColumnRow } from "@/features/directory/actions/directory-actions";
 import {
   getColumns, updateColumn, createCustomColumn, reorderColumns, archiveColumn,
-  getStatusOptions,
 } from "@/features/directory/actions/directory-actions";
 import type { EmploymentTypeRow, WorkingStatusRow } from "@/features/hr/actions/org-actions";
 import {
@@ -25,27 +23,16 @@ import {
   createEmploymentType, updateEmploymentType, archiveEmploymentType,
   createWorkingStatus, updateWorkingStatus, archiveWorkingStatus,
 } from "@/features/hr/actions/org-actions";
-import { generateLocalCode, composeFullCode } from "@/features/hr/components/org-settings/cost-code";
 import "./directory-settings.scss";
 
 // ── Types ──
 
-type Tab = "columns" | "employment-types" | "working-statuses" | "default-view";
-
 type Props = {
   companySlug: string;
   initialColumns: ColumnRow[];
-  initialStatusOptions: StatusOptionRow[];
   initialEmploymentTypes: EmploymentTypeRow[];
   initialWorkingStatuses: WorkingStatusRow[];
 };
-
-const TABS: { key: Tab; label: string; icon: typeof Columns3 }[] = [
-  { key: "columns", label: "Columns", icon: Columns3 },
-  { key: "employment-types", label: "Employment Types", icon: FileBadge },
-  { key: "working-statuses", label: "Working Statuses", icon: Activity },
-  { key: "default-view", label: "Default View", icon: LayoutGrid },
-];
 
 const COLUMN_TYPES: SelectOption[] = [
   { value: "text", label: "Text" },
@@ -62,20 +49,21 @@ const SENSITIVITY_OPTIONS: SelectOption[] = Array.from({ length: 10 }, (_, i) =>
   label: `Level ${i + 1}`,
 }));
 
+const ORG_BACKED_KEYS = new Set(["department_id", "division_id", "lob_id", "position_id", "location_id"]);
+
 // ── Component ──
 
 export function DirectorySettings({
   companySlug,
   initialColumns,
-  initialStatusOptions,
   initialEmploymentTypes,
   initialWorkingStatuses,
 }: Props) {
-  const [tab, setTab] = useState<Tab>("columns");
   const [columns, setColumns] = useState(initialColumns);
   const [etRows, setEtRows] = useState(initialEmploymentTypes);
   const [wsRows, setWsRows] = useState(initialWorkingStatuses);
   const [saving, setSaving] = useState(false);
+  const [expandedCol, setExpandedCol] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
   function bgRefresh() {
@@ -133,11 +121,11 @@ export function DirectorySettings({
 
   // ── Employment Types ──
 
-  async function handleCreateEt(name: string, costCode: string) {
+  async function handleCreateEt(name: string) {
     const tempId = `temp-${Date.now()}`;
-    setEtRows((prev) => [...prev, { id: tempId, name, costCode, active: true, sortOrder: 0, employeeCount: 0 }]);
+    setEtRows((prev) => [...prev, { id: tempId, name, costCode: null, active: true, sortOrder: 0, employeeCount: 0 }]);
     try {
-      const realId = await createEmploymentType(companySlug, { name, costCode: costCode || null });
+      const realId = await createEmploymentType(companySlug, { name });
       setEtRows((prev) => prev.map((r) => r.id === tempId ? { ...r, id: realId } : r));
     } catch {
       setEtRows((prev) => prev.filter((r) => r.id !== tempId));
@@ -159,11 +147,11 @@ export function DirectorySettings({
 
   // ── Working Statuses ──
 
-  async function handleCreateWs(name: string, costCode: string, color: string) {
+  async function handleCreateWs(name: string, color: string) {
     const tempId = `temp-${Date.now()}`;
-    setWsRows((prev) => [...prev, { id: tempId, name, costCode, color, active: true, sortOrder: 0, employeeCount: 0 }]);
+    setWsRows((prev) => [...prev, { id: tempId, name, costCode: null, color, active: true, sortOrder: 0, employeeCount: 0 }]);
     try {
-      const realId = await createWorkingStatus(companySlug, { name, color, costCode: costCode || null });
+      const realId = await createWorkingStatus(companySlug, { name, color });
       setWsRows((prev) => prev.map((r) => r.id === tempId ? { ...r, id: realId } : r));
     } catch {
       setWsRows((prev) => prev.filter((r) => r.id !== tempId));
@@ -183,75 +171,82 @@ export function DirectorySettings({
     bgRefresh();
   }
 
+  // ── Custom column options ──
+
+  async function handleUpdateColumnOptions(id: string, options: { value: string; label: string; color?: string }[]) {
+    applyColumnUpdate(id, { options } as any);
+  }
+
+  // ── DnD ──
+
+  const active = mergedColumns.filter((c) => c.active).sort((a, b) => a.sortOrder - b.sortOrder);
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active: a, over } = event;
+    if (!over || a.id === over.id) return;
+    const oldIdx = active.findIndex((c) => c.id === a.id);
+    const newIdx = active.findIndex((c) => c.id === over.id);
+    const reordered = arrayMove(active, oldIdx, newIdx);
+    const ids = reordered.map((c) => c.id);
+    setColumns((prev) => {
+      const map = new Map(prev.map((c) => [c.id, c]));
+      return ids.map((id, i) => ({ ...map.get(id)!, sortOrder: i }));
+    });
+    reorderColumns(companySlug, ids).then(() => bgRefresh());
+  }
+
   // ── Render ──
+
+  function getOptionsContext(col: ColumnRow) {
+    if (col.columnKey === "employment_type") return { type: "et" as const, rows: etRows };
+    if (col.columnKey === "employment_status") return { type: "ws" as const, rows: wsRows };
+    if (ORG_BACKED_KEYS.has(col.columnKey)) return { type: "org" as const };
+    if (col.type === "select") return { type: "custom" as const, options: col.options ?? [] };
+    return null;
+  }
+
+  const rows = active.map((col) => (
+    <SortableColumnRow
+      key={col.id}
+      col={col}
+      draggable={mounted}
+      expanded={expandedCol === col.id}
+      onToggleExpand={() => setExpandedCol((c) => c === col.id ? null : col.id)}
+      onToggleVisibility={() => applyColumnUpdate(col.id, { visibleByDefault: !col.visibleByDefault })}
+      onToggleEditable={() => applyColumnUpdate(col.id, { editable: !col.editable })}
+      onSensitivityChange={(level) => applyColumnUpdate(col.id, { sensitivityLevel: parseInt(level) })}
+      onArchive={() => { archiveColumn(companySlug, col.id); bgRefresh(); }}
+      optionsContext={getOptionsContext(col)}
+      onCreateEt={handleCreateEt}
+      onUpdateEt={handleUpdateEt}
+      onArchiveEt={handleArchiveEt}
+      onCreateWs={handleCreateWs}
+      onUpdateWs={handleUpdateWs}
+      onArchiveWs={handleArchiveWs}
+      onUpdateOptions={(opts) => handleUpdateColumnOptions(col.id, opts)}
+    />
+  ));
 
   return (
     <div className="dir-settings">
       <div className="dir-settings__header">
         <h2>Directory Settings</h2>
+        <Button variant="primary" size="sm" onClick={() => setShowCreateCol(true)}>
+          <Plus size={14} /> Custom Column
+        </Button>
       </div>
 
-      <div className="dir-settings__tabs">
-        {TABS.map((t) => (
-          <button
-            key={t.key}
-            className={cn("dir-settings__tab", tab === t.key && "dir-settings__tab--active")}
-            onClick={() => setTab(t.key)}
-          >
-            <t.icon size={14} />
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {tab === "columns" && (
-        <ColumnsTab
-          columns={mergedColumns}
-          onToggleVisibility={(col) => applyColumnUpdate(col.id, { visibleByDefault: !col.visibleByDefault })}
-          onToggleEditable={(col) => applyColumnUpdate(col.id, { editable: !col.editable })}
-          onSensitivityChange={(col, level) => applyColumnUpdate(col.id, { sensitivityLevel: parseInt(level) })}
-          onArchive={(id) => { archiveColumn(companySlug, id); bgRefresh(); }}
-          onAdd={() => setShowCreateCol(true)}
-          onSortEnd={(ids) => {
-            setColumns((prev) => {
-              const map = new Map(prev.map((c) => [c.id, c]));
-              return ids.map((id, i) => ({ ...map.get(id)!, sortOrder: i }));
-            });
-            reorderColumns(companySlug, ids).then(() => bgRefresh());
-          }}
-        />
-      )}
-
-      {tab === "employment-types" && (
-        <SimpleEntityTab
-          rows={etRows}
-          entityLabel="Employment Type"
-          showColor={false}
-          costCodePrefix="ET"
-          existingCodes={etRows}
-          onCreate={handleCreateEt}
-          onUpdate={handleUpdateEt}
-          onArchive={handleArchiveEt}
-        />
-      )}
-
-      {tab === "working-statuses" && (
-        <SimpleEntityTab
-          rows={wsRows}
-          entityLabel="Working Status"
-          showColor
-          costCodePrefix="WS"
-          existingCodes={wsRows}
-          onCreate={(name, costCode, color) => handleCreateWs(name, costCode, color!)}
-          onUpdate={handleUpdateWs}
-          onArchive={handleArchiveWs}
-        />
-      )}
-
-      {tab === "default-view" && (
-        <p className="dir-settings__empty">
-          Default view configuration will be available once the directory has data.
-        </p>
+      {mounted ? (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={active.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+            <div className="dir-settings__col-list">{rows}</div>
+          </SortableContext>
+        </DndContext>
+      ) : (
+        <div className="dir-settings__col-list">{rows}</div>
       )}
 
       {/* Create Column Dialog */}
@@ -291,74 +286,39 @@ export function DirectorySettings({
   );
 }
 
-// ── Columns Tab ──
+// ── Sortable Column Row ──
 
-function ColumnsTab({
-  columns, onToggleVisibility, onToggleEditable, onSensitivityChange, onArchive, onAdd, onSortEnd,
-}: {
-  columns: ColumnRow[];
-  onToggleVisibility: (col: ColumnRow) => void;
-  onToggleEditable: (col: ColumnRow) => void;
-  onSensitivityChange: (col: ColumnRow, level: string) => void;
-  onArchive: (id: string) => void;
-  onAdd: () => void;
-  onSortEnd: (orderedIds: string[]) => void;
-}) {
-  const active = columns.filter((c) => c.active).sort((a, b) => a.sortOrder - b.sortOrder);
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
-
-  function handleDragEnd(event: DragEndEvent) {
-    const { active: a, over } = event;
-    if (!over || a.id === over.id) return;
-    const oldIdx = active.findIndex((c) => c.id === a.id);
-    const newIdx = active.findIndex((c) => c.id === over.id);
-    const reordered = arrayMove(active, oldIdx, newIdx);
-    onSortEnd(reordered.map((c) => c.id));
-  }
-
-  const rows = active.map((col) => (
-    <SortableColumnRow
-      key={col.id}
-      col={col}
-      draggable={mounted}
-      onToggleVisibility={onToggleVisibility}
-      onToggleEditable={onToggleEditable}
-      onSensitivityChange={onSensitivityChange}
-      onArchive={onArchive}
-    />
-  ));
-
-  return (
-    <>
-      <div className="dir-settings__toolbar">
-        <Button variant="primary" size="sm" onClick={onAdd}>
-          <Plus size={14} /> Custom Column
-        </Button>
-      </div>
-      {mounted ? (
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={active.map((c) => c.id)} strategy={verticalListSortingStrategy}>
-            <div className="dir-settings__col-list">{rows}</div>
-          </SortableContext>
-        </DndContext>
-      ) : (
-        <div className="dir-settings__col-list">{rows}</div>
-      )}
-    </>
-  );
-}
+type OptionsContext =
+  | { type: "et"; rows: EmploymentTypeRow[] }
+  | { type: "ws"; rows: WorkingStatusRow[] }
+  | { type: "org" }
+  | { type: "custom"; options: { value: string; label: string; color?: string }[] }
+  | null;
 
 function SortableColumnRow({
-  col, draggable, onToggleVisibility, onToggleEditable, onSensitivityChange, onArchive,
+  col, draggable, expanded, onToggleExpand,
+  onToggleVisibility, onToggleEditable, onSensitivityChange, onArchive,
+  optionsContext,
+  onCreateEt, onUpdateEt, onArchiveEt,
+  onCreateWs, onUpdateWs, onArchiveWs,
+  onUpdateOptions,
 }: {
   col: ColumnRow;
   draggable: boolean;
-  onToggleVisibility: (col: ColumnRow) => void;
-  onToggleEditable: (col: ColumnRow) => void;
-  onSensitivityChange: (col: ColumnRow, level: string) => void;
-  onArchive: (id: string) => void;
+  expanded: boolean;
+  onToggleExpand: () => void;
+  onToggleVisibility: () => void;
+  onToggleEditable: () => void;
+  onSensitivityChange: (level: string) => void;
+  onArchive: () => void;
+  optionsContext: OptionsContext;
+  onCreateEt: (name: string) => void;
+  onUpdateEt: (id: string, patch: Record<string, any>) => void;
+  onArchiveEt: (id: string) => void;
+  onCreateWs: (name: string, color: string) => void;
+  onUpdateWs: (id: string, patch: Record<string, any>) => void;
+  onArchiveWs: (id: string) => void;
+  onUpdateOptions: (opts: { value: string; label: string; color?: string }[]) => void;
 }) {
   const sortable = useSortable({ id: col.id, disabled: !draggable });
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = sortable;
@@ -370,197 +330,216 @@ function SortableColumnRow({
     zIndex: isDragging ? 10 : undefined,
   } : undefined;
 
+  const hasOptions = optionsContext !== null;
+
   return (
-    <div ref={setNodeRef} style={style} className="dir-settings__col-row">
-      <button type="button" className="dir-settings__col-grip" {...(draggable ? { ...attributes, ...listeners } : {})}>
-        <GripVertical size={16} />
-      </button>
-      <div className="dir-settings__col-info">
-        <div className="dir-settings__col-name">
-          {col.label}
-          <Badge variant={col.isSystem ? "default" : "info"}>
-            {col.isSystem ? "System" : "Custom"}
-          </Badge>
-          <Badge variant="outline">{col.type}</Badge>
-        </div>
-        <span className="dir-settings__col-key">{col.columnKey}</span>
-      </div>
-      <div className="dir-settings__col-controls">
-        <div className="dir-settings__col-toggle">
-          {col.visibleByDefault ? <Eye size={14} /> : <EyeOff size={14} />}
-          <Switch checked={col.visibleByDefault} onCheckedChange={() => onToggleVisibility(col)} />
-        </div>
-        <div className="dir-settings__col-toggle">
-          <Pencil size={14} />
-          <Switch checked={col.editable} onCheckedChange={() => onToggleEditable(col)} />
-        </div>
-        <div className="dir-settings__col-sensitivity">
-          <ShieldCheck size={14} />
-          <Select options={SENSITIVITY_OPTIONS} value={String(col.sensitivityLevel)} onChange={(v) => onSensitivityChange(col, v)} placeholder="Level" />
-        </div>
-        {!col.isSystem && (
-          <Button variant="ghost" size="icon" onClick={() => onArchive(col.id)}>
-            <Archive size={14} />
-          </Button>
+    <>
+      <div ref={setNodeRef} style={style} className="dir-settings__col-row">
+        <button type="button" className="dir-settings__col-grip" {...(draggable ? { ...attributes, ...listeners } : {})}>
+          <GripVertical size={16} />
+        </button>
+        {hasOptions && (
+          <button type="button" className="dir-settings__col-expand" onClick={onToggleExpand}>
+            {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          </button>
         )}
+        <div className="dir-settings__col-info">
+          <div className="dir-settings__col-name">
+            {col.label}
+            <Badge variant={col.isSystem ? "default" : "info"}>
+              {col.isSystem ? "System" : "Custom"}
+            </Badge>
+            <Badge variant="outline">{col.type}</Badge>
+          </div>
+          <span className="dir-settings__col-key">{col.columnKey}</span>
+        </div>
+        <div className="dir-settings__col-controls">
+          <div className="dir-settings__col-toggle">
+            {col.visibleByDefault ? <Eye size={14} /> : <EyeOff size={14} />}
+            <Switch checked={col.visibleByDefault} onCheckedChange={onToggleVisibility} />
+          </div>
+          <div className="dir-settings__col-toggle">
+            <Pencil size={14} />
+            <Switch checked={col.editable} onCheckedChange={onToggleEditable} />
+          </div>
+          <div className="dir-settings__col-sensitivity">
+            <ShieldCheck size={14} />
+            <Select options={SENSITIVITY_OPTIONS} value={String(col.sensitivityLevel)} onChange={onSensitivityChange} placeholder="Level" />
+          </div>
+          {!col.isSystem && (
+            <Button variant="ghost" size="icon" onClick={onArchive}>
+              <Archive size={14} />
+            </Button>
+          )}
+        </div>
       </div>
-    </div>
+      {expanded && hasOptions && (
+        <div className="dir-settings__col-options">
+          {optionsContext.type === "org" && (
+            <p className="dir-settings__col-options-note">
+              <Link2 size={14} /> Options managed in <strong>Organization</strong> settings
+            </p>
+          )}
+          {optionsContext.type === "et" && (
+            <OptionsList
+              items={optionsContext.rows.filter((r) => r.active).map((r) => ({ id: r.id, label: r.name }))}
+              showColor={false}
+              onAdd={(name) => onCreateEt(name)}
+              onRename={(id, name) => onUpdateEt(id, { name })}
+              onArchive={onArchiveEt}
+              placeholder="Employment type name..."
+            />
+          )}
+          {optionsContext.type === "ws" && (
+            <OptionsList
+              items={optionsContext.rows.filter((r) => r.active).map((r) => ({ id: r.id, label: r.name, color: r.color }))}
+              showColor
+              onAdd={(name, color) => onCreateWs(name, color!)}
+              onRename={(id, name) => onUpdateWs(id, { name })}
+              onColorChange={(id, color) => onUpdateWs(id, { color })}
+              onArchive={onArchiveWs}
+              placeholder="Working status name..."
+            />
+          )}
+          {optionsContext.type === "custom" && (
+            <OptionsList
+              items={optionsContext.options.map((o, i) => ({ id: String(i), label: o.label, color: o.color }))}
+              showColor
+              onAdd={(label, color) => {
+                const value = label.trim().toLowerCase().replace(/\s+/g, "_");
+                onUpdateOptions([...optionsContext.options, { value, label: label.trim(), color }]);
+              }}
+              onRename={(id, label) => {
+                const opts = [...optionsContext.options];
+                const idx = parseInt(id);
+                opts[idx] = { ...opts[idx], label };
+                onUpdateOptions(opts);
+              }}
+              onColorChange={(id, color) => {
+                const opts = [...optionsContext.options];
+                const idx = parseInt(id);
+                opts[idx] = { ...opts[idx], color };
+                onUpdateOptions(opts);
+              }}
+              onArchive={(id) => {
+                const opts = optionsContext.options.filter((_, i) => String(i) !== id);
+                onUpdateOptions(opts);
+              }}
+              placeholder="Option label..."
+            />
+          )}
+        </div>
+      )}
+    </>
   );
 }
 
-// ── Reusable inline-edit tab for simple entities (Employment Types / Working Statuses) ──
+// ── Inline options list (used by ET, WS, and custom select columns) ──
 
-function SimpleEntityTab({
-  rows, entityLabel, showColor, costCodePrefix, existingCodes,
-  onCreate, onUpdate, onArchive,
+function OptionsList({
+  items, showColor, onAdd, onRename, onColorChange, onArchive, placeholder,
 }: {
-  rows: (EmploymentTypeRow | WorkingStatusRow)[];
-  entityLabel: string;
+  items: { id: string; label: string; color?: string }[];
   showColor: boolean;
-  costCodePrefix: string;
-  existingCodes: { costCode: string | null }[];
-  onCreate: (name: string, costCode: string, color?: string) => void;
-  onUpdate: (id: string, patch: Record<string, any>) => void;
+  onAdd: (label: string, color?: string) => void;
+  onRename: (id: string, label: string) => void;
+  onColorChange?: (id: string, color: string) => void;
   onArchive: (id: string) => void;
+  placeholder: string;
 }) {
-  const [showInactive, setShowInactive] = useState(false);
-  const [addName, setAddName] = useState("");
-  const [addColor, setAddColor] = useState("#6B7280");
   const [adding, setAdding] = useState(false);
-
-  const filtered = showInactive ? rows : rows.filter((r) => r.active);
-
-  const usedCodes = new Set(existingCodes.filter((r) => r.costCode).map((r) => {
-    const code = r.costCode!;
-    const idx = code.lastIndexOf("-");
-    return idx === -1 ? code : code.slice(idx + 1);
-  }));
+  const [addLabel, setAddLabel] = useState("");
+  const [addColor, setAddColor] = useState("#6B7280");
 
   function commitAdd() {
-    const name = addName.trim();
-    if (!name) return;
-    const local = generateLocalCode(name, usedCodes);
-    const costCode = `${costCodePrefix}-${local}`;
-    onCreate(name, costCode, showColor ? addColor : undefined);
-    setAddName("");
+    const label = addLabel.trim();
+    if (!label) return;
+    onAdd(label, showColor ? addColor : undefined);
+    setAddLabel("");
     setAddColor("#6B7280");
     setAdding(false);
   }
 
   return (
-    <>
-      <div className="dir-settings__toolbar">
-        <Switch checked={showInactive} onCheckedChange={setShowInactive} label="Inactive" />
-        <Button variant="primary" size="sm" onClick={() => setAdding(true)} disabled={adding}>
-          <Plus size={14} /> Add
-        </Button>
-      </div>
-      <div className="dir-settings__entity-list">
-        {adding && (
-          <div className="dir-settings__entity-row dir-settings__entity-row--draft">
-            {showColor && (
-              <ColorPicker value={addColor} onChange={setAddColor} />
-            )}
-            <input
-              className="dir-settings__entity-input"
-              placeholder={`${entityLabel} name...`}
-              value={addName}
-              autoFocus
-              onChange={(e) => setAddName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") commitAdd();
-                if (e.key === "Escape") { setAdding(false); setAddName(""); }
-              }}
-            />
-            <div className="dir-settings__entity-actions">
-              <Button variant="ghost" size="icon" onClick={commitAdd} title="Save"><Plus size={14} /></Button>
-              <Button variant="ghost" size="icon" onClick={() => { setAdding(false); setAddName(""); }} title="Cancel"><Archive size={14} /></Button>
-            </div>
-          </div>
-        )}
-        {filtered.length === 0 && !adding && (
-          <p className="dir-settings__empty">No {entityLabel.toLowerCase()}s yet.</p>
-        )}
-        {filtered.map((row) => (
-          <SimpleEntityRow
-            key={row.id}
-            row={row}
-            showColor={showColor}
-            onUpdate={onUpdate}
-            onArchive={onArchive}
+    <div className="dir-settings__opts">
+      {items.map((item) => (
+        <OptionRow
+          key={item.id}
+          item={item}
+          showColor={showColor}
+          onRename={(label) => onRename(item.id, label)}
+          onColorChange={onColorChange ? (c) => onColorChange(item.id, c) : undefined}
+          onArchive={() => onArchive(item.id)}
+        />
+      ))}
+      {adding ? (
+        <div className="dir-settings__opt-row dir-settings__opt-row--draft">
+          {showColor && <ColorPicker value={addColor} onChange={setAddColor} />}
+          <input
+            className="dir-settings__opt-input"
+            placeholder={placeholder}
+            value={addLabel}
+            autoFocus
+            onChange={(e) => setAddLabel(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") commitAdd();
+              if (e.key === "Escape") { setAdding(false); setAddLabel(""); }
+            }}
           />
-        ))}
-      </div>
-    </>
+          <Button variant="ghost" size="icon" onClick={commitAdd} title="Add"><Plus size={14} /></Button>
+        </div>
+      ) : (
+        <button type="button" className="dir-settings__opt-add" onClick={() => setAdding(true)}>
+          <Plus size={14} /> Add option
+        </button>
+      )}
+    </div>
   );
 }
 
-function SimpleEntityRow({
-  row, showColor, onUpdate, onArchive,
+function OptionRow({
+  item, showColor, onRename, onColorChange, onArchive,
 }: {
-  row: EmploymentTypeRow | WorkingStatusRow;
+  item: { id: string; label: string; color?: string };
   showColor: boolean;
-  onUpdate: (id: string, patch: Record<string, any>) => void;
-  onArchive: (id: string) => void;
+  onRename: (label: string) => void;
+  onColorChange?: (color: string) => void;
+  onArchive: () => void;
 }) {
   const [editing, setEditing] = useState(false);
-  const [name, setName] = useState(row.name);
-  const archived = !row.active;
-  const color = (row as WorkingStatusRow).color;
+  const [label, setLabel] = useState(item.label);
 
-  function commitName() {
-    const trimmed = name.trim();
-    if (trimmed && trimmed !== row.name) onUpdate(row.id, { name: trimmed });
+  function commit() {
+    const trimmed = label.trim();
+    if (trimmed && trimmed !== item.label) onRename(trimmed);
     setEditing(false);
   }
 
   return (
-    <div className={cn("dir-settings__entity-row", archived && "dir-settings__entity-row--archived")}>
-      {showColor && color && (
-        <ColorPicker
-          value={color}
-          disabled={archived}
-          onChange={(c) => onUpdate(row.id, { color: c })}
-        />
+    <div className="dir-settings__opt-row">
+      {showColor && item.color && onColorChange && (
+        <ColorPicker value={item.color} onChange={onColorChange} />
       )}
-      <div className="dir-settings__entity-info">
-        {editing ? (
-          <input
-            className="dir-settings__entity-input"
-            value={name}
-            autoFocus
-            onChange={(e) => setName(e.target.value)}
-            onBlur={commitName}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") commitName();
-              if (e.key === "Escape") { setName(row.name); setEditing(false); }
-            }}
-          />
-        ) : (
-          <button
-            type="button"
-            className="dir-settings__entity-name"
-            onClick={() => !archived && setEditing(true)}
-            disabled={archived}
-          >
-            {row.name}
-          </button>
-        )}
-        {row.costCode && <span className="dir-settings__entity-code">{row.costCode}</span>}
-        {archived && <Badge variant="warning">Inactive</Badge>}
-      </div>
-      <span className="dir-settings__entity-count">{row.employeeCount}</span>
-      <div className="dir-settings__entity-actions">
-        {archived ? (
-          <Button variant="ghost" size="icon" onClick={() => onUpdate(row.id, { active: true })} title="Restore">
-            <Activity size={14} />
-          </Button>
-        ) : (
-          <Button variant="ghost" size="icon" onClick={() => onArchive(row.id)} title="Archive">
-            <Archive size={14} />
-          </Button>
-        )}
-      </div>
+      {editing ? (
+        <input
+          className="dir-settings__opt-input"
+          value={label}
+          autoFocus
+          onChange={(e) => setLabel(e.target.value)}
+          onBlur={commit}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") commit();
+            if (e.key === "Escape") { setLabel(item.label); setEditing(false); }
+          }}
+        />
+      ) : (
+        <button type="button" className="dir-settings__opt-label" onClick={() => setEditing(true)}>
+          {item.label}
+        </button>
+      )}
+      <Button variant="ghost" size="icon" onClick={onArchive} title="Remove">
+        <Archive size={14} />
+      </Button>
     </div>
   );
 }
