@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useTransition } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Archive, Pencil, Eye, EyeOff, ShieldCheck, Plus, GripVertical, ChevronDown, ChevronRight, Activity, Link2 } from "lucide-react";
+import { Archive, Eye, EyeOff, Plus, GripVertical, ChevronDown, ChevronRight, Link2 } from "lucide-react";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -80,7 +80,6 @@ export function DirectorySettings({
     });
   }
 
-  // ── Column optimistic overrides ──
   const [colOverrides, setColOverrides] = useState<Record<string, Partial<ColumnRow>>>({});
   const mergedColumns = useMemo(
     () => columns.map((c) => ({ ...c, ...(colOverrides[c.id] ?? {}) })),
@@ -98,28 +97,26 @@ export function DirectorySettings({
 
   // Create column dialog
   const [showCreateCol, setShowCreateCol] = useState(false);
-  const [newColKey, setNewColKey] = useState("");
   const [newColLabel, setNewColLabel] = useState("");
   const [newColType, setNewColType] = useState("text");
-  const [newColSensitivity, setNewColSensitivity] = useState("1");
 
   async function handleCreateColumn() {
-    if (!newColKey.trim() || !newColLabel.trim()) return;
+    if (!newColLabel.trim()) return;
     setSaving(true);
     try {
+      const key = newColLabel.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_");
       await createCustomColumn(companySlug, {
-        columnKey: newColKey.trim().toLowerCase().replace(/\s+/g, "_"),
+        columnKey: key,
         label: newColLabel.trim(),
         type: newColType,
-        sensitivityLevel: parseInt(newColSensitivity),
       });
       setShowCreateCol(false);
-      setNewColKey(""); setNewColLabel(""); setNewColType("text"); setNewColSensitivity("1");
+      setNewColLabel(""); setNewColType("text");
       bgRefresh();
     } finally { setSaving(false); }
   }
 
-  // ── Employment Types ──
+  // ── ET / WS handlers ──
 
   async function handleCreateEt(name: string) {
     const tempId = `temp-${Date.now()}`;
@@ -127,9 +124,7 @@ export function DirectorySettings({
     try {
       const realId = await createEmploymentType(companySlug, { name });
       setEtRows((prev) => prev.map((r) => r.id === tempId ? { ...r, id: realId } : r));
-    } catch {
-      setEtRows((prev) => prev.filter((r) => r.id !== tempId));
-    }
+    } catch { setEtRows((prev) => prev.filter((r) => r.id !== tempId)); }
     bgRefresh();
   }
 
@@ -145,17 +140,13 @@ export function DirectorySettings({
     bgRefresh();
   }
 
-  // ── Working Statuses ──
-
   async function handleCreateWs(name: string, color: string) {
     const tempId = `temp-${Date.now()}`;
     setWsRows((prev) => [...prev, { id: tempId, name, costCode: null, color, active: true, sortOrder: 0, employeeCount: 0 }]);
     try {
       const realId = await createWorkingStatus(companySlug, { name, color });
       setWsRows((prev) => prev.map((r) => r.id === tempId ? { ...r, id: realId } : r));
-    } catch {
-      setWsRows((prev) => prev.filter((r) => r.id !== tempId));
-    }
+    } catch { setWsRows((prev) => prev.filter((r) => r.id !== tempId)); }
     bgRefresh();
   }
 
@@ -170,8 +161,6 @@ export function DirectorySettings({
     await archiveWorkingStatus(companySlug, id);
     bgRefresh();
   }
-
-  // ── Custom column options ──
 
   async function handleUpdateColumnOptions(id: string, options: { value: string; label: string; color?: string }[]) {
     applyColumnUpdate(id, { options } as any);
@@ -198,8 +187,6 @@ export function DirectorySettings({
     reorderColumns(companySlug, ids).then(() => bgRefresh());
   }
 
-  // ── Render ──
-
   function getOptionsContext(col: ColumnRow) {
     if (col.columnKey === "employment_type") return { type: "et" as const, rows: etRows };
     if (col.columnKey === "employment_status") return { type: "ws" as const, rows: wsRows };
@@ -215,9 +202,7 @@ export function DirectorySettings({
       draggable={mounted}
       expanded={expandedCol === col.id}
       onToggleExpand={() => setExpandedCol((c) => c === col.id ? null : col.id)}
-      onToggleVisibility={() => applyColumnUpdate(col.id, { visibleByDefault: !col.visibleByDefault })}
-      onToggleEditable={() => applyColumnUpdate(col.id, { editable: !col.editable })}
-      onSensitivityChange={(level) => applyColumnUpdate(col.id, { sensitivityLevel: parseInt(level) })}
+      onUpdate={(patch) => applyColumnUpdate(col.id, patch)}
       onArchive={() => { archiveColumn(companySlug, col.id); bgRefresh(); }}
       optionsContext={getOptionsContext(col)}
       onCreateEt={handleCreateEt}
@@ -261,23 +246,13 @@ export function DirectorySettings({
                 <Input placeholder="e.g., Badge Number" value={newColLabel} onChange={(e) => setNewColLabel(e.target.value)} autoFocus />
               </label>
               <label className="dir-settings__dialog-label">
-                Key
-                <Input placeholder="e.g., badge_number" value={newColKey} onChange={(e) => setNewColKey(e.target.value)} />
+                Type
+                <Select options={COLUMN_TYPES} value={newColType} onChange={setNewColType} placeholder="Select type..." />
               </label>
-              <div className="dir-settings__dialog-row">
-                <label className="dir-settings__dialog-label">
-                  Type
-                  <Select options={COLUMN_TYPES} value={newColType} onChange={setNewColType} placeholder="Select type..." />
-                </label>
-                <label className="dir-settings__dialog-label">
-                  Sensitivity Level
-                  <Select options={SENSITIVITY_OPTIONS} value={newColSensitivity} onChange={setNewColSensitivity} />
-                </label>
-              </div>
             </div>
             <div className="dir-settings__dialog-actions">
               <Button variant="outline" onClick={() => setShowCreateCol(false)}>Cancel</Button>
-              <Button variant="primary" onClick={handleCreateColumn} loading={saving} disabled={!newColLabel.trim() || !newColKey.trim()}>Create</Button>
+              <Button variant="primary" onClick={handleCreateColumn} loading={saving} disabled={!newColLabel.trim()}>Create</Button>
             </div>
           </Dialog.Content>
         </Dialog.Portal>
@@ -297,7 +272,7 @@ type OptionsContext =
 
 function SortableColumnRow({
   col, draggable, expanded, onToggleExpand,
-  onToggleVisibility, onToggleEditable, onSensitivityChange, onArchive,
+  onUpdate, onArchive,
   optionsContext,
   onCreateEt, onUpdateEt, onArchiveEt,
   onCreateWs, onUpdateWs, onArchiveWs,
@@ -307,9 +282,7 @@ function SortableColumnRow({
   draggable: boolean;
   expanded: boolean;
   onToggleExpand: () => void;
-  onToggleVisibility: () => void;
-  onToggleEditable: () => void;
-  onSensitivityChange: (level: string) => void;
+  onUpdate: (patch: Partial<ColumnRow>) => void;
   onArchive: () => void;
   optionsContext: OptionsContext;
   onCreateEt: (name: string) => void;
@@ -330,67 +303,80 @@ function SortableColumnRow({
     zIndex: isDragging ? 10 : undefined,
   } : undefined;
 
-  const hasOptions = optionsContext !== null;
-
   return (
-    <>
-      <div ref={setNodeRef} style={style} className="dir-settings__col-row">
+    <div ref={setNodeRef} style={style} className="dir-settings__col-wrap">
+      <div className={cn("dir-settings__col-row", expanded && "dir-settings__col-row--expanded")}>
         <button type="button" className="dir-settings__col-grip" {...(draggable ? { ...attributes, ...listeners } : {})}>
-          <GripVertical size={16} />
+          <GripVertical size={14} />
         </button>
-        {hasOptions && (
-          <button type="button" className="dir-settings__col-expand" onClick={onToggleExpand}>
-            {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-          </button>
-        )}
-        <div className="dir-settings__col-info">
-          <div className="dir-settings__col-name">
-            {col.label}
-            <Badge variant={col.isSystem ? "default" : "info"}>
-              {col.isSystem ? "System" : "Custom"}
-            </Badge>
-            <Badge variant="outline">{col.type}</Badge>
-          </div>
-          <span className="dir-settings__col-key">{col.columnKey}</span>
+
+        <button
+          type="button"
+          className="dir-settings__col-toggle-expand"
+          onClick={onToggleExpand}
+        >
+          {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+        </button>
+
+        <div className="dir-settings__col-info" onClick={onToggleExpand}>
+          <span className="dir-settings__col-label">{col.label}</span>
+          <span className="dir-settings__col-meta">
+            {col.type}
+            {!col.isSystem && " · custom"}
+          </span>
         </div>
-        <div className="dir-settings__col-controls">
-          <div className="dir-settings__col-toggle">
-            {col.visibleByDefault ? <Eye size={14} /> : <EyeOff size={14} />}
-            <Switch checked={col.visibleByDefault} onCheckedChange={onToggleVisibility} />
-          </div>
-          <div className="dir-settings__col-toggle">
-            <Pencil size={14} />
-            <Switch checked={col.editable} onCheckedChange={onToggleEditable} />
-          </div>
-          <div className="dir-settings__col-sensitivity">
-            <ShieldCheck size={14} />
-            <Select options={SENSITIVITY_OPTIONS} value={String(col.sensitivityLevel)} onChange={onSensitivityChange} placeholder="Level" />
-          </div>
+
+        <div className="dir-settings__col-actions">
+          <button
+            type="button"
+            className={cn("dir-settings__col-vis", !col.visibleByDefault && "dir-settings__col-vis--hidden")}
+            onClick={() => onUpdate({ visibleByDefault: !col.visibleByDefault })}
+            title={col.visibleByDefault ? "Visible — click to hide" : "Hidden — click to show"}
+          >
+            {col.visibleByDefault ? <Eye size={16} /> : <EyeOff size={16} />}
+          </button>
           {!col.isSystem && (
-            <Button variant="ghost" size="icon" onClick={onArchive}>
+            <Button variant="ghost" size="icon" onClick={onArchive} title="Archive">
               <Archive size={14} />
             </Button>
           )}
         </div>
       </div>
-      {expanded && hasOptions && (
-        <div className="dir-settings__col-options">
-          {optionsContext.type === "org" && (
-            <p className="dir-settings__col-options-note">
+
+      {expanded && (
+        <div className="dir-settings__col-detail">
+          {/* Settings row */}
+          <div className="dir-settings__col-settings">
+            <Switch checked={col.editable} onCheckedChange={(v) => onUpdate({ editable: v })} label="Editable" />
+            <Switch checked={col.visibleByDefault} onCheckedChange={(v) => onUpdate({ visibleByDefault: v })} label="Visible" />
+            <div className="dir-settings__col-sens">
+              <span>Sensitivity</span>
+              <Select
+                options={SENSITIVITY_OPTIONS}
+                value={String(col.sensitivityLevel)}
+                onChange={(v) => onUpdate({ sensitivityLevel: parseInt(v) })}
+                className="dir-settings__col-sens-select"
+              />
+            </div>
+          </div>
+
+          {/* Options section for select types */}
+          {optionsContext?.type === "org" && (
+            <p className="dir-settings__col-note">
               <Link2 size={14} /> Options managed in <strong>Organization</strong> settings
             </p>
           )}
-          {optionsContext.type === "et" && (
+          {optionsContext?.type === "et" && (
             <OptionsList
               items={optionsContext.rows.filter((r) => r.active).map((r) => ({ id: r.id, label: r.name }))}
               showColor={false}
               onAdd={(name) => onCreateEt(name)}
               onRename={(id, name) => onUpdateEt(id, { name })}
               onArchive={onArchiveEt}
-              placeholder="Employment type name..."
+              placeholder="Employment type..."
             />
           )}
-          {optionsContext.type === "ws" && (
+          {optionsContext?.type === "ws" && (
             <OptionsList
               items={optionsContext.rows.filter((r) => r.active).map((r) => ({ id: r.id, label: r.name, color: r.color }))}
               showColor
@@ -398,10 +384,10 @@ function SortableColumnRow({
               onRename={(id, name) => onUpdateWs(id, { name })}
               onColorChange={(id, color) => onUpdateWs(id, { color })}
               onArchive={onArchiveWs}
-              placeholder="Working status name..."
+              placeholder="Working status..."
             />
           )}
-          {optionsContext.type === "custom" && (
+          {optionsContext?.type === "custom" && (
             <OptionsList
               items={optionsContext.options.map((o, i) => ({ id: String(i), label: o.label, color: o.color }))}
               showColor
@@ -411,30 +397,27 @@ function SortableColumnRow({
               }}
               onRename={(id, label) => {
                 const opts = [...optionsContext.options];
-                const idx = parseInt(id);
-                opts[idx] = { ...opts[idx], label };
+                opts[parseInt(id)] = { ...opts[parseInt(id)], label };
                 onUpdateOptions(opts);
               }}
               onColorChange={(id, color) => {
                 const opts = [...optionsContext.options];
-                const idx = parseInt(id);
-                opts[idx] = { ...opts[idx], color };
+                opts[parseInt(id)] = { ...opts[parseInt(id)], color };
                 onUpdateOptions(opts);
               }}
               onArchive={(id) => {
-                const opts = optionsContext.options.filter((_, i) => String(i) !== id);
-                onUpdateOptions(opts);
+                onUpdateOptions(optionsContext.options.filter((_, i) => String(i) !== id));
               }}
               placeholder="Option label..."
             />
           )}
         </div>
       )}
-    </>
+    </div>
   );
 }
 
-// ── Inline options list (used by ET, WS, and custom select columns) ──
+// ── Inline options list ──
 
 function OptionsList({
   items, showColor, onAdd, onRename, onColorChange, onArchive, placeholder,
@@ -462,6 +445,7 @@ function OptionsList({
 
   return (
     <div className="dir-settings__opts">
+      <div className="dir-settings__opts-header">Options</div>
       {items.map((item) => (
         <OptionRow
           key={item.id}
@@ -486,7 +470,7 @@ function OptionsList({
               if (e.key === "Escape") { setAdding(false); setAddLabel(""); }
             }}
           />
-          <Button variant="ghost" size="icon" onClick={commitAdd} title="Add"><Plus size={14} /></Button>
+          <Button variant="ghost" size="icon" onClick={commitAdd}><Plus size={14} /></Button>
         </div>
       ) : (
         <button type="button" className="dir-settings__opt-add" onClick={() => setAdding(true)}>

@@ -5,7 +5,6 @@
   flex-direction: column;
   gap: $space-lg;
 
-  // ── Header ──
   &__header {
     display: flex;
     align-items: center;
@@ -20,32 +19,33 @@
     }
   }
 
-
-  // ── Column List ──
+  // ── Column list ──
   &__col-list {
     display: flex;
     flex-direction: column;
     gap: $space-xs;
   }
 
+  &__col-wrap {
+    border-radius: $radius-md;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 1px var(--border);
+  }
+
   &__col-row {
     display: flex;
     align-items: center;
-    gap: $space-md;
+    gap: $space-sm;
     padding: $space-sm $space-md;
     background: var(--surface);
-    box-shadow: inset 0 0 0 1px var(--border);
-    border-radius: $radius-md;
-    transition: box-shadow 0.12s;
+    transition: background 0.12s;
 
     &:hover {
-      box-shadow: inset 0 0 0 1px var(--border-strong);
+      background: var(--surface-2);
     }
 
-    @media (max-width: 768px) {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: $space-sm;
+    &--expanded {
+      border-bottom: 1px solid var(--border);
     }
   }
 
@@ -54,15 +54,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
+    width: 20px;
     flex-shrink: 0;
     color: var(--muted-fg);
     cursor: grab;
     touch-action: none;
-    transition: color 0.12s;
+    opacity: 0.4;
+    transition: opacity 0.12s;
 
-    &:hover {
-      color: var(--fg);
+    .dir-settings__col-row:hover & {
+      opacity: 1;
     }
 
     &:active {
@@ -70,61 +71,7 @@
     }
   }
 
-  &__col-info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    flex: 1;
-    min-width: 0;
-  }
-
-  &__col-name {
-    font-size: $text-sm;
-    font-weight: 600;
-    color: var(--fg);
-    display: flex;
-    align-items: center;
-    gap: $space-sm;
-  }
-
-  &__col-key {
-    font-size: $text-xs;
-    color: var(--muted-fg);
-    font-family: monospace;
-  }
-
-  &__col-controls {
-    display: flex;
-    align-items: center;
-    gap: $space-sm;
-    flex-shrink: 0;
-
-    @media (max-width: 768px) {
-      width: 100%;
-      justify-content: space-between;
-    }
-  }
-
-  &__col-toggle {
-    display: flex;
-    align-items: center;
-    gap: $space-xs;
-    font-size: $text-xs;
-    color: var(--muted-fg);
-    white-space: nowrap;
-  }
-
-  &__col-sensitivity {
-    display: flex;
-    align-items: center;
-    gap: $space-xs;
-    font-size: $text-xs;
-    color: var(--muted-fg);
-    min-width: 80px;
-  }
-
-  // ── Column expand chevron ──
-  &__col-expand {
+  &__col-toggle-expand {
     all: unset;
     display: flex;
     align-items: center;
@@ -140,33 +87,128 @@
     }
   }
 
-  // ── Expanded options section (below a column row) ──
-  &__col-options {
-    margin: -$space-xs 0 $space-xs;
-    padding: $space-md $space-lg $space-md calc($space-lg + 44px);
-    background: var(--surface-2);
-    box-shadow: inset 0 0 0 1px var(--border);
-    border-radius: 0 0 $radius-md $radius-md;
+  &__col-info {
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: baseline;
+    gap: $space-sm;
   }
 
-  &__col-options-note {
+  &__col-label {
+    font-size: $text-sm;
+    font-weight: 600;
+    color: var(--fg);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__col-meta {
+    font-size: $text-xs;
+    color: var(--muted-fg);
+    white-space: nowrap;
+  }
+
+  &__col-actions {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+    flex-shrink: 0;
+  }
+
+  &__col-vis {
+    all: unset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: $radius-sm;
+    color: var(--pop);
+    cursor: pointer;
+    transition: color 0.12s, background 0.12s;
+
+    &:hover {
+      background: var(--surface-2);
+    }
+
+    &--hidden {
+      color: var(--muted-fg);
+      opacity: 0.5;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  // ── Expanded detail section ──
+  &__col-detail {
+    padding: $space-md $space-lg $space-lg;
+    padding-left: calc($space-lg + 40px);
+    background: var(--surface-2);
+    display: flex;
+    flex-direction: column;
+    gap: $space-md;
+  }
+
+  &__col-settings {
+    display: flex;
+    align-items: center;
+    gap: $space-lg;
+    flex-wrap: wrap;
+  }
+
+  &__col-sens {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    font-size: $text-sm;
+    color: var(--fg);
+
+    .select__trigger {
+      min-height: 32px;
+      height: 32px;
+      width: 110px;
+      font-size: $text-sm;
+    }
+  }
+
+  &__col-note {
     display: flex;
     align-items: center;
     gap: $space-sm;
     font-size: $text-sm;
     color: var(--muted-fg);
     margin: 0;
+    padding: $space-sm;
+    background: var(--surface);
+    border-radius: $radius-sm;
 
     strong {
       color: var(--pop);
     }
   }
 
-  // ── Options list (inline, used by ET/WS/custom select) ──
+  // ── Options list ──
   &__opts {
     display: flex;
     flex-direction: column;
     gap: 2px;
+    background: var(--surface);
+    border-radius: $radius-md;
+    padding: $space-sm;
+  }
+
+  &__opts-header {
+    font-size: $text-xs;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted-fg);
+    padding: $space-xs $space-sm;
   }
 
   &__opt-row {
@@ -178,13 +220,13 @@
     transition: background 0.12s;
 
     &:hover {
-      background: var(--surface);
+      background: var(--surface-2);
     }
 
     &--draft {
-      background: var(--surface);
+      background: var(--surface-2);
       padding: $space-sm;
-      border-radius: $radius-md;
+      border-radius: $radius-sm;
     }
   }
 
@@ -196,11 +238,6 @@
     cursor: text;
     padding: 2px $space-xs;
     border-radius: $radius-sm;
-    transition: background 0.12s;
-
-    &:hover {
-      background: var(--surface);
-    }
   }
 
   &__opt-input {
@@ -227,11 +264,10 @@
     color: var(--muted-fg);
     cursor: pointer;
     border-radius: $radius-sm;
-    transition: color 0.12s, background 0.12s;
+    transition: color 0.12s;
 
     &:hover {
       color: var(--pop);
-      background: var(--surface);
     }
   }
 
@@ -243,21 +279,12 @@
     font-size: $text-sm;
   }
 
-  // ── Toolbar ──
-  &__toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: $space-sm;
-  }
-
   // ── Dialog ──
   &__overlay {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.4);
     z-index: $z-modal;
-    animation: dir-fade-in 0.15s ease;
   }
 
   &__dialog {
@@ -265,20 +292,14 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: min(480px, 90vw);
-    max-height: 85vh;
-    overflow-y: auto;
+    width: min(420px, 90vw);
     background: var(--surface);
-    border: 1px solid var(--border);
+    box-shadow: inset 0 0 0 1px var(--border), var(--shadow-lg);
     border-radius: $radius-lg;
-    box-shadow: var(--shadow-lg);
     padding: $space-xl;
     z-index: $z-modal;
-    animation: dir-fade-in 0.15s ease;
 
-    &:focus {
-      outline: none;
-    }
+    &:focus { outline: none; }
   }
 
   &__dialog-title {
@@ -304,28 +325,9 @@
     color: var(--fg);
   }
 
-  &__dialog-row {
-    display: flex;
-    gap: $space-sm;
-
-    > * {
-      flex: 1;
-    }
-
-    @media (max-width: 480px) {
-      flex-direction: column;
-    }
-  }
-
   &__dialog-actions {
     display: flex;
     justify-content: flex-end;
     gap: $space-sm;
   }
-
-}
-
-@keyframes dir-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
