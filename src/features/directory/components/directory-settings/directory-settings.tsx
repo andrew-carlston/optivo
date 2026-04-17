@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useTransition } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Archive, Eye, EyeOff, Plus, GripVertical, ChevronDown, ChevronRight, Link2 } from "lucide-react";
+import { Archive, Eye, EyeOff, Plus, GripVertical, ChevronDown, ChevronRight, Link2, Search } from "lucide-react";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -168,7 +168,11 @@ export function DirectorySettings({
 
   // ── DnD ──
 
-  const active = mergedColumns.filter((c) => c.active).sort((a, b) => a.sortOrder - b.sortOrder);
+  const [search, setSearch] = useState("");
+  const allActive = mergedColumns.filter((c) => c.active).sort((a, b) => a.sortOrder - b.sortOrder);
+  const active = search
+    ? allActive.filter((c) => c.label.toLowerCase().includes(search.toLowerCase()) || c.columnKey.toLowerCase().includes(search.toLowerCase()))
+    : allActive;
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
@@ -219,9 +223,19 @@ export function DirectorySettings({
     <div className="dir-settings">
       <div className="dir-settings__header">
         <h2>Directory Settings</h2>
-        <Button variant="primary" size="sm" onClick={() => setShowCreateCol(true)}>
-          <Plus size={14} /> Custom Column
-        </Button>
+        <div className="dir-settings__header-actions">
+          <div className="dir-settings__search">
+            <Input
+              placeholder="Search columns..."
+              icon={<Search size={15} />}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <Button variant="primary" size="sm" onClick={() => setShowCreateCol(true)}>
+            <Plus size={14} /> Custom Column
+          </Button>
+        </div>
       </div>
 
       {mounted ? (

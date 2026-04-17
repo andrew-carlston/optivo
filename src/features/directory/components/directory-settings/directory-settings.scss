@@ -19,6 +19,16 @@
     }
   }
 
+  &__header-actions {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+  }
+
+  &__search {
+    width: 220px;
+  }
+
   // ── Column list ──
   &__col-list {
     display: flex;
