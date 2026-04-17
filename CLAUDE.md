@@ -93,8 +93,8 @@ live under `/admin/platform/*` and only show in the Settings sidebar for super u
 /admin/hr, /staffing, /cost, /analytics              (stubs)
 /admin/profile
 /admin/settings                 Settings hub
-/admin/settings/org             Organization (7 tabs: Divisions, Departments, LOBs, Roles, Locations, Employment Types, Working Statuses)
-/admin/settings/directory       Directory column config + statuses + default view
+/admin/settings/org             Organization (5 tabs: Divisions, Departments, LOBs, Roles, Locations)
+/admin/settings/directory       Directory settings (4 tabs: Columns, Employment Types, Working Statuses, Default View)
 /admin/settings/integrations, /points, /templates, /templates/[id]
 
 # Platform-only — super users via Settings sidebar
@@ -115,8 +115,8 @@ live under `/admin/platform/*` and only show in the Settings sidebar for super u
 /[company]/hr, /staffing, /cost, /analytics
 /[company]/profile
 /[company]/settings              Settings hub
-/[company]/settings/org          Organization (7 tabs: Divisions, Departments, LOBs, Roles, Locations, Employment Types, Working Statuses)
-/[company]/settings/directory    Directory column config + statuses
+/[company]/settings/org          Organization (5 tabs: Divisions, Departments, LOBs, Roles, Locations)
+/[company]/settings/directory    Directory settings (4 tabs: Columns, Employment Types, Working Statuses, Default View)
 /[company]/settings/integrations, /points, /templates, /templates/[id]
 ```
 
@@ -287,7 +287,7 @@ src/
                                 employment_types, working_statuses — all share cost_code;
                                 getOrgStructureAll batched loader (7 entity + count queries)
       components/
-        org-settings/           Settings page for the org structure (7 tabs, inline data table)
+        org-settings/           Settings page for the org structure (5 tabs, inline data table)
           org-settings.tsx      Main component — takes companySlug + initialData from Server
                                 Component page; optimistic updates + background refresh;
                                 calls server actions directly (no callback prop threading)
@@ -313,7 +313,11 @@ src/
         page-data-actions.ts    Batched directory page loader (one auth round-trip)
         directory-actions.ts, employee-actions.ts, lock-actions.ts   Barrel re-exports
       components/               directory-table, directory-toolbar, review-sidebar,
-                                pending-toast, employee-form, directory-settings, etc.
+                                pending-toast, employee-form, etc.
+      components/
+        directory-settings/     Settings page (Columns with reorder, Employment Types,
+                                Working Statuses with color picker, Default View);
+                                Server Component pages, optimistic updates, inline editing
       hooks/                    use-directory, use-draft-changes, use-directory-ws
     realtime/
       hooks/

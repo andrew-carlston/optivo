@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Archive, ArchiveRestore, Check, RotateCcw, X, ChevronDown, ChevronRight } from "lucide-react";
-import { ColorPicker } from "@/components/ui/color-picker/color-picker";
 import { Button } from "@/components/ui/button/button";
 import { Select, type SelectOption } from "@/components/ui/select/select";
 import { Switch } from "@/components/ui/switch/switch";
@@ -10,16 +9,14 @@ import { Badge } from "@/components/ui/badge/badge";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { cn } from "@/lib/cn";
 import type {
-  DepartmentRow, DivisionRow, EmploymentTypeRow, LobRow,
-  LocationRow, PositionRow, WorkingStatusRow,
+  DepartmentRow, DivisionRow, LobRow,
+  LocationRow, PositionRow,
 } from "@/features/hr/actions/org-actions";
 import { LocationFields, type LocationFieldValues } from "./location-fields";
 import { NONE, toIdOrNull, type Tab } from "./_shared";
 import type { DraftRow } from "./org-settings";
 
-type Row =
-  | DivisionRow | LocationRow | LobRow | DepartmentRow | PositionRow
-  | EmploymentTypeRow | WorkingStatusRow;
+type Row = DivisionRow | LocationRow | LobRow | DepartmentRow | PositionRow;
 
 export type TableHandlers = {
   onArchive: (item: any) => Promise<void>;
@@ -79,10 +76,6 @@ function colsForTab(tab: Tab): ColumnDef[] {
         { key: "division", label: "Division", width: "150px" },
         ...tail,
       ];
-    case "employment_types":
-      return [...base, ...tail];
-    case "working_statuses":
-      return [...base, { key: "color", label: "Color", width: "80px" }, ...tail];
   }
 }
 
@@ -251,24 +244,6 @@ function InlineSelect({
   );
 }
 
-function InlineColor({
-  value,
-  onCommit,
-  disabled,
-}: {
-  value: string;
-  onCommit: (next: string) => Promise<void> | void;
-  disabled?: boolean;
-}) {
-  return (
-    <ColorPicker
-      value={value}
-      disabled={disabled}
-      onChange={(c) => onCommit(c)}
-    />
-  );
-}
-
 function InlineActive({
   active,
   onToggle,
@@ -427,16 +402,6 @@ function ItemRow({
                     {tab === "locations" && item.isRemote && <Badge variant="info">Remote</Badge>}
                     {archived && <Badge variant="warning">Inactive</Badge>}
                   </div>
-                </td>
-              );
-            case "color":
-              return (
-                <td key={c.key}>
-                  <InlineColor
-                    value={item.color ?? "#6b7280"}
-                    disabled={archived}
-                    onCommit={(v) => handlers.onUpdateField(item, "color", v)}
-                  />
                 </td>
               );
             case "parent":
@@ -682,15 +647,6 @@ function DraftRowView({
                       if (e.key === "Enter") { e.preventDefault(); onCommit(); }
                       if (e.key === "Escape") onCancel();
                     }}
-                  />
-                </td>
-              );
-            case "color":
-              return (
-                <td key={c.key}>
-                  <InlineColor
-                    value={draft.color ?? "#6b7280"}
-                    onCommit={(v) => onChange({ color: v })}
                   />
                 </td>
               );

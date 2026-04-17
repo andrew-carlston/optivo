@@ -87,18 +87,48 @@
     gap: $space-md;
     padding: $space-sm $space-md;
     background: var(--surface);
-    border: 1px solid var(--border);
+    box-shadow: inset 0 0 0 1px var(--border);
     border-radius: $radius-md;
-    transition: border-color 0.12s;
+    transition: box-shadow 0.12s;
 
     &:hover {
-      border-color: var(--border-strong);
+      box-shadow: inset 0 0 0 1px var(--border-strong);
     }
 
     @media (max-width: 768px) {
       flex-direction: column;
       align-items: flex-start;
       gap: $space-sm;
+    }
+  }
+
+  &__col-order {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    flex-shrink: 0;
+  }
+
+  &__col-arrow {
+    all: unset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 16px;
+    border-radius: $radius-sm;
+    color: var(--muted-fg);
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+
+    &:hover:not(:disabled) {
+      background: var(--surface-2);
+      color: var(--fg);
+    }
+
+    &:disabled {
+      opacity: 0.25;
+      cursor: default;
     }
   }
 
@@ -300,29 +330,99 @@
     gap: $space-sm;
   }
 
-  &__color-input {
+  // ── Entity list (Employment Types / Working Statuses) ──
+
+  &__entity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: $radius-md;
+    overflow: hidden;
+  }
+
+  &__entity-row {
+    display: flex;
+    align-items: center;
+    gap: $space-md;
+    padding: $space-sm $space-md;
+    background: var(--surface);
+    transition: background 0.12s;
+
+    &:hover {
+      background: var(--surface-2);
+    }
+
+    &--archived {
+      opacity: 0.6;
+    }
+
+    &--draft {
+      background: var(--surface-2);
+    }
+  }
+
+  &__entity-info {
+    flex: 1;
     display: flex;
     align-items: center;
     gap: $space-sm;
+    min-width: 0;
+  }
 
-    input[type="color"] {
-      width: 36px;
-      height: 36px;
-      border: 1px solid var(--border);
-      border-radius: $radius-sm;
-      padding: 2px;
-      cursor: pointer;
-      background: var(--surface);
+  &__entity-name {
+    all: unset;
+    cursor: text;
+    font-size: $text-sm;
+    font-weight: 500;
+    color: var(--fg);
+    padding: 4px $space-xs;
+    border-radius: $radius-sm;
+    transition: background 0.12s;
 
-      &::-webkit-color-swatch-wrapper {
-        padding: 0;
-      }
-
-      &::-webkit-color-swatch {
-        border: none;
-        border-radius: 4px;
-      }
+    &:hover:not(:disabled) {
+      background: var(--surface-2);
     }
+
+    &:disabled {
+      cursor: default;
+    }
+  }
+
+  &__entity-input {
+    width: 100%;
+    max-width: 300px;
+    height: 32px;
+    padding: 4px $space-sm;
+    background: var(--surface);
+    color: var(--fg);
+    border: none;
+    box-shadow: inset 0 0 0 1px var(--pop);
+    border-radius: $radius-sm;
+    font: inherit;
+    font-size: $text-sm;
+    outline: none;
+  }
+
+  &__entity-code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: $text-sm;
+    color: var(--muted-fg);
+  }
+
+  &__entity-count {
+    font-size: $text-sm;
+    color: var(--muted-fg);
+    font-variant-numeric: tabular-nums;
+    min-width: 30px;
+    text-align: center;
+  }
+
+  &__entity-actions {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
   }
 }
 

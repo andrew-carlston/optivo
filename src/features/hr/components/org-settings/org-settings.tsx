@@ -10,7 +10,6 @@ import { Switch } from "@/components/ui/switch/switch";
 import { cn } from "@/lib/cn";
 import type {
   DepartmentRow, DivisionRow, LobRow, PositionRow, LocationRow,
-  EmploymentTypeRow, WorkingStatusRow,
 } from "@/features/hr/actions/org-actions";
 import {
   getOrgStructureAll,
@@ -19,8 +18,6 @@ import {
   createLob, updateLob, archiveLob,
   createPosition, updatePosition, archivePosition,
   createLocation, updateLocation, archiveLocation,
-  createEmploymentType, updateEmploymentType, archiveEmploymentType,
-  createWorkingStatus, updateWorkingStatus, archiveWorkingStatus,
 } from "@/features/hr/actions/org-actions";
 import { type LocationFieldValues } from "./location-fields";
 import { TABS, NONE, toId, toIdOrNull, EMPTY_LOC, type Tab, type LocationInput } from "./_shared";
@@ -36,8 +33,6 @@ export type OrgData = {
   lobs: LobRow[];
   positions: PositionRow[];
   locations: LocationRow[];
-  employmentTypes: EmploymentTypeRow[];
-  workingStatuses: WorkingStatusRow[];
 };
 
 export type DraftRow = {
@@ -67,8 +62,6 @@ function listForTab(data: OrgData, tab: Tab): any[] {
     case "lobs": return data.lobs;
     case "positions": return data.positions;
     case "locations": return data.locations;
-    case "employment_types": return data.employmentTypes;
-    case "working_statuses": return data.workingStatuses;
   }
 }
 
@@ -77,15 +70,13 @@ function updateList(data: OrgData, tab: Tab, fn: (items: any[]) => any[]): OrgDa
     tab === "departments" ? "departments" :
     tab === "divisions" ? "divisions" :
     tab === "lobs" ? "lobs" :
-    tab === "positions" ? "positions" :
-    tab === "locations" ? "locations" :
-    tab === "employment_types" ? "employmentTypes" : "workingStatuses";
+    tab === "positions" ? "positions" : "locations";
   return { ...data, [key]: fn(data[key]) };
 }
 
 // ── Component ──
 
-const VALID_TABS = new Set<string>(["divisions","departments","lobs","positions","locations","employment_types","working_statuses"]);
+const VALID_TABS = new Set<string>(["divisions","departments","lobs","positions","locations"]);
 
 export function OrgSettings({ companySlug, initialData }: OrgSettingsProps) {
   const searchParams = useSearchParams();
@@ -158,8 +149,6 @@ export function OrgSettings({ companySlug, initialData }: OrgSettingsProps) {
     lobs: data.lobs.filter((l) => l.active).length,
     departments: data.departments.filter((d) => d.active).length,
     positions: data.positions.filter((p) => p.active).length,
-    employment_types: data.employmentTypes.filter((e) => e.active).length,
-    working_statuses: data.workingStatuses.filter((w) => w.active).length,
   };
 
   const deptOptions: SelectOption[] = useMemo(() =>
@@ -226,8 +215,6 @@ export function OrgSettings({ companySlug, initialData }: OrgSettingsProps) {
       case "lobs": await updateLob(companySlug, item.id, { active: next }); break;
       case "positions": await updatePosition(companySlug, item.id, { active: next }); break;
       case "locations": await updateLocation(companySlug, item.id, { name: item.name, active: next }); break;
-      case "employment_types": await updateEmploymentType(companySlug, item.id, { active: next }); break;
-      case "working_statuses": await updateWorkingStatus(companySlug, item.id, { active: next }); break;
     }
     bgRefresh();
   }
@@ -282,8 +269,6 @@ export function OrgSettings({ companySlug, initialData }: OrgSettingsProps) {
       case "locations":
         await updateLocation(companySlug, item.id, { name: field === "name" ? value : item.name, ...patch });
         break;
-      case "employment_types": await updateEmploymentType(companySlug, item.id, patch); break;
-      case "working_statuses": await updateWorkingStatus(companySlug, item.id, patch); break;
     }
     bgRefresh();
   }
@@ -298,8 +283,6 @@ export function OrgSettings({ companySlug, initialData }: OrgSettingsProps) {
       case "lobs": await archiveLob(companySlug, item.id); break;
       case "positions": await archivePosition(companySlug, item.id); break;
       case "locations": await archiveLocation(companySlug, item.id); break;
-      case "employment_types": await archiveEmploymentType(companySlug, item.id); break;
-      case "working_statuses": await archiveWorkingStatus(companySlug, item.id); break;
     }
     bgRefresh();
   }
@@ -316,7 +299,7 @@ export function OrgSettings({ companySlug, initialData }: OrgSettingsProps) {
       tempId: `draft-${Date.now()}`,
       name: "",
       costCode: "",
-      color: tab === "working_statuses" ? "#6b7280" : undefined,
+      color: undefined,
       parentId: NONE,
       divisionId: NONE,
       lobId: NONE,
@@ -399,12 +382,6 @@ export function OrgSettings({ companySlug, initialData }: OrgSettingsProps) {
           });
           break;
         }
-        case "employment_types":
-          realId = await createEmploymentType(companySlug, { name, costCode: costCode || null });
-          break;
-        case "working_statuses":
-          realId = await createWorkingStatus(companySlug, { name, color: draft.color ?? "#6b7280", costCode: costCode || null });
-          break;
       }
       // Swap temp ID with real one
       if (realId) {

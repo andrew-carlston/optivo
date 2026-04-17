@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
+import "./org-settings.scss";
 
 export function OrgSettingsSkeleton() {
   return (
@@ -9,7 +10,7 @@ export function OrgSettingsSkeleton() {
 
       {/* Tab bar skeleton */}
       <div className="org-settings__tabs">
-        {Array.from({ length: 7 }).map((_, i) => (
+        {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} style={{ padding: "8px 12px" }}>
             <Skeleton width={i % 2 === 0 ? 100 : 80} height={16} />
           </div>
