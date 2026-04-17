@@ -2,7 +2,10 @@
 
 import { useState, useMemo, useTransition } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Columns3, LayoutGrid, FileBadge, Activity, Archive, Pencil, Eye, EyeOff, ShieldCheck, Plus, ChevronUp, ChevronDown } from "lucide-react";
+import { Columns3, LayoutGrid, FileBadge, Activity, Archive, Pencil, Eye, EyeOff, ShieldCheck, Plus, GripVertical } from "lucide-react";
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button/button";
 import { Input } from "@/components/ui/input/input";
 import { Badge } from "@/components/ui/badge/badge";
@@ -209,15 +212,8 @@ export function DirectorySettings({
           onSensitivityChange={(col, level) => applyColumnUpdate(col.id, { sensitivityLevel: parseInt(level) })}
           onArchive={(id) => { archiveColumn(companySlug, id); bgRefresh(); }}
           onAdd={() => setShowCreateCol(true)}
-          onReorder={(id, dir) => {
-            const active = mergedColumns.filter((c) => c.active).sort((a, b) => a.sortOrder - b.sortOrder);
-            const idx = active.findIndex((c) => c.id === id);
-            const swapIdx = dir === "up" ? idx - 1 : idx + 1;
-            if (swapIdx < 0 || swapIdx >= active.length) return;
-            const thisOrder = active[idx].sortOrder;
-            const thatOrder = active[swapIdx].sortOrder;
-            applyColumnUpdate(id, { sortOrder: thatOrder });
-            applyColumnUpdate(active[swapIdx].id, { sortOrder: thisOrder });
+          onSortEnd={(ids) => {
+            ids.forEach((id, i) => applyColumnUpdate(id, { sortOrder: i }));
           }}
         />
       )}
@@ -294,7 +290,7 @@ export function DirectorySettings({
 // ── Columns Tab ──
 
 function ColumnsTab({
-  columns, onToggleVisibility, onToggleEditable, onSensitivityChange, onArchive, onAdd, onReorder,
+  columns, onToggleVisibility, onToggleEditable, onSensitivityChange, onArchive, onAdd, onSortEnd,
 }: {
   columns: ColumnRow[];
   onToggleVisibility: (col: ColumnRow) => void;
@@ -302,9 +298,20 @@ function ColumnsTab({
   onSensitivityChange: (col: ColumnRow, level: string) => void;
   onArchive: (id: string) => void;
   onAdd: () => void;
-  onReorder: (id: string, direction: "up" | "down") => void;
+  onSortEnd: (orderedIds: string[]) => void;
 }) {
   const active = columns.filter((c) => c.active).sort((a, b) => a.sortOrder - b.sortOrder);
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active: a, over } = event;
+    if (!over || a.id === over.id) return;
+    const oldIdx = active.findIndex((c) => c.id === a.id);
+    const newIdx = active.findIndex((c) => c.id === over.id);
+    const reordered = arrayMove(active, oldIdx, newIdx);
+    onSortEnd(reordered.map((c) => c.id));
+  }
+
   return (
     <>
       <div className="dir-settings__toolbar">
@@ -312,62 +319,79 @@ function ColumnsTab({
           <Plus size={14} /> Custom Column
         </Button>
       </div>
-      <div className="dir-settings__col-list">
-        {active.map((col, i) => (
-          <div key={col.id} className="dir-settings__col-row">
-            <div className="dir-settings__col-order">
-              <button
-                type="button"
-                className="dir-settings__col-arrow"
-                disabled={i === 0}
-                onClick={() => onReorder(col.id, "up")}
-                title="Move up"
-              >
-                <ChevronUp size={14} />
-              </button>
-              <button
-                type="button"
-                className="dir-settings__col-arrow"
-                disabled={i === active.length - 1}
-                onClick={() => onReorder(col.id, "down")}
-                title="Move down"
-              >
-                <ChevronDown size={14} />
-              </button>
-            </div>
-            <div className="dir-settings__col-info">
-              <div className="dir-settings__col-name">
-                {col.label}
-                <Badge variant={col.isSystem ? "default" : "info"}>
-                  {col.isSystem ? "System" : "Custom"}
-                </Badge>
-                <Badge variant="outline">{col.type}</Badge>
-              </div>
-              <span className="dir-settings__col-key">{col.columnKey}</span>
-            </div>
-            <div className="dir-settings__col-controls">
-              <div className="dir-settings__col-toggle">
-                {col.visibleByDefault ? <Eye size={14} /> : <EyeOff size={14} />}
-                <Switch checked={col.visibleByDefault} onCheckedChange={() => onToggleVisibility(col)} />
-              </div>
-              <div className="dir-settings__col-toggle">
-                <Pencil size={14} />
-                <Switch checked={col.editable} onCheckedChange={() => onToggleEditable(col)} />
-              </div>
-              <div className="dir-settings__col-sensitivity">
-                <ShieldCheck size={14} />
-                <Select options={SENSITIVITY_OPTIONS} value={String(col.sensitivityLevel)} onChange={(v) => onSensitivityChange(col, v)} placeholder="Level" />
-              </div>
-              {!col.isSystem && (
-                <Button variant="ghost" size="icon" onClick={() => onArchive(col.id)}>
-                  <Archive size={14} />
-                </Button>
-              )}
-            </div>
+      <DndContext id="col-sort" sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={active.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+          <div className="dir-settings__col-list">
+            {active.map((col) => (
+              <SortableColumnRow
+                key={col.id}
+                col={col}
+                onToggleVisibility={onToggleVisibility}
+                onToggleEditable={onToggleEditable}
+                onSensitivityChange={onSensitivityChange}
+                onArchive={onArchive}
+              />
+            ))}
           </div>
-        ))}
-      </div>
+        </SortableContext>
+      </DndContext>
     </>
+  );
+}
+
+function SortableColumnRow({
+  col, onToggleVisibility, onToggleEditable, onSensitivityChange, onArchive,
+}: {
+  col: ColumnRow;
+  onToggleVisibility: (col: ColumnRow) => void;
+  onToggleEditable: (col: ColumnRow) => void;
+  onSensitivityChange: (col: ColumnRow, level: string) => void;
+  onArchive: (id: string) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: col.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : undefined,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="dir-settings__col-row">
+      <button type="button" className="dir-settings__col-grip" {...attributes} {...listeners}>
+        <GripVertical size={16} />
+      </button>
+      <div className="dir-settings__col-info">
+        <div className="dir-settings__col-name">
+          {col.label}
+          <Badge variant={col.isSystem ? "default" : "info"}>
+            {col.isSystem ? "System" : "Custom"}
+          </Badge>
+          <Badge variant="outline">{col.type}</Badge>
+        </div>
+        <span className="dir-settings__col-key">{col.columnKey}</span>
+      </div>
+      <div className="dir-settings__col-controls">
+        <div className="dir-settings__col-toggle">
+          {col.visibleByDefault ? <Eye size={14} /> : <EyeOff size={14} />}
+          <Switch checked={col.visibleByDefault} onCheckedChange={() => onToggleVisibility(col)} />
+        </div>
+        <div className="dir-settings__col-toggle">
+          <Pencil size={14} />
+          <Switch checked={col.editable} onCheckedChange={() => onToggleEditable(col)} />
+        </div>
+        <div className="dir-settings__col-sensitivity">
+          <ShieldCheck size={14} />
+          <Select options={SENSITIVITY_OPTIONS} value={String(col.sensitivityLevel)} onChange={(v) => onSensitivityChange(col, v)} placeholder="Level" />
+        </div>
+        {!col.isSystem && (
+          <Button variant="ghost" size="icon" onClick={() => onArchive(col.id)}>
+            <Archive size={14} />
+          </Button>
+        )}
+      </div>
+    </div>
   );
 }
 
