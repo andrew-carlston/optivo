@@ -154,6 +154,20 @@ export async function createCustomColumn(
   return row.id;
 }
 
+export async function reorderColumns(companySlug: string, orderedIds: string[]): Promise<void> {
+  const ctx = await getActionContext(companySlug);
+  await requireDirectorySettingsAccess(ctx.branchDb, ctx.user, "edit");
+
+  await Promise.all(
+    orderedIds.map((id, i) =>
+      ctx.branchDb
+        .update(directory.columns)
+        .set({ sort_order: i })
+        .where(and(eq(directory.columns.id, id), eq(directory.columns.company_id, ctx.company.id)))
+    )
+  );
+}
+
 export async function archiveColumn(companySlug: string, id: string): Promise<void> {
   const ctx = await getActionContext(companySlug);
   await requireDirectorySettingsAccess(ctx.branchDb, ctx.user, "edit");

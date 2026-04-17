@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useTransition } from "react";
+import { useState, useMemo, useEffect, useTransition } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Columns3, LayoutGrid, FileBadge, Activity, Archive, Pencil, Eye, EyeOff, ShieldCheck, Plus, GripVertical } from "lucide-react";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
@@ -16,7 +16,7 @@ import { ColorPicker } from "@/components/ui/color-picker/color-picker";
 import { cn } from "@/lib/cn";
 import type { ColumnRow, StatusOptionRow } from "@/features/directory/actions/directory-actions";
 import {
-  getColumns, updateColumn, createCustomColumn, archiveColumn,
+  getColumns, updateColumn, createCustomColumn, reorderColumns, archiveColumn,
   getStatusOptions,
 } from "@/features/directory/actions/directory-actions";
 import type { EmploymentTypeRow, WorkingStatusRow } from "@/features/hr/actions/org-actions";
@@ -213,7 +213,11 @@ export function DirectorySettings({
           onArchive={(id) => { archiveColumn(companySlug, id); bgRefresh(); }}
           onAdd={() => setShowCreateCol(true)}
           onSortEnd={(ids) => {
-            ids.forEach((id, i) => applyColumnUpdate(id, { sortOrder: i }));
+            setColumns((prev) => {
+              const map = new Map(prev.map((c) => [c.id, c]));
+              return ids.map((id, i) => ({ ...map.get(id)!, sortOrder: i }));
+            });
+            reorderColumns(companySlug, ids).then(() => bgRefresh());
           }}
         />
       )}
@@ -302,6 +306,8 @@ function ColumnsTab({
 }) {
   const active = columns.filter((c) => c.active).sort((a, b) => a.sortOrder - b.sortOrder);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   function handleDragEnd(event: DragEndEvent) {
     const { active: a, over } = event;
@@ -312,6 +318,18 @@ function ColumnsTab({
     onSortEnd(reordered.map((c) => c.id));
   }
 
+  const rows = active.map((col) => (
+    <SortableColumnRow
+      key={col.id}
+      col={col}
+      draggable={mounted}
+      onToggleVisibility={onToggleVisibility}
+      onToggleEditable={onToggleEditable}
+      onSensitivityChange={onSensitivityChange}
+      onArchive={onArchive}
+    />
+  ));
+
   return (
     <>
       <div className="dir-settings__toolbar">
@@ -319,47 +337,42 @@ function ColumnsTab({
           <Plus size={14} /> Custom Column
         </Button>
       </div>
-      <DndContext id="col-sort" sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={active.map((c) => c.id)} strategy={verticalListSortingStrategy}>
-          <div className="dir-settings__col-list">
-            {active.map((col) => (
-              <SortableColumnRow
-                key={col.id}
-                col={col}
-                onToggleVisibility={onToggleVisibility}
-                onToggleEditable={onToggleEditable}
-                onSensitivityChange={onSensitivityChange}
-                onArchive={onArchive}
-              />
-            ))}
-          </div>
-        </SortableContext>
-      </DndContext>
+      {mounted ? (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={active.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+            <div className="dir-settings__col-list">{rows}</div>
+          </SortableContext>
+        </DndContext>
+      ) : (
+        <div className="dir-settings__col-list">{rows}</div>
+      )}
     </>
   );
 }
 
 function SortableColumnRow({
-  col, onToggleVisibility, onToggleEditable, onSensitivityChange, onArchive,
+  col, draggable, onToggleVisibility, onToggleEditable, onSensitivityChange, onArchive,
 }: {
   col: ColumnRow;
+  draggable: boolean;
   onToggleVisibility: (col: ColumnRow) => void;
   onToggleEditable: (col: ColumnRow) => void;
   onSensitivityChange: (col: ColumnRow, level: string) => void;
   onArchive: (id: string) => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: col.id });
+  const sortable = useSortable({ id: col.id, disabled: !draggable });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = sortable;
 
-  const style = {
+  const style = draggable ? {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
     zIndex: isDragging ? 10 : undefined,
-  };
+  } : undefined;
 
   return (
     <div ref={setNodeRef} style={style} className="dir-settings__col-row">
-      <button type="button" className="dir-settings__col-grip" {...attributes} {...listeners}>
+      <button type="button" className="dir-settings__col-grip" {...(draggable ? { ...attributes, ...listeners } : {})}>
         <GripVertical size={16} />
       </button>
       <div className="dir-settings__col-info">

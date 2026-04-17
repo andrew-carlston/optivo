@@ -12,6 +12,7 @@ export {
   getColumns,
   updateColumn,
   createCustomColumn,
+  reorderColumns,
   archiveColumn,
 } from "./column-actions";
 
