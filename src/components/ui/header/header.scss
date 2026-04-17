@@ -46,31 +46,11 @@
   }
 
   &__nav-item {
-    display: flex;
-    align-items: center;
+    @include nav-pill;
     gap: $space-xs;
-    padding: $space-xs $space-md;
-    border-radius: $radius-full;
-    font-size: $text-sm;
-    font-weight: 500;
-    color: var(--muted-fg);
-    text-decoration: none;
-    transition: all 0.15s;
-    border: 1px solid transparent;
-    white-space: nowrap;
 
-    &:hover {
-      color: var(--fg);
-      background: var(--surface-2);
-      border-color: var(--border);
-    }
-
-    &--active {
-      color: var(--pop);
-      background: var(--pop-muted);
-      border-color: var(--pop);
-      font-weight: 600;
-    }
+    &:hover { @include nav-pill-hover; }
+    &--active { @include nav-pill-active; }
 
     svg { width: 16px; height: 16px; }
   }

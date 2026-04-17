@@ -20,8 +20,9 @@
     }
   }
 
-  // ── Tabs (underline style) ──
+  // ── Tabs (underline style with fade-scroll hints) ──
   &__tabs {
+    position: relative;
     display: flex;
     gap: $space-xs;
     border-bottom: 1px solid var(--border);
@@ -31,6 +32,34 @@
     &::-webkit-scrollbar {
       display: none;
     }
+
+    // Fade hints — masked via CSS; JS toggles data attrs
+    &::before,
+    &::after {
+      content: "";
+      position: sticky;
+      top: 0;
+      bottom: 0;
+      width: 32px;
+      flex-shrink: 0;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    &::before {
+      left: 0;
+      background: linear-gradient(to right, var(--surface), transparent);
+    }
+
+    &::after {
+      right: 0;
+      background: linear-gradient(to left, var(--surface), transparent);
+    }
+
+    &[data-scroll-left="true"]::before { opacity: 1; }
+    &[data-scroll-right="true"]::after { opacity: 1; }
   }
 
   &__tab {
@@ -113,75 +142,15 @@
     min-width: 0;
   }
 
-  // ── Grid ──
-  &__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: $space-sm;
-
-    @media (max-width: 480px) {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  // ── Card ──
-  &__card {
-    display: flex;
-    flex-direction: column;
-    gap: $space-xs;
-
-    &:not(&--archived) {
-      cursor: pointer;
-    }
-
-    &--archived {
-      opacity: 0.5;
-    }
-  }
-
-  &__card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: $space-sm;
-  }
-
-  &__card-title {
-    display: flex;
-    align-items: center;
-    gap: $space-sm;
-    font-weight: 600;
-    font-size: $text-base;
-    color: var(--fg);
-    min-width: 0;
-  }
-
-  &__card-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  &__card-actions {
-    display: flex;
-    align-items: center;
-    gap: 2px;
+  // Slimmer search in the new toolbar (caps width, keeps toggle + button tight)
+  &__toolbar-search {
+    width: 260px;
+    max-width: 100%;
     flex-shrink: 0;
-  }
 
-  &__card-meta {
-    display: flex;
-    align-items: center;
-    gap: $space-sm;
-    font-size: $text-xs;
-    color: var(--muted-fg);
-    flex-wrap: wrap;
-  }
-
-  &__card-meta-item {
-    display: flex;
-    align-items: center;
-    gap: $space-xs;
+    @media (max-width: 768px) {
+      width: 100%;
+    }
   }
 
   // ── Empty ──
@@ -192,132 +161,165 @@
     font-size: $text-sm;
   }
 
-  // ── Dialog ──
-  &__overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: $z-modal;
-    animation: org-fade-in 0.15s ease;
+}
+
+// ── Data Table ──
+
+.org-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: $text-sm;
+
+  &__wrap {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: $radius-md;
+    background: var(--surface);
   }
 
-  &__dialog {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: min(560px, 94vw);
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: $radius-lg;
-    box-shadow: var(--shadow-lg);
-    z-index: $z-modal;
-    animation: org-fade-in 0.15s ease;
-    overflow: hidden;
+  thead tr {
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+  }
 
-    &:focus {
-      outline: none;
+  th {
+    text-align: left;
+    font-size: $text-xs;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted-fg);
+    padding: $space-sm $space-md;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: $space-sm $space-md;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  &__row {
+    transition: background 0.12s;
+
+    &:hover {
+      background: var(--surface-2);
+    }
+
+    &--archived {
+      opacity: 0.6;
     }
   }
 
-  // ── Dialog header (sticky) ──
-  &__dialog-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: $space-md;
-    padding: $space-lg $space-xl;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    flex-shrink: 0;
+  &__cell-name {
+    font-weight: 500;
   }
 
-  &__dialog-header-left {
-    display: flex;
+  &__name-wrap {
+    display: inline-flex;
     align-items: center;
     gap: $space-sm;
     min-width: 0;
-    flex: 1;
+    flex-wrap: wrap;
   }
 
-  // Cost Code input in the dialog header (top-right)
-  &__dialog-cost {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    flex-shrink: 0;
-    width: 180px;
-  }
-
-  &__dialog-cost-label {
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--muted-fg);
-  }
-
-  &__dialog-cost-wrap {
-    display: flex;
+  &__name-btn {
+    all: unset;
+    display: inline-flex;
     align-items: center;
-    gap: $space-xs;
+    gap: $space-sm;
+    cursor: text;
+    color: var(--fg);
+    padding: 4px $space-xs;
+    border-radius: $radius-sm;
+    min-width: 0;
+    transition: background 0.12s;
 
-    .btn {
-      min-height: 32px;
-      width: 32px;
-      padding: 0;
-      flex-shrink: 0;
+    &:hover:not(:disabled) {
+      background: var(--surface-2);
+    }
+
+    &:disabled {
+      cursor: default;
     }
   }
 
-  &__dialog-cost-input {
-    height: 32px !important;
-    min-height: 32px !important;
-    font-size: $text-sm;
-    padding: 4px $space-sm !important;
-    text-transform: uppercase;
+  &__name-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  &__dialog-header-icon {
-    width: 32px;
+  // ── Inline input (name + cost code in edit mode) ──
+  &__input {
+    width: 100%;
     height: 32px;
-    border-radius: $radius-md;
-    background: var(--pop-muted);
-    color: var(--pop);
+    padding: 4px $space-sm;
+    background: var(--surface);
+    color: var(--fg);
+    border: 1px solid var(--pop);
+    border-radius: $radius-sm;
+    font: inherit;
+    font-size: $text-sm;
+    outline: none;
+    box-shadow: 0 0 0 2px var(--pop-muted);
+
+    // Cost code edit mode: just a text line, no chunky box/shadow
+    &--code {
+      text-transform: uppercase;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: $text-sm;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--pop);
+      border-radius: 0;
+      box-shadow: none;
+      padding: 4px 0;
+      height: auto;
+    }
+  }
+
+  // ── Cost code cell (flat — no pill/badge look) ──
+  &__code-wrap {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+    gap: 4px;
   }
 
-  &__dialog-title {
-    font-size: $text-lg;
-    font-weight: 600;
+  &__code-btn {
+    all: unset;
+    cursor: text;
+    padding: 4px 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: $text-sm;
     color: var(--fg);
-    margin: 0;
-    line-height: 1.2;
+    transition: color 0.12s;
+
+    &:hover:not(:disabled) {
+      color: var(--pop);
+    }
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.6;
+    }
   }
 
-  &__dialog-subtitle {
-    font-size: $text-xs;
-    color: var(--muted-fg);
-    margin: 2px 0 0;
-  }
-
-  &__dialog-close {
+  &__icon-btn {
     all: unset;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: $touch-min;
-    height: $touch-min;
-    border-radius: $radius-md;
+    width: 24px;
+    height: 24px;
+    border-radius: $radius-sm;
     color: var(--muted-fg);
     cursor: pointer;
-    flex-shrink: 0;
     transition: background 0.12s, color 0.12s;
 
     &:hover {
@@ -326,52 +328,165 @@
     }
   }
 
-  // ── Dialog body (scrolls) ──
-  &__dialog-body {
-    overflow-y: auto;
-    padding: $space-lg $space-xl;
-    flex: 1;
+  &__color-label {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-xs;
+    cursor: pointer;
+    position: relative;
   }
 
-  // ── Sections within body ──
-  &__dialog-section {
-    & + & {
-      margin-top: $space-xl;
-      padding-top: $space-xl;
-      border-top: 1px solid var(--border);
+  &__color-dot {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    border-radius: $radius-full;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    transition: border-color 0.12s;
+
+    .org-table__color-label:hover & {
+      border-color: var(--fg);
     }
   }
 
-  &__dialog-section-title {
-    font-size: $text-xs;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+  &__color-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+  }
+
+  &__muted {
     color: var(--muted-fg);
-    margin: 0 0 $space-md;
   }
 
-  &__dialog-row {
-    display: flex;
-    gap: $space-md;
+  &__cell-count {
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted-fg);
+  }
 
-    > * {
-      flex: 1;
-      min-width: 0;
+  &__cell-actions {
+    text-align: right;
+    white-space: nowrap;
+
+    .btn {
+      margin-left: 2px;
+    }
+  }
+
+  &__select {
+    min-height: 32px !important;
+    font-size: $text-sm;
+  }
+
+  &__empty {
+    text-align: center;
+    color: var(--muted-fg);
+    padding: $space-2xl;
+    font-size: $text-sm;
+    border: 1px dashed var(--border);
+    border-radius: $radius-md;
+  }
+
+  &__empty-row {
+    text-align: center;
+    color: var(--muted-fg);
+    padding: $space-xl;
+    font-size: $text-sm;
+
+    strong {
+      color: var(--fg);
+    }
+  }
+
+  // ── Draft row (inline add) ──
+  &__row--draft {
+    background: var(--surface-2);
+
+    &:hover {
+      background: var(--surface-2);
     }
 
-    @media (max-width: 480px) {
-      flex-direction: column;
+    td {
+      padding-top: $space-sm;
+      padding-bottom: $space-sm;
+      border-bottom: 2px solid var(--pop);
+    }
+
+    // Draft inputs should look like regular form inputs — not the
+    // subtle click-to-edit style used for existing rows.
+    .org-table__input {
+      height: 38px;
+      font-size: $text-sm;
+    }
+
+    .select__trigger {
+      min-height: 38px;
     }
   }
 
-  &__dialog-fields {
-    display: flex;
-    flex-direction: column;
-    gap: $space-md;
+  // ── Expand row (location details) ──
+  &__cell-expand {
+    padding-left: $space-sm !important;
+    padding-right: 0 !important;
   }
 
-  &__dialog-label {
+  &__expand-row td {
+    padding: 0;
+    background: var(--surface-2);
+    border-bottom: 2px solid var(--pop);
+  }
+
+  // When the draft expand row follows a draft row, remove the
+  // double-border between them.
+  &__row--draft + &__expand-row td {
+    border-top: none;
+  }
+
+  &__expand-body {
+    padding: $space-md $space-lg $space-lg;
+  }
+
+  &__expand-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: $space-md;
+  }
+}
+
+// ── Location Fields (inline form) ──
+
+.loc-fields {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $space-md;
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+
+    &--half {
+      grid-template-columns: 1fr 1fr;
+
+      // Only fills the first column
+      > :only-child {
+        grid-column: 1;
+      }
+    }
+  }
+
+  &__label {
     display: flex;
     flex-direction: column;
     gap: $space-xs;
@@ -380,56 +495,31 @@
     color: var(--fg);
   }
 
-  &__dialog-toggle {
-    flex-direction: row;
+  &__toggle {
+    display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: $space-md;
-    background: var(--surface-2);
+    gap: $space-md;
+    padding: $space-sm $space-md;
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: $radius-md;
-    cursor: pointer;
   }
 
-  &__dialog-toggle-info {
+  &__toggle-info {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    min-width: 0;
   }
 
-  &__dialog-toggle-title {
+  &__toggle-title {
     font-size: $text-sm;
     font-weight: 600;
     color: var(--fg);
   }
 
-  &__dialog-toggle-desc {
+  &__toggle-desc {
     font-size: $text-xs;
     color: var(--muted-fg);
   }
-
-  // ── Dialog footer (sticky) ──
-  &__dialog-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: $space-sm;
-    padding: $space-md $space-xl;
-    border-top: 1px solid var(--border);
-    background: var(--surface);
-    flex-shrink: 0;
-  }
-
-  // Confirmation dialog prose (archive dialog body text)
-  &__dialog-text {
-    font-size: $text-sm;
-    color: var(--muted-fg);
-    margin: 0 0 $space-lg;
-    line-height: 1.5;
-  }
-}
-
-@keyframes org-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }

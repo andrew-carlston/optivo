@@ -93,7 +93,7 @@ live under `/admin/platform/*` and only show in the Settings sidebar for super u
 /admin/hr, /staffing, /cost, /analytics              (stubs)
 /admin/profile
 /admin/settings                 Settings hub
-/admin/settings/org             Organization (Divisions, Locations, LOBs, Departments, Positions)
+/admin/settings/org             Organization (7 tabs: Divisions, Departments, LOBs, Roles, Locations, Employment Types, Working Statuses)
 /admin/settings/directory       Directory column config + statuses + default view
 /admin/settings/integrations, /points, /templates, /templates/[id]
 
@@ -115,7 +115,7 @@ live under `/admin/platform/*` and only show in the Settings sidebar for super u
 /[company]/hr, /staffing, /cost, /analytics
 /[company]/profile
 /[company]/settings              Settings hub
-/[company]/settings/org          Organization (Divisions/Locations/LOBs/Departments/Positions)
+/[company]/settings/org          Organization (7 tabs: Divisions, Departments, LOBs, Roles, Locations, Employment Types, Working Statuses)
 /[company]/settings/directory    Directory column config + statuses
 /[company]/settings/integrations, /points, /templates, /templates/[id]
 ```
@@ -129,12 +129,15 @@ core.*          companies (incl. branch_host), users, user_company_access, confi
                 field_sensitivity, template_field_overrides (ReBAC),
                 tags, tag_assignments
 hr.*            divisions, lobs, departments, positions, locations,
-                employees, employee_locations (M2M)
-                — every org table has cost_code; locations have full address +
-                  is_remote + IANA timezone
+                employees, employee_locations (M2M),
+                employment_types, working_statuses
+                — every org table has cost_code (flat PREFIX-LOCAL format: DIV-NA, DEPT-OPS)
+                — locations have full address + is_remote + IANA timezone
                 — Hierarchy: Division → LOB → Department → Position;
                   Location is parallel; Department links LOB + Location;
                   Position links Division + LOB + Department + Location
+                — employment_types: Full-Time, Part-Time, Contractor, Temp, etc.
+                — working_statuses: Active, On Leave, Terminated, Resigned (with color)
 directory.*     columns (system + custom column registry per company),
                 status_options (configurable employment statuses),
                 saved_views (per-user view prefs),
@@ -216,7 +219,8 @@ src/
                                 Points & Attendance, Integrations, Access Templates)
         page.tsx                General settings (stub)
         org/
-          page.tsx              Organization settings (stub)
+          page.tsx              Organization settings (Server Component, fetches data SSR)
+          loading.tsx           Skeleton fallback (Suspense boundary)
         points/
           page.tsx              Points & Attendance settings (stub)
         integrations/
@@ -279,15 +283,23 @@ src/
     auth/
     hr/
       actions/
-        org-actions.ts          CRUD for departments, divisions, lobs, positions, locations
-                                — all share cost_code; getOrgStructureAll batched loader
+        org-actions.ts          CRUD for divisions, locations, lobs, departments, positions,
+                                employment_types, working_statuses — all share cost_code;
+                                getOrgStructureAll batched loader (7 entity + count queries)
       components/
-        org-settings/           Settings page for the org structure
-          org-settings.tsx      Main component (tabs, dialogs, state)
-          _shared.ts            Constants (TABS, NONE, EMPTY_LOC), helpers (toId)
-          cost-code.ts          Auto-gen + cascading composition (NA:R:S:T1:T1A)
-          org-cards.tsx         Per-entity card components (DivisionCard, LocationCard, etc.)
-          location-fields.tsx   Location-specific form fields (country/state/city, timezone)
+        org-settings/           Settings page for the org structure (7 tabs, inline data table)
+          org-settings.tsx      Main component — takes companySlug + initialData from Server
+                                Component page; optimistic updates + background refresh;
+                                calls server actions directly (no callback prop threading)
+          org-table.tsx         Data table with inline editing: click-to-edit name/cost-code,
+                                inline parent dropdowns, active toggle, archive/restore;
+                                draft row for adding new items; location expand row
+          org-skeleton.tsx      Loading skeleton (used by loading.tsx Suspense boundary)
+          _shared.ts            Tab definitions (7 tabs with prefix), helpers (toId, NONE)
+          cost-code.ts          Flat PREFIX-LOCAL cost codes (DIV-NA, DEPT-OPS);
+                                auto-gen with collision detection; buildFullPath for reports
+          location-fields.tsx   Location form fields (country/state/city cascading dropdowns,
+                                timezone auto-fill, remote toggle) — own loc-fields CSS
     directory/
       actions/
         _shared.ts, _employee-shared.ts, _lock-shared.ts   Types + helpers
@@ -359,7 +371,7 @@ src/
                                 field_sensitivity, template_field_overrides),
                                 tags, tag_assignments
       hr.ts                     divisions, lobs, departments, positions, locations,
-                                employees, employee_locations
+                                employees, employee_locations, employment_types, working_statuses
       directory.ts              columns, status_options, saved_views, row_locks, pending_changes
       attendance.ts
       realtime.ts
@@ -419,6 +431,11 @@ npx drizzle-kit studio
 - Feature shells: CompanyShell, SettingsShell (in `features/core/components/`, not the UI library)
   AdminShell was deleted — admin panel uses CompanyShell with the "admin" company
 - Dropdown style: pill-shaped rows, filled circle check icons, hover border
+- **nav-pill mixin** (`_tokens.scss`): shared `@include nav-pill` + `nav-pill-hover` + `nav-pill-active`
+  for all pill-shaped interactive elements (header nav, sidebar links, dropdown items, select options)
+- **Borders use `box-shadow: inset 0 0 0 1px`** instead of CSS `border` on rounded elements
+  (cards, inputs, selects, nav pills) — renders smooth anti-aliased corners with `border-radius`
+- Active states: text color + border only (no background fill), hover doesn't override active
 - Skeletons: left-to-right shimmer, 2.5s cycle, deterministic widths
 - All timestamps UTC in DB, displayed in user's timezone
 - `cn()` utility for conditional classnames
@@ -464,8 +481,8 @@ pages. Super users on the admin company see extra sections in the sidebar:
 - **Access** (super on admin only): Platform Users, Templates, Tags
 - **Platform** (super on admin only): Billing, Analytics, Integrations, Settings
 
-Sidebar is a sticky surface card with pill-shaped nav items matching the header
-nav pattern (transparent border → `--border` on hover → `--pop` on active).
+Sidebar is a sticky surface card with pill-shaped nav items using the shared
+`nav-pill` mixin (`box-shadow` border on hover → `--pop` text/border on active, no bg fill).
 
 ## Key Principles
 
@@ -487,6 +504,9 @@ nav pattern (transparent border → `--border` on hover → `--pop` on active).
 16. **Hard redirects on sign-out** — `window.location.href` (not `router.push`) to clear client state
 17. **Skeleton loading states** — all list pages show skeleton shimmer while loading (never "Loading..." text)
 18. **Login redirect skeleton** — login pages show AuthCard skeleton while redirecting after authentication
+19. **Server Component pages + optimistic mutations** — pages fetch data server-side (no client waterfall), client components receive `initialData` + `companySlug`, mutations update local state instantly then background-refresh via `useTransition`
+20. **Shared nav-pill mixin** — `@include nav-pill` in `_tokens.scss` for all pill-shaped interactive elements; active = text + border only, no bg fill
+21. **box-shadow borders on rounded elements** — `box-shadow: inset 0 0 0 1px` instead of CSS `border` for smooth anti-aliased corners
 
 ## ReBAC (Relationship-Based Access Control)
 

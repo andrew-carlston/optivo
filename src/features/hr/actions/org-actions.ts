@@ -1,6 +1,6 @@
 "use server";
 
-import { eq, and, count, sql } from "drizzle-orm";
+import { eq, and, count } from "drizzle-orm";
 import { hr } from "@/db/schema";
 import { getActionContext, checkAccess } from "@/features/core/lib/access";
 
@@ -78,6 +78,25 @@ export type LocationRow = {
   employeeCount: number;
 };
 
+export type EmploymentTypeRow = {
+  id: string;
+  name: string;
+  costCode: string | null;
+  active: boolean;
+  sortOrder: number;
+  employeeCount: number;
+};
+
+export type WorkingStatusRow = {
+  id: string;
+  name: string;
+  color: string;
+  costCode: string | null;
+  active: boolean;
+  sortOrder: number;
+  employeeCount: number;
+};
+
 // ── Helpers ──
 
 async function requireOrgAccess(branchDb: any, user: any, action: string) {
@@ -97,6 +116,8 @@ export async function getOrgStructureAll(companySlug: string): Promise<{
   lobs: LobRow[];
   positions: PositionRow[];
   locations: LocationRow[];
+  employmentTypes: EmploymentTypeRow[];
+  workingStatuses: WorkingStatusRow[];
 }> {
   const ctx = await getActionContext(companySlug);
   await requireOrgAccess(ctx.branchDb, ctx.user, "view");
@@ -105,8 +126,8 @@ export async function getOrgStructureAll(companySlug: string): Promise<{
   const activeEmp = and(eq(hr.employees.company_id, companyId), eq(hr.employees.active, true));
 
   const [
-    depts, divs, lobsRows, posRows, locRows,
-    empByDept, empByDiv, empByLob, empByPos, empByLoc,
+    depts, divs, lobsRows, posRows, locRows, etRows, wsRows,
+    empByDept, empByDiv, empByLob, empByPos, empByLoc, empByEt, empByWs,
   ] = await Promise.all([
     ctx.branchDb.select({
       id: hr.departments.id, name: hr.departments.name, parentId: hr.departments.parent_id,
@@ -146,6 +167,18 @@ export async function getOrgStructureAll(companySlug: string): Promise<{
       active: hr.locations.active, sortOrder: hr.locations.sort_order,
     }).from(hr.locations).where(eq(hr.locations.company_id, companyId)).orderBy(hr.locations.sort_order, hr.locations.name),
 
+    ctx.branchDb.select({
+      id: hr.employmentTypes.id, name: hr.employmentTypes.name,
+      costCode: hr.employmentTypes.cost_code,
+      active: hr.employmentTypes.active, sortOrder: hr.employmentTypes.sort_order,
+    }).from(hr.employmentTypes).where(eq(hr.employmentTypes.company_id, companyId)).orderBy(hr.employmentTypes.sort_order, hr.employmentTypes.name),
+
+    ctx.branchDb.select({
+      id: hr.workingStatuses.id, name: hr.workingStatuses.name, color: hr.workingStatuses.color,
+      costCode: hr.workingStatuses.cost_code,
+      active: hr.workingStatuses.active, sortOrder: hr.workingStatuses.sort_order,
+    }).from(hr.workingStatuses).where(eq(hr.workingStatuses.company_id, companyId)).orderBy(hr.workingStatuses.sort_order, hr.workingStatuses.name),
+
     ctx.branchDb.select({ id: hr.employees.department_id, count: count() })
       .from(hr.employees).where(activeEmp).groupBy(hr.employees.department_id),
 
@@ -164,6 +197,14 @@ export async function getOrgStructureAll(companySlug: string): Promise<{
       .innerJoin(hr.employees, eq(hr.employees.id, hr.employeeLocations.employee_id))
       .where(activeEmp)
       .groupBy(hr.employeeLocations.location_id),
+
+    // employment_type / working_status: employees.employment_type + employees.employment_status
+    // are text slugs, not FKs — match by lowercased name
+    ctx.branchDb.select({ name: hr.employees.employment_type, count: count() })
+      .from(hr.employees).where(activeEmp).groupBy(hr.employees.employment_type),
+
+    ctx.branchDb.select({ name: hr.employees.employment_status, count: count() })
+      .from(hr.employees).where(activeEmp).groupBy(hr.employees.employment_status),
   ]);
 
   const deptCount = new Map(empByDept.map((r: any) => [r.id, Number(r.count)]));
@@ -171,6 +212,8 @@ export async function getOrgStructureAll(companySlug: string): Promise<{
   const lobCount = new Map(empByLob.map((r: any) => [r.id, Number(r.count)]));
   const posCount = new Map(empByPos.map((r: any) => [r.id, Number(r.count)]));
   const locCount = new Map(empByLoc.map((r: any) => [r.id, Number(r.count)]));
+  const etCount = new Map(empByEt.map((r: any) => [String(r.name ?? "").toLowerCase(), Number(r.count)]));
+  const wsCount = new Map(empByWs.map((r: any) => [String(r.name ?? "").toLowerCase(), Number(r.count)]));
   const deptNames = new Map(depts.map((d: any) => [d.id, d.name]));
   const lobNames = new Map(lobsRows.map((l: any) => [l.id, l.name]));
   const locNames = new Map(locRows.map((l: any) => [l.id, l.name]));
@@ -229,6 +272,18 @@ export async function getOrgStructureAll(companySlug: string): Promise<{
       costCode: l.costCode,
       active: l.active, sortOrder: l.sortOrder ?? 0,
       employeeCount: locCount.get(l.id) ?? 0,
+    })),
+    employmentTypes: etRows.map((r: any) => ({
+      id: r.id, name: r.name,
+      costCode: r.costCode,
+      active: r.active, sortOrder: r.sortOrder ?? 0,
+      employeeCount: etCount.get(String(r.name ?? "").toLowerCase()) ?? 0,
+    })),
+    workingStatuses: wsRows.map((r: any) => ({
+      id: r.id, name: r.name, color: r.color ?? "#6b7280",
+      costCode: r.costCode,
+      active: r.active, sortOrder: r.sortOrder ?? 0,
+      employeeCount: wsCount.get(String(r.name ?? "").toLowerCase()) ?? 0,
     })),
   };
 }
@@ -751,4 +806,106 @@ export async function archivePosition(companySlug: string, id: string): Promise<
         eq(hr.positions.company_id, ctx.company.id),
       ),
     );
+}
+
+// ── Employment Types ──
+
+type EmploymentTypeInput = {
+  name?: string;
+  costCode?: string | null;
+  sortOrder?: number;
+  active?: boolean;
+};
+
+function mapEtInput(data: EmploymentTypeInput): Record<string, any> {
+  const u: Record<string, any> = {};
+  if (data.name !== undefined) u.name = data.name;
+  if (data.costCode !== undefined) u.cost_code = data.costCode;
+  if (data.sortOrder !== undefined) u.sort_order = data.sortOrder;
+  if (data.active !== undefined) u.active = data.active;
+  return u;
+}
+
+export async function createEmploymentType(companySlug: string, data: EmploymentTypeInput & { name: string }): Promise<string> {
+  const ctx = await getActionContext(companySlug);
+  await requireOrgAccess(ctx.branchDb, ctx.user, "edit");
+
+  const [row] = await ctx.branchDb
+    .insert(hr.employmentTypes)
+    .values({ company_id: ctx.company.id, ...mapEtInput(data) })
+    .returning({ id: hr.employmentTypes.id });
+
+  return row.id;
+}
+
+export async function updateEmploymentType(companySlug: string, id: string, data: EmploymentTypeInput): Promise<void> {
+  const ctx = await getActionContext(companySlug);
+  await requireOrgAccess(ctx.branchDb, ctx.user, "edit");
+
+  await ctx.branchDb
+    .update(hr.employmentTypes)
+    .set(mapEtInput(data))
+    .where(and(eq(hr.employmentTypes.id, id), eq(hr.employmentTypes.company_id, ctx.company.id)));
+}
+
+export async function archiveEmploymentType(companySlug: string, id: string): Promise<void> {
+  const ctx = await getActionContext(companySlug);
+  await requireOrgAccess(ctx.branchDb, ctx.user, "edit");
+
+  await ctx.branchDb
+    .update(hr.employmentTypes)
+    .set({ active: false })
+    .where(and(eq(hr.employmentTypes.id, id), eq(hr.employmentTypes.company_id, ctx.company.id)));
+}
+
+// ── Working Statuses ──
+
+type WorkingStatusInput = {
+  name?: string;
+  color?: string;
+  costCode?: string | null;
+  sortOrder?: number;
+  active?: boolean;
+};
+
+function mapWsInput(data: WorkingStatusInput): Record<string, any> {
+  const u: Record<string, any> = {};
+  if (data.name !== undefined) u.name = data.name;
+  if (data.color !== undefined) u.color = data.color;
+  if (data.costCode !== undefined) u.cost_code = data.costCode;
+  if (data.sortOrder !== undefined) u.sort_order = data.sortOrder;
+  if (data.active !== undefined) u.active = data.active;
+  return u;
+}
+
+export async function createWorkingStatus(companySlug: string, data: WorkingStatusInput & { name: string }): Promise<string> {
+  const ctx = await getActionContext(companySlug);
+  await requireOrgAccess(ctx.branchDb, ctx.user, "edit");
+
+  const [row] = await ctx.branchDb
+    .insert(hr.workingStatuses)
+    .values({ company_id: ctx.company.id, ...mapWsInput(data) })
+    .returning({ id: hr.workingStatuses.id });
+
+  return row.id;
+}
+
+export async function updateWorkingStatus(companySlug: string, id: string, data: WorkingStatusInput): Promise<void> {
+  const ctx = await getActionContext(companySlug);
+  await requireOrgAccess(ctx.branchDb, ctx.user, "edit");
+
+  await ctx.branchDb
+    .update(hr.workingStatuses)
+    .set(mapWsInput(data))
+    .where(and(eq(hr.workingStatuses.id, id), eq(hr.workingStatuses.company_id, ctx.company.id)));
+}
+
+export async function archiveWorkingStatus(companySlug: string, id: string): Promise<void> {
+  const ctx = await getActionContext(companySlug);
+  await requireOrgAccess(ctx.branchDb, ctx.user, "edit");
+
+  await ctx.branchDb
+    .update(hr.workingStatuses)
+    .set({ active: false })
+    .where(and(eq(hr.workingStatuses.id, id), eq(hr.workingStatuses.company_id, ctx.company.id)));
 }

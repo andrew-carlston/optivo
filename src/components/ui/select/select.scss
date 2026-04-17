@@ -12,7 +12,7 @@
   width: 100%;
   height: 40px;
   padding: 0 14px;
-  border: 1px solid var(--border);
+  border: none;
   border-radius: $radius-full;
   background: var(--input-bg);
   color: var(--fg);
@@ -20,12 +20,12 @@
   font-family: inherit;
   cursor: pointer;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: inset 0 0 0 1px var(--border);
+  transition: box-shadow 0.2s;
 
-  &:hover { border-color: var(--border-strong); }
+  &:hover { box-shadow: inset 0 0 0 1px var(--border-strong); }
   &:focus, &[data-state="open"] {
-    border-color: var(--pop);
-    box-shadow: 0 0 0 3px var(--pop-muted);
+    box-shadow: inset 0 0 0 1px var(--pop), 0 0 0 3px var(--pop-muted);
   }
 
   > svg, [data-radix-select-icon] { color: var(--muted-fg); flex-shrink: 0; width: 16px; height: 16px; }
@@ -69,7 +69,7 @@
   font-weight: 500;
   white-space: nowrap;
   flex-shrink: 0;
-  border: 1px solid var(--border);
+  box-shadow: inset 0 0 0 1px var(--border);
 }
 
 .select__chip-remove {
@@ -92,9 +92,8 @@
   width: var(--radix-select-trigger-width, var(--radix-popover-trigger-width, 100%));
   min-width: 200px;
   background: var(--surface);
-  border: 1px solid var(--border);
   border-radius: $radius-xl;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+  box-shadow: inset 0 0 0 1px var(--border), 0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
   z-index: $z-modal + 10;
   overflow: hidden;
   animation: selectAppear 0.15s ease;
@@ -165,43 +164,16 @@
 }
 
 .select__option {
-  display: flex;
-  align-items: center;
+  @include nav-pill;
   justify-content: space-between;
   width: 100%;
   padding: 6px 12px;
-  border: 1px solid transparent;
-  border-radius: $radius-full;
-  background: transparent;
-  color: var(--muted-fg);
   font-size: 13px;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  outline: none;
-  transition: all 0.15s;
   min-height: 32px;
 
-  // Hover or keyboard-highlighted — same visual treatment
-  &:hover, &[data-highlighted], &--highlighted {
-    background: var(--surface-2);
-    border-color: var(--border);
-    color: var(--fg);
-  }
-
-  // Selected — accent pill (matches active nav/sidebar item)
-  &--active, &[data-state="checked"] {
-    background: var(--pop-muted);
-    border-color: var(--pop);
-    color: var(--pop);
-    font-weight: 600;
-  }
-
-  // Selected + keyboard-highlighted (stronger emphasis)
-  &--active.select__option--highlighted {
-    border-color: var(--pop);
-    background: var(--pop-muted);
-  }
+  &:hover, &[data-highlighted], &--highlighted { @include nav-pill-hover; }
+  &--active, &[data-state="checked"] { @include nav-pill-active; }
+  &--active.select__option--highlighted { @include nav-pill-active; }
 
   [data-radix-select-item-indicator] { display: flex; }
 }

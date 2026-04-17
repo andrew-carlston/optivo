@@ -104,25 +104,9 @@
 }
 
 .user-menu__item {
-  display: flex;
-  align-items: center;
-  gap: $space-sm;
-  padding: $space-xs $space-md;
-  border-radius: $radius-full;
-  font-size: $text-sm;
-  font-weight: 500;
-  color: var(--muted-fg);
-  cursor: pointer;
-  outline: none;
-  transition: all 0.15s;
-  border: 1px solid transparent;
+  @include nav-pill;
 
-  &:hover,
-  &[data-highlighted] {
-    color: var(--fg);
-    background: var(--surface-2);
-    border-color: var(--border);
-  }
+  &:hover, &[data-highlighted] { @include nav-pill-hover; }
 
   svg {
     flex-shrink: 0;
@@ -137,7 +121,7 @@
     &[data-highlighted] {
       background: var(--danger);
       color: var(--danger-fg);
-      border-color: var(--danger);
+      box-shadow: inset 0 0 0 1px var(--danger);
 
       svg { color: var(--danger-fg); }
     }
@@ -156,13 +140,13 @@
   border-radius: $radius-md;
   color: var(--muted-fg);
   background: none;
-  border: 1px solid transparent;
+  box-shadow: inset 0 0 0 1px transparent;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: color 0.15s, box-shadow 0.15s, background 0.15s;
 
   &:hover {
     background: var(--surface-2);
-    border-color: var(--border);
+    box-shadow: inset 0 0 0 1px var(--border);
     color: var(--fg);
   }
 }
@@ -179,14 +163,14 @@
   border-radius: $radius-md;
   color: var(--muted-fg);
   background: none;
-  border: 1px solid transparent;
+  box-shadow: inset 0 0 0 1px transparent;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: color 0.15s, box-shadow 0.15s, background 0.15s;
 
   &:hover,
   &[data-state="open"] {
     background: var(--surface-2);
-    border-color: var(--border);
+    box-shadow: inset 0 0 0 1px var(--border);
     color: var(--fg);
   }
 }
@@ -216,47 +200,15 @@
 // ── Nav dropdown trigger (matches NavItem style) ──
 
 .nav-dropdown__trigger {
-  display: flex;
-  align-items: center;
+  @include nav-pill;
   gap: $space-xs;
-  padding: $space-xs $space-md;
-  border-radius: $radius-full;
-  font-size: $text-sm;
-  font-weight: 500;
-  color: var(--muted-fg);
-  background: none;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: all 0.15s;
-  white-space: nowrap;
-  font-family: inherit;
 
-  &:hover {
-    color: var(--fg);
-    background: var(--surface-2);
-    border-color: var(--border);
-  }
+  &:hover { @include nav-pill-hover; }
+  &--active { @include nav-pill-active; }
+  &[data-state="open"] { @include nav-pill-hover; }
 
-  &--active {
-    color: var(--pop);
-    background: var(--pop-muted);
-    border-color: var(--pop);
-    font-weight: 600;
-  }
-
-  &[data-state="open"] {
-    color: var(--fg);
-    background: var(--surface-2);
-    border-color: var(--border);
-  }
-
-  svg {
-    transition: transform 0.15s;
-  }
-
-  &[data-state="open"] svg {
-    transform: rotate(180deg);
-  }
+  svg { transition: transform 0.15s; }
+  &[data-state="open"] svg { transform: rotate(180deg); }
 }
 
 // ── Dropdown content ──
@@ -286,38 +238,11 @@
 // ── Dropdown item ──
 
 .nav-dropdown__item {
-  display: flex;
-  align-items: center;
-  gap: $space-sm;
-  padding: $space-xs $space-md;
-  border-radius: $radius-full;
-  font-size: $text-sm;
-  font-weight: 500;
-  color: var(--muted-fg);
-  cursor: pointer;
-  outline: none;
-  transition: all 0.15s;
-  border: 1px solid transparent;
+  @include nav-pill;
 
-  &:hover,
-  &[data-highlighted] {
-    color: var(--fg);
-    background: var(--surface-2);
-    border-color: var(--border);
-  }
+  &:hover, &[data-highlighted] { @include nav-pill-hover; }
+  &--active { @include nav-pill-active; }
 
-  &--active {
-    color: var(--pop);
-    background: var(--pop-muted);
-    border-color: var(--pop);
-    font-weight: 600;
-  }
-
-  svg {
-    flex-shrink: 0;
-  }
-
-  &--active svg {
-    color: var(--pop);
-  }
+  svg { flex-shrink: 0; }
+  &--active svg { color: var(--pop); }
 }

@@ -29,3 +29,45 @@ $z-dropdown: 100;
 $z-modal: 200;
 $z-toast: 300;
 $z-tooltip: 400;
+
+// ── Shared pill-nav pattern ──
+// Used by header nav, sidebar links, dropdown triggers/items, select options.
+// Call @include nav-pill; then add &--active / &:hover as needed.
+
+@mixin nav-pill {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  padding: $space-xs $space-md;
+  border-radius: $radius-full;
+  font-size: $text-sm;
+  font-weight: 500;
+  color: var(--muted-fg);
+  background: none;
+  box-shadow: inset 0 0 0 1px transparent;
+  text-decoration: none;
+  cursor: pointer;
+  outline: none;
+  transition: color 0.15s, box-shadow 0.15s, background 0.15s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+@mixin nav-pill-hover {
+  color: var(--fg);
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+@mixin nav-pill-active {
+  color: var(--pop);
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--pop);
+  font-weight: 600;
+
+  &:hover {
+    background: none;
+    box-shadow: inset 0 0 0 1px var(--pop);
+    color: var(--pop);
+  }
+}

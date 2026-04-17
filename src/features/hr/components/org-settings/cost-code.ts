@@ -1,15 +1,29 @@
-import type { DepartmentRow, DivisionRow, LobRow, LocationRow } from "@/features/hr/actions/org-actions";
+import type { DepartmentRow, DivisionRow, LobRow, LocationRow, PositionRow } from "@/features/hr/actions/org-actions";
 import type { Tab } from "./_shared";
-import { NONE, toIdOrNull } from "./_shared";
+import { TABS } from "./_shared";
 
 /**
- * Generate a LOCAL cost code suffix from a name. The full cascading code is
- * built by composeFullCode by joining the parent's full code with this local
- * suffix. Auto-tries variations to avoid collision with existing local codes.
+ * Cost code format: {ENTITY_PREFIX}-{LOCAL_CODE}
+ *   Division  → DIV-NA
+ *   Location  → LOC-HQ
+ *   LOB       → LOB-SUP
+ *   Department → DEPT-OPS
+ *   Role      → ROLE-PA
+ *   Employment Type → ET-FT
+ *   Working Status  → WS-AC
  *
- *   "North America"   → "NA"  (initials of each word)
- *   "Customer Care"   → "CC"
- *   "Engineering"     → "EN"  (first 2 chars when single word)
+ * Entities are NOT cascaded. Each one has its own flat code. A separate
+ * full-path string (e.g., "NA:R:S:OPS") can be built from the parent chain
+ * when needed for reporting — see buildFullPath below.
+ */
+
+function prefixForTab(tab: Tab): string {
+  return TABS.find((t) => t.key === tab)?.prefix ?? "";
+}
+
+/**
+ * Generate a short local code (e.g., "NA", "OPS", "FT") from a name.
+ * Falls back to numeric suffix if all initial variants collide.
  */
 export function generateLocalCode(name: string, existingLocals: Set<string>): string {
   const cleaned = name.trim().toUpperCase().replace(/[^A-Z0-9\s]/g, "");
@@ -38,36 +52,17 @@ export function generateLocalCode(name: string, existingLocals: Set<string>): st
 }
 
 /**
- * Extract the LOCAL portion of a stored full cost code (the part after the last colon).
- *   "NA:R:S:T1" → "T1"
- *   "NA"        → "NA"
+ * Extract the LOCAL portion of a stored cost code (the part after the last hyphen).
+ *   "DEPT-OPS"   → "OPS"
+ *   "DIV-NA"     → "NA"
+ *   "NA"         → "NA"  (legacy, no prefix)
  */
 export function localPart(code: string | null | undefined): string {
   if (!code) return "";
-  const idx = code.lastIndexOf(":");
+  const idx = code.lastIndexOf("-");
   return idx === -1 ? code : code.slice(idx + 1);
 }
 
-/**
- * Compose a Department cost code by interleaving location into the LOB chain:
- *   div + (location?) + lob_local + dept_local  →  "NA:R:S:T1"
- */
-function composeDeptCode(lobCode: string | null, locationCode: string | null, deptLocal: string): string {
-  if (!lobCode && !locationCode) return deptLocal;
-  if (!lobCode) return [locationCode, deptLocal].filter(Boolean).join(":");
-  const parts = lobCode.split(":");
-  const div = parts[0];
-  const lobLocal = parts[parts.length - 1];
-  if (parts.length === 1) {
-    return [locationCode, lobLocal, deptLocal].filter(Boolean).join(":");
-  }
-  return [div, locationCode, lobLocal, deptLocal].filter(Boolean).join(":");
-}
-
-/**
- * Form data shape for parent IDs needed by composeFullCode.
- * Each tab uses a subset.
- */
 export type ParentForm = {
   parentLocId?: string;
   divisionId?: string;
@@ -77,14 +72,14 @@ export type ParentForm = {
 };
 
 /**
- * Compose the full cost code for the current tab + selected parents + a local suffix.
- * Cascade order (always): Division → Location → LOB → Department → Position.
+ * Compose a flat PREFIX-LOCAL cost code for the given tab.
+ * Parent dropdowns are ignored here — each entity has its own standalone code.
  */
 export function composeFullCode(
   tab: Tab,
   local: string,
-  formData: ParentForm,
-  lookups: {
+  _formData: ParentForm,
+  _lookups: {
     divisions: DivisionRow[];
     locations: LocationRow[];
     lobs: LobRow[];
@@ -92,30 +87,85 @@ export function composeFullCode(
   },
 ): string {
   if (!local) return "";
+  const prefix = prefixForTab(tab);
+  return prefix ? `${prefix}-${local}` : local;
+}
+
+/**
+ * Build the full hierarchical path string for an entity (for reports / display).
+ * Walks up parents and joins local codes with ":". Returns empty string when no
+ * parents can be resolved.
+ *
+ *   Position "Phone Agent" under Dept "Ops" under LOB "Support" under Div "NA"
+ *   with Location "Remote" →  "NA:R:S:OPS:PA"
+ */
+export function buildFullPath(
+  tab: Tab,
+  costCode: string,
+  entity: {
+    parentId?: string | null;
+    divisionId?: string | null;
+    lobId?: string | null;
+    departmentId?: string | null;
+    locationId?: string | null;
+  },
+  lookups: {
+    divisions: DivisionRow[];
+    locations: LocationRow[];
+    lobs: LobRow[];
+    departments: DepartmentRow[];
+    positions?: PositionRow[];
+  },
+): string {
+  const own = localPart(costCode);
+  const chain: string[] = [];
+
+  const add = (code: string | null | undefined) => {
+    const c = localPart(code);
+    if (c) chain.push(c);
+  };
+
   switch (tab) {
     case "divisions":
-      return local;
+      return own;
     case "locations": {
-      const parent = lookups.locations.find((l) => l.id === toIdOrNull(formData.parentLocId ?? NONE));
-      return parent?.costCode ? `${parent.costCode}:${local}` : local;
+      const parent = entity.parentId ? lookups.locations.find((l) => l.id === entity.parentId) : null;
+      add(parent?.costCode);
+      break;
     }
     case "lobs": {
-      const div = lookups.divisions.find((d) => d.id === toIdOrNull(formData.divisionId ?? NONE));
-      return div?.costCode ? `${div.costCode}:${local}` : local;
+      const div = entity.divisionId ? lookups.divisions.find((d) => d.id === entity.divisionId) : null;
+      add(div?.costCode);
+      break;
     }
     case "departments": {
-      const lob = lookups.lobs.find((l) => l.id === toIdOrNull(formData.lobId ?? NONE));
-      const loc = lookups.locations.find((l) => l.id === toIdOrNull(formData.locationId ?? NONE));
-      return composeDeptCode(lob?.costCode ?? null, loc?.costCode ?? null, local);
+      const lob = entity.lobId ? lookups.lobs.find((l) => l.id === entity.lobId) : null;
+      if (lob) {
+        const div = lob.divisionId ? lookups.divisions.find((d) => d.id === lob.divisionId) : null;
+        add(div?.costCode);
+      }
+      const loc = entity.locationId ? lookups.locations.find((l) => l.id === entity.locationId) : null;
+      add(loc?.costCode);
+      add(lob?.costCode);
+      break;
     }
     case "positions": {
-      const dept = lookups.departments.find((d) => d.id === toIdOrNull(formData.deptId ?? NONE));
-      if (dept?.costCode) return `${dept.costCode}:${local}`;
-      // Fallback if no dept selected — compose from other parents
-      const lob = lookups.lobs.find((l) => l.id === toIdOrNull(formData.lobId ?? NONE));
-      const div = lookups.divisions.find((d) => d.id === toIdOrNull(formData.divisionId ?? NONE));
-      const loc = lookups.locations.find((l) => l.id === toIdOrNull(formData.locationId ?? NONE));
-      return composeDeptCode(lob?.costCode ?? div?.costCode ?? null, loc?.costCode ?? null, local);
+      const dept = entity.departmentId ? lookups.departments.find((d) => d.id === entity.departmentId) : null;
+      if (dept) {
+        const lob = dept.lobId ? lookups.lobs.find((l) => l.id === dept.lobId) : null;
+        if (lob) {
+          const div = lob.divisionId ? lookups.divisions.find((d) => d.id === lob.divisionId) : null;
+          add(div?.costCode);
+        }
+        const loc = dept.locationId ? lookups.locations.find((l) => l.id === dept.locationId) : null;
+        add(loc?.costCode);
+        add(lob?.costCode);
+        add(dept.costCode);
+      }
+      break;
     }
   }
+
+  chain.push(own);
+  return chain.filter(Boolean).join(":");
 }

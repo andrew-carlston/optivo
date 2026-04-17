@@ -101,40 +101,15 @@
   // ── Nav item ──
   // Matches the .nav-dropdown__trigger pattern from the header (pill + border).
   &__link {
-    display: flex;
-    align-items: center;
-    gap: $space-sm;
-    padding: $space-xs $space-md;
-    border-radius: $radius-full;
-    font-size: $text-sm;
-    font-weight: 500;
-    color: var(--muted-fg);
-    background: none;
-    border: 1px solid transparent;
-    text-decoration: none;
-    transition: all 0.15s;
-    white-space: nowrap;
+    @include nav-pill;
     line-height: 1.4;
 
-    svg {
-      flex-shrink: 0;
-    }
+    svg { flex-shrink: 0; }
 
-    &:hover {
-      color: var(--fg);
-      background: var(--surface-2);
-      border-color: var(--border);
-    }
-
+    &:hover { @include nav-pill-hover; }
     &--active {
-      color: var(--pop);
-      background: var(--pop-muted);
-      border-color: var(--pop);
-      font-weight: 600;
-
-      svg {
-        color: var(--pop);
-      }
+      @include nav-pill-active;
+      svg { color: var(--pop); }
     }
   }
 

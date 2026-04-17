@@ -115,3 +115,29 @@ export const employeeLocations = hr.table("employee_locations", {
   is_primary: boolean("is_primary").default(false),
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
+
+// ── Employment Types (Full-Time, Part-Time, Contractor, Temp, ...) ──
+
+export const employmentTypes = hr.table("employment_types", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  company_id: uuid("company_id").references(() => companies.id, { onDelete: "cascade" }).notNull(),
+  name: text("name").notNull(),
+  cost_code: text("cost_code"),
+  active: boolean("active").default(true),
+  sort_order: integer("sort_order").default(0),
+  created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
+// ── Working Statuses (Active, On Leave, Terminated, Resigned, ...) ──
+// Replaces the old directory.status_options table.
+
+export const workingStatuses = hr.table("working_statuses", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  company_id: uuid("company_id").references(() => companies.id, { onDelete: "cascade" }).notNull(),
+  name: text("name").notNull(),
+  color: text("color").default("#6b7280"),
+  cost_code: text("cost_code"),
+  active: boolean("active").default(true),
+  sort_order: integer("sort_order").default(0),
+  created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
